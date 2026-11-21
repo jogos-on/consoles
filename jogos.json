@@ -54,5 +54,17 @@
     "capa": "capas/ps2/midnight-club-3-dub-edition-remix.jpg",
     "categoria": "jogos",
     "senha": "dubsgamer.com"
+  },
+  {
+    "id": "tom-and-jerry-in-house-trap-ps1",
+    "titulo": "Tom and Jerry in House Trap",
+    "console": "ps1",
+    "categoria": "jogos",
+    "popular": false,
+    "genero": "Ação / Plataforma",
+    "ano": "2000",
+    "link": "https://dlc.coolrom.com/roms/psx/Tom%20and%20Jerry%20in%20House%20Trap.7z/9c-_tUD89EEQQ0Bxo_JSkR-h2zC-eGya898RyRHdOj0/1795334938/1024/2/?r=%2Froms%2Fpsx%2F39967%2FTom_and_Jerry_in_House_Trap.php",
+    "descricao": "Neste jogo, os jogadores controlam Tom ou Jerry em uma série de desafios dentro de uma casa. O objetivo é superar o adversário usando armadilhas e itens espalhados pelos cenários.",
+    "capa": "capas/ps1/tom-and-jerry-in-house-trap.jpg"
   }
 ]
