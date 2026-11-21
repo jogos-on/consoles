@@ -30,6 +30,15 @@ dialog::backdrop{background:#000a}
 .lrow{border-top:1px solid var(--bd);padding:10px 0}
 .lrow input{margin-top:6px}
 .lrow .nt{color:#b42318;font-size:.85rem;margin-top:4px}
+.gh{margin-top:14px;font-weight:bold;color:var(--ac);border-bottom:2px solid var(--bd);padding-bottom:4px}
+.it{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.it img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg);flex:none}
+.it .tt{flex:1;min-width:0}.it .tt b{display:block;overflow-wrap:anywhere}.it small{color:var(--mu)}
+.it button{margin:0;padding:6px 12px}
+#lista{max-height:62vh;overflow:auto;margin-top:6px}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.flt>*{flex:1 1 140px}
+#capaInfo{display:none;margin-top:10px;font-size:.9rem}
+#capaInfo img{max-width:120px;max-height:120px;border-radius:6px;display:block;margin-bottom:6px}
 #msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
 </style>
 </head>
@@ -62,8 +71,15 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarPagina()">Salvar e publicar configurações</button>
 </details>
 
+<details id="ct"><summary>Categorias</summary>
+  <div id="catl"></div>
+  <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
+  <button class="s" onclick="addCat()">Adicionar</button><button onclick="salvarCats()">Salvar e publicar categorias</button>
+</details>
+
 <details id="lt"><summary>Cadastro em lote com IA</summary>
   <label>Console de todos os jogos da lista<select id="lc"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Categoria<select id="lcat"></select></label>
   <label>Nomes dos jogos, um por linha (pode haver erros de digitação)<textarea id="ln" rows="6" placeholder="crash bandicoot&#10;resident evil 2&#10;tekken 3"></textarea></label>
   <button onclick="gerarLote()">Preencher lista com IA</button>
   <div id="lr"></div>
@@ -76,17 +92,22 @@ gemini-2.5-flash-lite</textarea></label>
   <b id="ft">Novo jogo</b>
   <label>Título<input id="titulo"></label>
   <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Categoria<select id="categoria"></select></label>
   <button class="s" onclick="preencherIA()">Preencher com IA</button>
   <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
   <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
   <label>Link<input id="link" type="url" placeholder="https://"></label>
+  <label>Senha para descompactar (opcional, ex.: dubsgamer.com)<input id="senha" autocomplete="off"></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
-  <label>Capa (imagem)<input id="arq" type="file" accept="image/*"></label>
+  <div id="capaInfo"><img id="capaPrev" alt="" style="display:none"><div id="capaTxt"></div></div>
+  <label>Capa (imagem). Deixe vazio para manter a capa atual<input id="arq" type="file" accept="image/*"></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" onclick="limpar()">Limpar</button>
 </div>
 
-<div class="box"><b>Jogos (<span id="n">0</span>)</b><div id="lista"></div>
+<div class="box"><b>Jogos (<span id="n">0</span>)</b>
+  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
+  <div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
 <dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
@@ -103,13 +124,82 @@ function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;lista()}).catch(()=>lista());
 
-function lista(){
-  $("n").textContent=jogos.length;
-  $("lista").innerHTML=jogos.map((j,i)=>`<div class="row"><span></span><button class="s" onclick="editar(${i})">Editar</button><button class="d" onclick="remover(${i})">Remover</button></div>`).join("");
-  document.querySelectorAll("#lista .row span").forEach((s,i)=>s.textContent=`${jogos[i].popular?"★ ":""}${jogos[i].titulo} (${jogos[i].console.toUpperCase()})`);
+let CATS=[{id:"jogos",nome:"Jogos"}];
+const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
+function iniciarCats(){
+  [["categoria",0],["lcat",0],["fcat",1]].forEach(([id,todas])=>{
+    const e=$(id),v=e.value;e.replaceChildren();
+    if(todas)e.add(new Option("Todas as categorias",""));
+    CATS.forEach(c=>e.add(new Option(c.nome,c.id)));
+    if([...e.options].some(o=>o.value===v))e.value=v;
+  });
+  const l=$("catl");l.replaceChildren();
+  CATS.forEach(c=>{const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.style.marginTop="6px";l.appendChild(i)});
 }
-function limpar(){edit=null;$("ft").textContent="Novo jogo";["titulo","genero","ano","link","descricao","arq"].forEach(k=>$(k).value="");$("popular").checked=false}
-function editar(i){const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;["titulo","console","genero","ano","link","descricao"].forEach(k=>$(k).value=j[k]||"");$("popular").checked=!!j.popular;scrollTo(0,0)}
+function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n})}
+function addCat(){
+  lerCats();const n=$("catnovo").value.trim();if(!n)return aviso("Digite o nome da categoria.");
+  const id=slug(n);if(!id||CATS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Essa categoria já existe.");
+  CATS.push({id,nome:n});$("catnovo").value="";iniciarCats();aviso("Adicionada. Toque em Salvar e publicar categorias.");
+}
+async function salvarCats(){
+  lerCats();
+  try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;iniciarCats();lista();aviso("Categorias publicadas.")}
+  catch(e){aviso(e.message)}
+}
+
+function lista(){
+  const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
+  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
+  idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
+  $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
+  const box=$("lista");box.replaceChildren();
+  if(!idx.length){box.textContent="Nenhum jogo encontrado.";return}
+  let atual="";
+  idx.forEach(i=>{
+    const j=jogos[i];
+    if(j.console!==atual){atual=j.console;const h=document.createElement("div");h.className="gh";h.textContent=atual.toUpperCase()+" ("+idx.filter(k=>jogos[k].console===atual).length+")";box.appendChild(h)}
+    const d=document.createElement("div");d.className="it";
+    const im=document.createElement("img");im.alt="";im.loading="lazy";
+    if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
+    const t=document.createElement("div");t.className="tt";
+    const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
+    const m=document.createElement("small");m.textContent=[catNome(j.categoria||"jogos"),j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
+    t.append(b,m);
+    const e=document.createElement("button");e.className="s";e.textContent="Editar";e.onclick=()=>editar(i);
+    const r=document.createElement("button");r.className="d";r.textContent="Remover";r.onclick=()=>remover(i);
+    d.append(im,t,e,r);box.appendChild(d);
+  });
+}
+function limpar(){
+  edit=null;$("ft").textContent="Novo jogo";
+  ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
+  $("popular").checked=false;$("categoria").value="jogos";$("capaInfo").style.display="none";
+}
+async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
+async function acharCapa(j){
+  const s=slug(j.titulo),cand=[j.capa,...["jpg","jpeg","png","webp"].map(x=>`capas/${j.console}/${s}.${x}`)].filter(Boolean);
+  for(const p of cand)if(await existe(p))return p;
+  if(C.token&&C.user&&C.repo)for(const p of cand){try{if(await api(p+"?ref="+C.branch))return p}catch(e){}}
+  return "";
+}
+async function statusCapa(j,i){
+  const box=$("capaInfo"),im=$("capaPrev"),tx=$("capaTxt");
+  box.style.display="block";im.style.display="none";tx.textContent="Verificando se já existe capa...";
+  const p=await acharCapa(j);
+  if(edit!==i)return;
+  if(p){
+    const nova=j.capa!==p;j.capa=p;im.src=p;im.style.display="block";
+    tx.textContent="✔ Capa já cadastrada ("+p+")"+(nova?", encontrada no repositório e vinculada ao jogo":"")+". Só escolha um arquivo abaixo se quiser trocar.";
+    lista();
+  }else tx.textContent="Este jogo ainda não tem capa. Escolha uma imagem abaixo.";
+}
+function editar(i){
+  const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
+  ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
+  $("categoria").value=j.categoria||"jogos";$("popular").checked=!!j.popular;$("arq").value="";
+  scrollTo(0,0);statusCapa(j,i);
+}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
 const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
@@ -247,7 +337,7 @@ async function gerarLote(){
       break;
     }
     grupos[g].forEach((n,k)=>{
-      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c);
+      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c+($("lcat").value!=="jogos"?"-"+$("lcat").value:""));
       const dup=!!t&&jogos.some(j=>j.id===id);
       lote.push({entrada:n,titulo:t||n,genero:it.genero||"",ano:String(it.ano||""),descricao:it.descricao||"",popular:!!it.popular,link:"",sel:!!t&&!dup,nota:!t?"A IA não reconheceu este jogo. Confira o nome.":dup?"Este jogo já está na lista.":""});
     });
@@ -276,9 +366,9 @@ function reduzirCapa(f){
 }
 
 async function adicionarLote(pub){
-  const vistos=new Set();
+  const vistos=new Set(),cat=$("lcat").value,suf=cat!=="jogos"?"-"+cat:"";
   const sel=lote.filter(x=>x.sel&&String(x.titulo).trim())
-    .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC)}))
+    .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC+suf)}))
     .filter(o=>{if(jogos.some(j=>j.id===o.id)||vistos.has(o.id))return false;vistos.add(o.id);return true});
   if(!sel.length)return aviso("Nenhum jogo novo para adicionar.");
   try{
@@ -286,13 +376,13 @@ async function adicionarLote(pub){
     for(const o of sel){
       k++;aviso(`Enviando jogo ${k} de ${sel.length}: ${String(o.x.titulo).trim()}...`);
       if(!o.x.arq)continue;
-      o.capa=`capas/${loteC}/${slug(String(o.x.titulo).trim())}.jpg`;
+      o.capa=`capas/${loteC}/${slug(String(o.x.titulo).trim())}${suf}.jpg`;
       await enviar(o.capa,await b64(await reduzirCapa(o.x.arq)),"Capa: "+String(o.x.titulo).trim());
     }
   }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
   sel.forEach(o=>{
     const x=o.x;
-    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular};
+    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular,categoria:cat};
     if(o.capa)j.capa=o.capa;
     jogos.push(j);
   });
@@ -303,6 +393,8 @@ async function adicionarLote(pub){
 let CFG={};
 fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
   CFG=c||{};const f=CFG.frases||{};
+  if(Array.isArray(CFG.categorias)&&CFG.categorias.length){CATS=CFG.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
+  iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("f_ps1").value=f.ps1||"Clássicos que marcaram época!";$("f_ps2").value=f.ps2||"Aventuras inesquecíveis!";$("f_snes").value=f.snes||"A era 16-bits!";
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
@@ -337,12 +429,14 @@ async function salvarJogo(){
   const titulo=$("titulo").value.trim();
   if(!titulo)return aviso("Informe o título.");
   const antigo=edit!==null?jogos[edit]:{};
-  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value),titulo,console:$("console").value,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),descricao:$("descricao").value.trim()};
+  const cat=$("categoria").value||"jogos",suf=cat!=="jogos"?"-"+cat:"";
+  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
+  if(!j.senha)delete j.senha;
   const f=$("arq").files[0];
   try{
     if(f){
       const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
-      j.capa=`capas/${j.console}/${slug(titulo)}.${ext}`;
+      j.capa=`capas/${j.console}/${slug(titulo)}${suf}.${ext}`;
       aviso("Enviando capa...");
       await enviar(j.capa,await b64(f),"Capa: "+titulo);
     }
@@ -354,6 +448,7 @@ async function publicar(){
   try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.")}catch(e){aviso(e.message)}
 }
 function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
+iniciarCats();
 </script>
 </body>
 </html>
