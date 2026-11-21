@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;1,800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#070a14;--fg:#eef1f8;--mu:#8e98b3;--gold:#e8b923;--ps1:#3b82f6;--ps2:#4f7cff;--snes:#8b5cf6}
+:root{--hero:url("hero.png");--bg:#070a14;--fg:#eef1f8;--mu:#8e98b3;--gold:#e8b923;--ps1:#3b82f6;--ps2:#4f7cff;--snes:#8b5cf6}
 *{box-sizing:border-box}
 body{margin:0;color:var(--fg);font:16px/1.45 Barlow,"Trebuchet MS",system-ui,sans-serif;
   background:radial-gradient(900px 420px at 85% -80px,#1b3a8a66,transparent),radial-gradient(700px 400px at 0 100%,#4c1d9533,transparent),var(--bg)}
@@ -37,7 +37,9 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .g{all:unset;cursor:pointer;display:block;text-align:center}
 .cv{display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
 .cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:cover;display:block}
-.ph{display:grid;place-items:center;padding:8px;color:var(--mu);font-size:.85rem}
+.ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
+.ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
+.top .ph{float:left;width:130px;margin:0 14px 8px 0;border-radius:6px}
 .g b{display:block;margin-top:8px;font:700 .95rem/1.15 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em}
 .g em{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:5px;font:normal 600 .72rem/1.3 Barlow,sans-serif;text-transform:uppercase;color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 22%,#0a0f1f)}
 .sub2{padding:12px 16px 0;color:var(--mu);font-weight:600}
@@ -71,7 +73,7 @@ dialog::backdrop{background:#000a}
 @media(prefers-reduced-motion:no-preference){.g .cv{transition:transform .15s}.g:hover .cv{transform:translateY(-3px)}}
 @media(max-width:700px){.hero{flex-direction:column;align-items:flex-start;gap:8px}.hero img{flex:none;width:100%;max-width:520px;margin:0 auto}}
 @media(max-width:560px){.sh h2{font-size:1.5rem}}
-@media(max-width:400px){.top img{width:40%!important}}
+@media(max-width:400px){.top img,.top .ph{width:40%!important}}
 </style>
 </head>
 <body>
@@ -127,11 +129,12 @@ function aplicarCfg(c){
   Object.keys(c.frases||{}).forEach(k=>{if(SEC[k]&&c.frases[k])SEC[k][1]=c.frases[k]});
   const h=$("hero"),src=c.hero===undefined?"hero.png":c.hero;
   if(src){h.src=src+(c.heroV?"?v="+c.heroV:"");h.hidden=false}
+  document.documentElement.style.setProperty("--hero",src?`url("${encodeURI(src+(c.heroV?"?v="+c.heroV:""))}")`:"none");
   if(jogos.length)render();
 }
 fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
 
-function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph>${esc(j.titulo)}</div>'">`:`<div class="ph">${esc(j.titulo)}</div>`}
+function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
 function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
@@ -215,7 +218,9 @@ function abrir(j){
   if(!j)return;
   const link=seguro(j.link);
   const w={ps1:150,ps2:130,snes:170}[j.console]||130;
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:""}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar jogo</a>`:""}<button class="btn alt" onclick="abrirPix()">Doar uns trocados</button></div></div>`;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar jogo</a>`:""}<button class="btn alt" onclick="abrirPix()">Doar uns trocados</button></div></div>`;
+  const im=$("det").querySelector(".top img");
+  if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
   const s=document.createElement("script");
   s.src="https://giscus.app/client.js";s.async=true;s.crossOrigin="anonymous";
   Object.entries({repo:GISCUS.repo,"repo-id":GISCUS.repoId,category:GISCUS.category,"category-id":GISCUS.categoryId,mapping:"specific",term:j.id,"reactions-enabled":"1","input-position":"top",theme:"dark",lang:"pt",loading:"lazy"}).forEach(([k,v])=>s.setAttribute("data-"+k,v));
