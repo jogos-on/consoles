@@ -1,0 +1,11 @@
+{
+  "titulo1": "Catálogo",
+  "titulo2": "de jogos",
+  "subtitulo": "Reviva grandes clássicos!",
+  "frases": {
+    "ps1": "Clássicos que marcaram época!",
+    "ps2": "Aventuras inesquecíveis!",
+    "snes": "A era 16-bits!"
+  },
+  "hero": "hero.png"
+}
