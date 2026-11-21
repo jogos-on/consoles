@@ -129,7 +129,7 @@ let jogos=[],edit=null,C=JSON.parse(localStorage.getItem("cfg")||"{}");
 ["user","repo","branch","token","akey","gmodel"].forEach(k=>{if(C[k])$(k).value=C[k]});
 if(!C.token)$("cfg").open=true;
 
-function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",5000)}
+function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não/i.test(t)?20000:5000)}
 function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarCats();lista()}).catch(()=>lista());
@@ -240,18 +240,35 @@ function voltar(){limpar();scrollTo(0,posLista)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
 const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
+async function capaJpg(f){
+  try{
+    const bm=await createImageBitmap(f),w=Math.min(700,bm.width),h=Math.round(bm.height*w/bm.width);
+    const c=document.createElement("canvas");c.width=w;c.height=h;
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(bm,0,0,w,h);
+    const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));
+    if(b)return await b64(b);
+  }catch(e){}
+  return null;
+}
 const enc=s=>btoa(unescape(encodeURIComponent(s)));
 
 async function api(p,o={}){
   if(!C.token||!C.user||!C.repo)throw new Error("Preencha a conexão com o GitHub.");
   const r=await fetch(`https://api.github.com/repos/${C.user}/${C.repo}/contents/${p}`,{...o,headers:{Authorization:"Bearer "+C.token,Accept:"application/vnd.github+json"}});
-  if(r.status===404)return null;
-  if(!r.ok)throw new Error("GitHub respondeu "+r.status);
+  if(r.status===404&&(!o.method||o.method==="GET"))return null;
+  if(!r.ok){
+    const d=await r.json().catch(()=>({}));
+    const dica={401:"token inválido ou expirado",403:"token sem permissão de escrita ou limite atingido",404:"usuário, repositório ou branch incorretos",409:"conflito, tente salvar de novo",413:"arquivo grande demais",422:"dados recusados pelo GitHub"}[r.status]||"";
+    throw new Error("GitHub "+r.status+(dica?" ("+dica+")":"")+(d.message?": "+d.message:""));
+  }
   return r.json();
 }
 async function enviar(p,conteudo,msg){
-  const cur=await api(p+"?ref="+C.branch);
-  await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});
+  for(let t=0;t<3;t++){
+    const cur=await api(p+"?ref="+C.branch);
+    try{await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});return}
+    catch(e){if(t<2&&/GitHub (409|422)/.test(e.message)){await espera(1200);continue}throw e}
+  }
 }
 
 
@@ -472,14 +489,16 @@ async function salvarJogo(){
   const f=$("arq").files[0];
   try{
     if(f){
-      const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
-      j.capa=`capas/${j.console}/${slug(titulo)}${suf}.${ext}`;
+      aviso("Preparando capa...");
+      const dados=await capaJpg(f);
+      if(!dados)throw new Error("Falha na capa: formato de imagem não suportado. Use JPG, PNG ou WEBP.");
+      j.capa=`capas/${j.console}/${slug(titulo)}${suf}.jpg`;
       aviso("Enviando capa...");
-      await enviar(j.capa,await b64(f),"Capa: "+titulo);
+      await enviar(j.capa,dados,"Capa: "+titulo);
     }
     edit!==null?jogos[edit]=j:jogos.push(j);
     limpar();lista();await publicar();
-  }catch(e){aviso(e.message)}
+  }catch(e){aviso("Falha ao salvar: "+e.message)}
 }
 async function publicar(){
   try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.")}catch(e){aviso(e.message)}
