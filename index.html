@@ -53,14 +53,25 @@ footer small{display:block;color:var(--fg);font-size:1.1rem}
 dialog{width:min(640px,94vw);max-height:92vh;border:1px solid #2a3350;border-radius:14px;padding:0;background:#0d1224;color:var(--fg)}
 dialog::backdrop{background:#000a}
 .in{padding:18px}
-.top{display:flex;gap:14px}
-.top img{width:120px;flex:none;object-fit:cover;border-radius:6px}
+.top{display:flow-root}
+.top img{float:left;width:130px;height:auto;margin:0 14px 8px 0;object-fit:cover;border-radius:6px}
 .top h3{margin:0 0 4px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
-.btn{display:inline-block;margin-top:10px;padding:10px 18px;border-radius:8px;background:var(--gold);color:#1a1300;font-weight:700;text-decoration:none}
+.acts{display:block}
+.btn{display:inline-block;margin:10px 8px 0 0;padding:10px 18px;border:0;border-radius:8px;background:var(--gold);color:#1a1300;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.btn:focus-visible{outline:3px solid var(--snes);outline-offset:2px}
+#pix{width:min(380px,94vw);text-align:center}
+#pix h3{margin:0 0 8px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+#pixqr{min-height:60px;margin:12px 0;color:var(--mu)}
+#pixqr img{width:220px;height:220px;image-rendering:pixelated;background:#fff;border-radius:8px;padding:6px}
+.cod{margin:4px 0;padding:8px 10px;border:1px dashed #39425e;border-radius:8px;color:var(--mu);font:.8rem/1.3 monospace;word-break:break-all}
+#pixok{min-height:1.4em;color:var(--gold);font-weight:600}
+#pix .nt{margin:6px 0 0;color:var(--mu);font-size:.85rem}
 .x{float:right;border:0;background:none;color:var(--mu);font-size:1.7rem;cursor:pointer}
 @media(prefers-reduced-motion:no-preference){.g .cv{transition:transform .15s}.g:hover .cv{transform:translateY(-3px)}}
 @media(max-width:700px){.hero{flex-direction:column;align-items:flex-start;gap:8px}.hero img{flex:none;width:100%;max-width:520px;margin:0 auto}}
 @media(max-width:560px){.sh h2{font-size:1.5rem}}
+@media(max-width:400px){.top img{width:40%!important}}
 </style>
 </head>
 <body>
@@ -83,6 +94,15 @@ dialog::backdrop{background:#000a}
   <footer><div class="l cond">Escolha seu clássico<small class="cond">e boa jogatina!</small></div><div class="r cond">Game over?<small class="cond">Jamais.</small></div></footer>
 </div>
 <dialog id="dlg"><div class="in"><button class="x" aria-label="Fechar" onclick="dlg.close()">×</button><div id="det"></div><div id="cm" style="margin-top:16px"></div></div></dialog>
+<dialog id="pix"><div class="in"><button class="x" aria-label="Fechar" onclick="document.getElementById('pix').close()">×</button>
+  <h3>Doar uns trocados</h3>
+  <div>Nome: <b id="pxn"></b><br>Banco: <b id="pxb"></b></div>
+  <div id="pixqr"></div>
+  <div class="cod" id="pixv"></div>
+  <button class="btn" onclick="copiarPix()">Copiar Pix copia e cola</button>
+  <div id="pixok" role="status"></div>
+  <p class="nt">Sem valor definido: doe quanto quiser, digitando o valor no app do seu banco.</p>
+</div></dialog>
 
 <script>
 // Preencha com os dados de https://giscus.app (repositório público com Discussions ativadas)
@@ -154,10 +174,48 @@ $("grid").onclick=e=>{
   const b=e.target.closest(".g");if(b)abrir(jogos.find(j=>j.id===b.dataset.id));
 };
 
+// Dados do PIX (a cidade e a chave não aparecem na tela; vão apenas dentro do código gerado)
+const PIX={nome:"Johnny Mary",banco:"Nubank",cidade:"Extremoz",chave:"hypertv1000@gmail.com"};
+let pixCode="";
+function crc16(t){let c=0xFFFF;for(let i=0;i<t.length;i++){c^=t.charCodeAt(i)<<8;for(let b=0;b<8;b++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
+const tlv=(id,v)=>id+String(v.length).padStart(2,"0")+v;
+function pixPayload(){
+  const conta=tlv("00","br.gov.bcb.pix")+tlv("01",PIX.chave);
+  const p=tlv("00","01")+tlv("01","11")+tlv("26",conta)+tlv("52","0000")+tlv("53","986")+tlv("58","BR")+tlv("59",PIX.nome)+tlv("60",PIX.cidade)+tlv("62",tlv("05","***"))+"6304";
+  return p+crc16(p);
+}
+function carregarQR(){
+  return window.qrcode?Promise.resolve():new Promise((ok,err)=>{
+    const t=document.createElement("script");
+    t.src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+    t.onload=ok;t.onerror=err;document.head.appendChild(t);
+  });
+}
+async function abrirPix(){
+  pixCode=pixPayload();
+  $("pxn").textContent=PIX.nome;$("pxb").textContent=PIX.banco;
+  $("pixv").textContent=pixCode.slice(0,24)+"...";
+  $("pixok").textContent="";$("pixqr").textContent="Gerando QR Code...";
+  $("pix").showModal();
+  try{
+    await carregarQR();
+    const q=qrcode(0,"M");q.addData(pixCode);q.make();
+    $("pixqr").innerHTML=q.createImgTag(5,2);
+    const im=$("pixqr").querySelector("img");if(im)im.alt="QR Code Pix";
+  }catch(e){$("pixqr").textContent="Não foi possível gerar o QR Code. Use o botão para copiar o código."}
+}
+async function copiarPix(){
+  try{await navigator.clipboard.writeText(pixCode)}
+  catch(e){const t=document.createElement("textarea");t.value=pixCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}
+  $("pixok").textContent="Código copiado!";
+  setTimeout(()=>$("pixok").textContent="",2500);
+}
+
 function abrir(j){
   if(!j)return;
   const link=seguro(j.link);
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${j.console==="snes"?"150px":"120px"}">`:""}<div><h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Abrir link</a>`:""}</div></div>`;
+  const w={ps1:150,ps2:130,snes:170}[j.console]||130;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:""}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar jogo</a>`:""}<button class="btn alt" onclick="abrirPix()">Doar uns trocados</button></div></div>`;
   const s=document.createElement("script");
   s.src="https://giscus.app/client.js";s.async=true;s.crossOrigin="anonymous";
   Object.entries({repo:GISCUS.repo,"repo-id":GISCUS.repoId,category:GISCUS.category,"category-id":GISCUS.categoryId,mapping:"specific",term:j.id,"reactions-enabled":"1","input-position":"top",theme:"dark",lang:"pt",loading:"lazy"}).forEach(([k,v])=>s.setAttribute("data-"+k,v));
