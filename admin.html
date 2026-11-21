@@ -55,6 +55,7 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
   <label>Link<input id="link" type="url" placeholder="https://"></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
+  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
   <label>Capa (imagem)<input id="arq" type="file" accept="image/*"></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" onclick="limpar()">Limpar</button>
 </div>
@@ -79,10 +80,10 @@ fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;lista
 function lista(){
   $("n").textContent=jogos.length;
   $("lista").innerHTML=jogos.map((j,i)=>`<div class="row"><span></span><button class="s" onclick="editar(${i})">Editar</button><button class="d" onclick="remover(${i})">Remover</button></div>`).join("");
-  document.querySelectorAll("#lista .row span").forEach((s,i)=>s.textContent=`${jogos[i].titulo} (${jogos[i].console.toUpperCase()})`);
+  document.querySelectorAll("#lista .row span").forEach((s,i)=>s.textContent=`${jogos[i].popular?"★ ":""}${jogos[i].titulo} (${jogos[i].console.toUpperCase()})`);
 }
-function limpar(){edit=null;$("ft").textContent="Novo jogo";["titulo","genero","ano","link","descricao","arq"].forEach(k=>$(k).value="")}
-function editar(i){const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;["titulo","console","genero","ano","link","descricao"].forEach(k=>$(k).value=j[k]||"");scrollTo(0,0)}
+function limpar(){edit=null;$("ft").textContent="Novo jogo";["titulo","genero","ano","link","descricao","arq"].forEach(k=>$(k).value="");$("popular").checked=false}
+function editar(i){const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;["titulo","console","genero","ano","link","descricao"].forEach(k=>$(k).value=j[k]||"");$("popular").checked=!!j.popular;scrollTo(0,0)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
 const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
@@ -165,7 +166,7 @@ async function salvarJogo(){
   const titulo=$("titulo").value.trim();
   if(!titulo)return aviso("Informe o título.");
   const antigo=edit!==null?jogos[edit]:{};
-  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value),titulo,console:$("console").value,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),descricao:$("descricao").value.trim()};
+  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value),titulo,console:$("console").value,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),descricao:$("descricao").value.trim()};
   const f=$("arq").files[0];
   try{
     if(f){
