@@ -27,6 +27,9 @@ dialog::backdrop{background:#000a}
 #ial .ok{color:#15803d;font-weight:bold}
 #ial .er{color:#b42318}
 #iao button{display:block;width:100%;text-align:left;margin:6px 0}
+.lrow{border-top:1px solid var(--bd);padding:10px 0}
+.lrow input{margin-top:6px}
+.lrow .nt{color:#b42318;font-size:.85rem;margin-top:4px}
 #msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
 </style>
 </head>
@@ -58,6 +61,15 @@ gemini-2.5-flash-lite</textarea></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="hrm" type="checkbox" style="width:auto"> Remover a imagem do topo</label>
   <button onclick="salvarPagina()">Salvar e publicar configurações</button>
 </details>
+
+<details id="lt"><summary>Cadastro em lote com IA</summary>
+  <label>Console de todos os jogos da lista<select id="lc"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Nomes dos jogos, um por linha (pode haver erros de digitação)<textarea id="ln" rows="6" placeholder="crash bandicoot&#10;resident evil 2&#10;tekken 3"></textarea></label>
+  <button onclick="gerarLote()">Preencher lista com IA</button>
+  <div id="lr"></div>
+  <div id="lb" style="display:none"><button onclick="adicionarLote(false)">Adicionar selecionados à lista</button><button class="s" onclick="adicionarLote(true)">Adicionar e publicar</button></div>
+</details>
+
 
 
 <div class="box">
@@ -128,14 +140,13 @@ async function tentarModelo(m,prompt){
   return JSON.parse(txt);
 }
 const norm=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
-async function preencherIA(){
-  const t=$("titulo").value.trim(),c=$("console").selectedOptions[0].text;
-  if(!t)return aviso("Informe o título antes.");
-  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
-  $("ial").innerHTML="";$("iao").innerHTML="";$("iat").textContent="Consultando a IA...";$("iad").showModal();
-  const prompt=`Jogo digitado: "${t}". Plataforma: ${c}. O texto pode ter erros de grafia. Responda SOMENTE com JSON: {"opcoes":[{"titulo":"nome oficial do jogo, com a grafia e pontuação corretas","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}]} com de 1 a 3 jogos dessa plataforma que mais provavelmente correspondem ao texto digitado, do mais provável ao menos provável. Se nenhum jogo existir, responda {"opcoes":[]}.`;
+let ultimoOk="",lote=[],loteC="";
+const espera=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function consultarIA(prompt){
   let fila=(C.gmodel||"").split(/[\s,]+/).filter(Boolean);
   if(!fila.length)fila=[...MODELOS_PADRAO];
+  if(ultimoOk){fila=fila.filter(x=>x!==ultimoOk);fila.unshift(ultimoOk)}
   const feitos=new Set();let res=null,buscou=false;
   while(!res){
     const m=fila.shift();
@@ -153,12 +164,22 @@ async function preencherIA(){
     if(feitos.has(m))continue;
     feitos.add(m);
     const li=logIA("Tentando "+m+"...");
-    try{res=await tentarModelo(m,prompt);li.textContent="✔ "+m+": deu certo";li.className="ok"}
+    try{res=await tentarModelo(m,prompt);ultimoOk=m;li.textContent="✔ "+m+": deu certo";li.className="ok"}
     catch(e){
       li.textContent="✘ "+m+": "+e.message;li.className="er";
       if(/API key|API_KEY/i.test(e.message)){logIA("Chave inválida. Verifique a chave do Google AI.","er");break}
     }
   }
+  return res;
+}
+
+async function preencherIA(){
+  const t=$("titulo").value.trim(),c=$("console").selectedOptions[0].text;
+  if(!t)return aviso("Informe o título antes.");
+  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
+  $("ial").innerHTML="";$("iao").innerHTML="";$("iat").textContent="Consultando a IA...";$("iad").showModal();
+  const prompt=`Jogo digitado: "${t}". Plataforma: ${c}. O texto pode ter erros de grafia. Responda SOMENTE com JSON: {"opcoes":[{"titulo":"nome oficial do jogo, com a grafia e pontuação corretas","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}]} com de 1 a 3 jogos dessa plataforma que mais provavelmente correspondem ao texto digitado, do mais provável ao menos provável. Se nenhum jogo existir, responda {"opcoes":[]}.`;
+  const res=await consultarIA(prompt);
   if(!res){$("iat").textContent="Nenhum modelo funcionou. Preencha manualmente.";return}
   const ops=(Array.isArray(res.opcoes)?res.opcoes:[]).filter(o=>o&&o.titulo).slice(0,3);
   if(!ops.length){$("iat").textContent="A IA não reconheceu o jogo. Preencha manualmente.";return}
@@ -174,6 +195,71 @@ async function preencherIA(){
   const k=document.createElement("button");
   k.className="s";k.textContent="Manter o que digitei";k.onclick=()=>$("iad").close();
   $("iao").appendChild(k);
+}
+
+function renderLote(){
+  const r=$("lr");r.innerHTML="";
+  lote.forEach((x,i)=>{
+    const d=document.createElement("div");d.className="lrow";
+    d.innerHTML=`<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="sel"> Incluir</label>
+<input data-i="${i}" data-k="titulo" placeholder="Título">
+<input data-i="${i}" data-k="genero" placeholder="Gênero">
+<input data-i="${i}" data-k="ano" placeholder="Ano" inputmode="numeric">
+<input data-i="${i}" data-k="link" type="url" placeholder="Link (opcional)">
+<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="popular"> Popular</label>`;
+    d.querySelectorAll("[data-k]").forEach(el=>{const v=x[el.dataset.k];if(el.type==="checkbox")el.checked=!!v;else el.value=v||""});
+    if(x.nota){const n=document.createElement("div");n.className="nt";n.textContent=x.nota;d.appendChild(n)}
+    r.appendChild(d);
+  });
+}
+const editarLote=e=>{const el=e.target;if(!el.dataset||!el.dataset.k)return;lote[+el.dataset.i][el.dataset.k]=el.type==="checkbox"?el.checked:el.value};
+$("lr").addEventListener("input",editarLote);$("lr").addEventListener("change",editarLote);
+
+async function gerarLote(){
+  const c=$("lc").value,cn=$("lc").selectedOptions[0].text;
+  const nomes=$("ln").value.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,60);
+  if(!nomes.length)return aviso("Cole ao menos um nome de jogo.");
+  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
+  lote=[];loteC=c;renderLote();$("lb").style.display="none";
+  $("iao").innerHTML="";$("iad").showModal();
+  const grupos=[];for(let i=0;i<nomes.length;i+=8)grupos.push(nomes.slice(i,i+8));
+  let falhou=false;
+  for(let g=0;g<grupos.length;g++){
+    $("ial").innerHTML="";$("iat").textContent=`Lote ${g+1} de ${grupos.length}...`;
+    const lista_=grupos[g].map((n,k)=>`${k+1}. ${n}`).join("\n");
+    const prompt=`Plataforma: ${cn}. Lista de jogos digitados (podem ter erros de grafia):\n${lista_}\nResponda SOMENTE com JSON: {"itens":[{"titulo":"nome oficial do jogo nessa plataforma, com a grafia e pontuação corretas, ou \"\" se não existir","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers","popular":true ou false}]} com exatamente um item por jogo, na mesma ordem da lista. Use popular=true só para jogos muito conhecidos e marcantes da plataforma.`;
+    const res=await consultarIA(prompt);
+    const itens=Array.isArray(res&&res.itens)?res.itens:null;
+    if(!itens){
+      falhou=true;
+      grupos.slice(g).flat().forEach(n=>lote.push({entrada:n,titulo:n,sel:false,nota:"Não preenchido: a IA falhou. Preencha à mão ou tente de novo."}));
+      break;
+    }
+    grupos[g].forEach((n,k)=>{
+      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c);
+      const dup=!!t&&jogos.some(j=>j.id===id);
+      lote.push({entrada:n,titulo:t||n,genero:it.genero||"",ano:String(it.ano||""),descricao:it.descricao||"",popular:!!it.popular,link:"",sel:!!t&&!dup,nota:!t?"A IA não reconheceu este jogo. Confira o nome.":dup?"Este jogo já está na lista.":""});
+    });
+    renderLote();
+    if(g<grupos.length-1)await espera(3000);
+  }
+  renderLote();
+  $("lb").style.display=lote.length?"block":"none";
+  $("iat").textContent=falhou?"Parte da lista não foi preenchida. Veja os avisos na lista.":"Pronto. Revise a lista abaixo.";
+  if(!falhou)setTimeout(()=>{if($("iad").open)$("iad").close()},1200);
+}
+
+async function adicionarLote(pub){
+  let n=0;
+  lote.filter(x=>x.sel&&String(x.titulo).trim()).forEach(x=>{
+    const id=slug(String(x.titulo).trim()+"-"+loteC);
+    if(jogos.some(j=>j.id===id))return;
+    jogos.push({id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular});
+    n++;
+  });
+  lote=[];renderLote();$("lb").style.display="none";$("ln").value="";lista();
+  if(!n)return aviso("Nenhum jogo novo foi adicionado.");
+  if(pub)await publicar();else aviso(n+" jogo(s) adicionado(s). Toque em Publicar no GitHub para atualizar o site.");
 }
 
 let CFG={};
