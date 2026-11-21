@@ -32,6 +32,8 @@ button.d{background:#b42318}
   <label>Repositório<input id="repo"></label>
   <label>Branch<input id="branch" value="main"></label>
   <label>Token (fine-grained, permissão Contents: leitura e escrita neste repositório)<input id="token" type="password" autocomplete="off"></label>
+  <label>Chave da API do Google AI (opcional, usada em "Preencher com IA")<input id="akey" type="password" autocomplete="off" placeholder="AIza..."></label>
+  <label>Modelo da IA<input id="gmodel" value="gemini-flash-latest"></label>
   <button onclick="salvarCfg()">Salvar neste navegador</button>
 </details>
 
@@ -39,6 +41,7 @@ button.d{background:#b42318}
   <b id="ft">Novo jogo</b>
   <label>Título<input id="titulo"></label>
   <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <button class="s" onclick="preencherIA()">Preencher com IA</button>
   <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
   <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
   <label>Link<input id="link" type="url" placeholder="https://"></label>
@@ -55,11 +58,11 @@ button.d{background:#b42318}
 <script>
 const $=id=>document.getElementById(id);
 let jogos=[],edit=null,C=JSON.parse(localStorage.getItem("cfg")||"{}");
-["user","repo","branch","token"].forEach(k=>{if(C[k])$(k).value=C[k]});
+["user","repo","branch","token","akey","gmodel"].forEach(k=>{if(C[k])$(k).value=C[k]});
 if(!C.token)$("cfg").open=true;
 
 function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",5000)}
-function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
+function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()||"gemini-flash-latest"};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;lista()}).catch(()=>lista());
 
@@ -85,6 +88,23 @@ async function api(p,o={}){
 async function enviar(p,conteudo,msg){
   const cur=await api(p+"?ref="+C.branch);
   await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});
+}
+
+
+async function preencherIA(){
+  const t=$("titulo").value.trim(),c=$("console").selectedOptions[0].text;
+  if(!t)return aviso("Informe o título antes.");
+  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
+  aviso("Consultando a IA...");
+  try{
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${C.gmodel||"gemini-flash-latest"}:generateContent`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":C.akey},
+      body:JSON.stringify({contents:[{parts:[{text:`Jogo: "${t}". Plataforma: ${c}. Responda SOMENTE com JSON: {"genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}. Se não conhecer o jogo, use "" nos campos.`}]}],generationConfig:{responseMimeType:"application/json",temperature:0.2}})});
+    if(!r.ok)throw new Error("IA respondeu "+r.status);
+    const d=await r.json();
+    const j=JSON.parse((d.candidates?.[0]?.content?.parts||[]).map(x=>x.text||"").join("").replace(/```json|```/g,"").trim());
+    ["genero","ano","descricao"].forEach(k=>{if(j[k])$(k).value=j[k]});
+    aviso(j.genero||j.ano||j.descricao?"Preenchido. Revise antes de salvar.":"A IA não reconheceu o jogo. Preencha manualmente.");
+  }catch(e){aviso(e.message)}
 }
 
 async function salvarJogo(){
