@@ -46,6 +46,20 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarCfg()">Salvar neste navegador</button>
 </details>
 
+<details id="pg"><summary>Configurações da página</summary>
+  <label>Título, linha 1<input id="t1" placeholder="Catálogo"></label>
+  <label>Título, linha 2 (em dourado)<input id="t2" placeholder="de jogos"></label>
+  <label>Subtítulo<input id="st"></label>
+  <label>Frase do PS1<input id="f_ps1"></label>
+  <label>Frase do PS2<input id="f_ps2"></label>
+  <label>Frase do SNES<input id="f_snes"></label>
+  <label>Imagem do topo (ideal: 1000 × 540 px, PNG com fundo transparente)<input id="hf" type="file" accept="image/*"></label>
+  <img id="hp" alt="" style="max-width:100%;max-height:140px;margin-top:8px;display:none">
+  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="hrm" type="checkbox" style="width:auto"> Remover a imagem do topo</label>
+  <button onclick="salvarPagina()">Salvar e publicar configurações</button>
+</details>
+
+
 <div class="box">
   <b id="ft">Novo jogo</b>
   <label>Título<input id="titulo"></label>
@@ -160,6 +174,39 @@ async function preencherIA(){
   const k=document.createElement("button");
   k.className="s";k.textContent="Manter o que digitei";k.onclick=()=>$("iad").close();
   $("iao").appendChild(k);
+}
+
+let CFG={};
+fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
+  CFG=c||{};const f=CFG.frases||{};
+  $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
+  $("f_ps1").value=f.ps1||"Clássicos que marcaram época!";$("f_ps2").value=f.ps2||"Aventuras inesquecíveis!";$("f_snes").value=f.snes||"A era 16-bits!";
+  if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
+});
+$("hf").onchange=()=>{const f=$("hf").files[0];if(f){const h=$("hp");h.src=URL.createObjectURL(f);h.style.display="block"}};
+function redimensionar(f){
+  return new Promise((ok,err)=>{
+    const img=new Image(),u=URL.createObjectURL(f);
+    img.onload=()=>{
+      const k=Math.min(1,1000/img.width,600/img.height),w=Math.round(img.width*k),h=Math.round(img.height*k);
+      const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):err(new Error("Falha ao processar a imagem")),"image/png");
+    };
+    img.onerror=()=>err(new Error("Imagem inválida"));
+    img.src=u;
+  });
+}
+async function salvarPagina(){
+  try{
+    aviso("Publicando...");
+    const c={...CFG,titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim(),frases:{ps1:$("f_ps1").value.trim(),ps2:$("f_ps2").value.trim(),snes:$("f_snes").value.trim()}};
+    const f=$("hf").files[0];
+    if($("hrm").checked)c.hero="";
+    else if(f){await enviar("hero.png",await b64(await redimensionar(f)),"Imagem do topo");c.hero="hero.png";c.heroV=Date.now()}
+    await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza configurações da página");
+    CFG=c;$("hf").value="";$("hrm").checked=false;
+    aviso("Publicado. O site atualiza em cerca de 1 minuto.");
+  }catch(e){aviso(e.message)}
 }
 
 async function salvarJogo(){
