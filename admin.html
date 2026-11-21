@@ -26,6 +26,7 @@ dialog::backdrop{background:#000a}
 #ial{padding-left:18px;font-size:.92rem}
 #ial .ok{color:#15803d;font-weight:bold}
 #ial .er{color:#b42318}
+#iao button{display:block;width:100%;text-align:left;margin:6px 0}
 #msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
 </style>
 </head>
@@ -61,7 +62,7 @@ gemini-2.5-flash-lite</textarea></label>
 <div class="box"><b>Jogos (<span id="n">0</span>)</b><div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
-<dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><button class="s" onclick="iad.close()">Fechar</button></dialog>
+<dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
 <div id="msg" role="status"></div>
 
 <script>
@@ -111,12 +112,13 @@ async function tentarModelo(m,prompt){
   const txt=(d.candidates?.[0]?.content?.parts||[]).map(x=>x.text||"").join("").replace(/```json|```/g,"").trim();
   return JSON.parse(txt);
 }
+const norm=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
 async function preencherIA(){
   const t=$("titulo").value.trim(),c=$("console").selectedOptions[0].text;
   if(!t)return aviso("Informe o título antes.");
   if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
-  $("ial").innerHTML="";$("iat").textContent="Consultando a IA...";$("iad").showModal();
-  const prompt=`Jogo: "${t}". Plataforma: ${c}. Responda SOMENTE com JSON: {"genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}. Se não conhecer o jogo, use "" nos campos.`;
+  $("ial").innerHTML="";$("iao").innerHTML="";$("iat").textContent="Consultando a IA...";$("iad").showModal();
+  const prompt=`Jogo digitado: "${t}". Plataforma: ${c}. O texto pode ter erros de grafia. Responda SOMENTE com JSON: {"opcoes":[{"titulo":"nome oficial do jogo, com a grafia e pontuação corretas","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}]} com de 1 a 3 jogos dessa plataforma que mais provavelmente correspondem ao texto digitado, do mais provável ao menos provável. Se nenhum jogo existir, responda {"opcoes":[]}.`;
   let fila=(C.gmodel||"").split(/[\s,]+/).filter(Boolean);
   if(!fila.length)fila=[...MODELOS_PADRAO];
   const feitos=new Set();let res=null,buscou=false;
@@ -142,10 +144,21 @@ async function preencherIA(){
       if(/API key|API_KEY/i.test(e.message)){logIA("Chave inválida. Verifique a chave do Google AI.","er");break}
     }
   }
-  if(res){
-    ["genero","ano","descricao"].forEach(k=>{if(res[k])$(k).value=res[k]});
-    $("iat").textContent=(res.genero||res.ano||res.descricao)?"Preenchido. Revise antes de salvar.":"A IA não reconheceu o jogo. Preencha manualmente.";
-  }else $("iat").textContent="Nenhum modelo funcionou. Preencha manualmente.";
+  if(!res){$("iat").textContent="Nenhum modelo funcionou. Preencha manualmente.";return}
+  const ops=(Array.isArray(res.opcoes)?res.opcoes:[]).filter(o=>o&&o.titulo).slice(0,3);
+  if(!ops.length){$("iat").textContent="A IA não reconheceu o jogo. Preencha manualmente.";return}
+  const aplicar=o=>{$("titulo").value=o.titulo;["genero","ano","descricao"].forEach(k=>{if(o[k])$(k).value=o[k]})};
+  if(norm(ops[0].titulo)===norm(t)){aplicar(ops[0]);$("iat").textContent="Preenchido. Revise antes de salvar.";return}
+  $("iat").textContent="Você quis dizer:";
+  ops.forEach(o=>{
+    const b=document.createElement("button");
+    b.textContent=o.titulo+(o.ano?" ("+o.ano+")":"");
+    b.onclick=()=>{aplicar(o);$("iad").close();aviso("Preenchido. Revise antes de salvar.")};
+    $("iao").appendChild(b);
+  });
+  const k=document.createElement("button");
+  k.className="s";k.textContent="Manter o que digitei";k.onclick=()=>$("iad").close();
+  $("iao").appendChild(k);
 }
 
 async function salvarJogo(){
