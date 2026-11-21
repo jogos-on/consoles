@@ -30,12 +30,22 @@ dialog::backdrop{background:#000a}
 .lrow{border-top:1px solid var(--bd);padding:10px 0}
 .lrow input{margin-top:6px}
 .lrow .nt{color:#b42318;font-size:.85rem;margin-top:4px}
-.gh{margin-top:14px;font-weight:bold;color:var(--ac);border-bottom:2px solid var(--bd);padding-bottom:4px}
-.it{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
-.it img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg);flex:none}
-.it .tt{flex:1;min-width:0}.it .tt b{display:block;overflow-wrap:anywhere}.it small{color:var(--mu)}
-.it button{margin:0;padding:6px 12px}
-#lista{max-height:62vh;overflow:auto;margin-top:6px}
+details.gr{margin-top:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);padding:0}
+details.gr>summary{padding:10px 12px;font-weight:bold;color:var(--ac);list-style:none;display:flex;justify-content:space-between}
+details.gr>summary::-webkit-details-marker{display:none}
+details.gr>summary::after{content:"▾";transition:transform .15s}
+details.gr:not([open])>summary::after{transform:rotate(-90deg)}
+details.gr .it:first-of-type{border-top:1px solid var(--bd)}
+.it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--bd)}
+.it:last-child{border-bottom:0}
+.it img{width:34px;height:34px;object-fit:cover;border-radius:5px;background:var(--bd);flex:none}
+.it .tt{flex:1;min-width:0}
+.it .tt b,.it .tt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .tt b{font-size:.95rem}.it small{color:var(--mu);font-size:.78rem}
+.it button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1;flex:none}
+#lista{margin-top:4px}
+.crow{display:flex;gap:8px;align-items:center;margin-top:6px}.crow input{flex:1;min-width:0}
+.crow small{color:var(--mu);white-space:nowrap}.crow button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1}
 .flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.flt>*{flex:1 1 140px}
 #capaInfo{display:none;margin-top:10px;font-size:.9rem}
 #capaInfo img{max-width:120px;max-height:120px;border-radius:6px;display:block;margin-bottom:6px}
@@ -101,8 +111,8 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
   <div id="capaInfo"><img id="capaPrev" alt="" style="display:none"><div id="capaTxt"></div></div>
-  <label>Capa (imagem). Deixe vazio para manter a capa atual<input id="arq" type="file" accept="image/*"></label>
-  <button onclick="salvarJogo()">Salvar jogo</button><button class="s" onclick="limpar()">Limpar</button>
+  <label>Capa (imagem)<span id="trocar" style="display:none"> — se quiser trocar</span><input id="arq" type="file" accept="image/*"></label>
+  <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
 </div>
 
 <div class="box"><b>Jogos (<span id="n">0</span>)</b>
@@ -122,11 +132,13 @@ if(!C.token)$("cfg").open=true;
 function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",5000)}
 function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
-fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;lista()}).catch(()=>lista());
+fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarCats();lista()}).catch(()=>lista());
 
 let CATS=[{id:"jogos",nome:"Jogos"}];
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
+let jogosMudou=false;
 function iniciarCats(){
+  jogos.forEach(j=>{const id=j.categoria||"jogos";if(!CATS.some(c=>c.id===id))CATS.push({id,nome:id})});
   [["categoria",0],["lcat",0],["fcat",1]].forEach(([id,todas])=>{
     const e=$(id),v=e.value;e.replaceChildren();
     if(todas)e.add(new Option("Todas as categorias",""));
@@ -134,7 +146,15 @@ function iniciarCats(){
     if([...e.options].some(o=>o.value===v))e.value=v;
   });
   const l=$("catl");l.replaceChildren();
-  CATS.forEach(c=>{const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.style.marginTop="6px";l.appendChild(i)});
+  CATS.forEach(c=>{
+    const d=document.createElement("div");d.className="crow";
+    const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.setAttribute("aria-label","Nome da categoria");
+    const n=jogos.filter(j=>(j.categoria||"jogos")===c.id).length;
+    const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
+    d.append(i,m);
+    if(c.id!=="jogos"){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
+    l.appendChild(d);
+  });
 }
 function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n})}
 function addCat(){
@@ -142,12 +162,22 @@ function addCat(){
   const id=slug(n);if(!id||CATS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Essa categoria já existe.");
   CATS.push({id,nome:n});$("catnovo").value="";iniciarCats();aviso("Adicionada. Toque em Salvar e publicar categorias.");
 }
+function delCat(id){
+  lerCats();const c=CATS.find(x=>x.id===id);if(!c)return;
+  const n=jogos.filter(j=>j.categoria===id).length;
+  if(!confirm(`Excluir a categoria "${c.nome}"?`+(n?` Os ${n} jogo(s) dela voltarão para "Jogos".`:"")))return;
+  jogos.forEach(j=>{if(j.categoria===id)j.categoria="jogos"});
+  if(n)jogosMudou=true;
+  CATS=CATS.filter(x=>x.id!==id);iniciarCats();lista();
+  aviso("Excluída. Toque em Salvar e publicar categorias para confirmar.");
+}
 async function salvarCats(){
   lerCats();
-  try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;iniciarCats();lista();aviso("Categorias publicadas.")}
+  try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;if(jogosMudou){await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");jogosMudou=false}iniciarCats();lista();aviso("Categorias publicadas.")}
   catch(e){aviso(e.message)}
 }
 
+const abertos=new Set();let posLista=0;
 function lista(){
   const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
   const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
@@ -155,26 +185,32 @@ function lista(){
   $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
   const box=$("lista");box.replaceChildren();
   if(!idx.length){box.textContent="Nenhum jogo encontrado.";return}
-  let atual="";
-  idx.forEach(i=>{
-    const j=jogos[i];
-    if(j.console!==atual){atual=j.console;const h=document.createElement("div");h.className="gh";h.textContent=atual.toUpperCase()+" ("+idx.filter(k=>jogos[k].console===atual).length+")";box.appendChild(h)}
-    const d=document.createElement("div");d.className="it";
-    const im=document.createElement("img");im.alt="";im.loading="lazy";
-    if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
-    const t=document.createElement("div");t.className="tt";
-    const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
-    const m=document.createElement("small");m.textContent=[catNome(j.categoria||"jogos"),j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
-    t.append(b,m);
-    const e=document.createElement("button");e.className="s";e.textContent="Editar";e.onclick=()=>editar(i);
-    const r=document.createElement("button");r.className="d";r.textContent="Remover";r.onclick=()=>remover(i);
-    d.append(im,t,e,r);box.appendChild(d);
+  const forcar=!!(q||fc||fk);
+  ["ps1","ps2","snes"].forEach(c=>{
+    const doC=idx.filter(i=>jogos[i].console===c);if(!doC.length)return;
+    const g=document.createElement("details");g.className="gr";g.open=forcar||abertos.has(c);
+    const sm=document.createElement("summary");sm.textContent=c.toUpperCase()+" ("+doC.length+")";
+    sm.onclick=()=>{g.open?abertos.delete(c):abertos.add(c)};
+    g.appendChild(sm);
+    doC.forEach(i=>{
+      const j=jogos[i],d=document.createElement("div");d.className="it";
+      const im=document.createElement("img");im.alt="";im.loading="lazy";
+      if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
+      const t=document.createElement("div");t.className="tt";
+      const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
+      const m=document.createElement("small");m.textContent=[catNome(j.categoria||"jogos"),j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
+      t.append(b,m);
+      const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
+      const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
+      d.append(im,t,e,r);g.appendChild(d);
+    });
+    box.appendChild(g);
   });
 }
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("categoria").value="jogos";$("capaInfo").style.display="none";
+  $("popular").checked=false;$("categoria").value="jogos";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -185,21 +221,22 @@ async function acharCapa(j){
 }
 async function statusCapa(j,i){
   const box=$("capaInfo"),im=$("capaPrev"),tx=$("capaTxt");
-  box.style.display="block";im.style.display="none";tx.textContent="Verificando se já existe capa...";
+  box.style.display="block";im.style.display="none";$("trocar").style.display="none";tx.textContent="Verificando capa...";
   const p=await acharCapa(j);
   if(edit!==i)return;
   if(p){
     const nova=j.capa!==p;j.capa=p;im.src=p;im.style.display="block";
-    tx.textContent="✔ Capa já cadastrada ("+p+")"+(nova?", encontrada no repositório e vinculada ao jogo":"")+". Só escolha um arquivo abaixo se quiser trocar.";
-    lista();
-  }else tx.textContent="Este jogo ainda não tem capa. Escolha uma imagem abaixo.";
+    tx.textContent="✔ Capa já cadastrada";$("trocar").style.display="inline";
+    if(nova)lista();
+  }else tx.textContent="Sem capa cadastrada.";
 }
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
   $("categoria").value=j.categoria||"jogos";$("popular").checked=!!j.popular;$("arq").value="";
-  scrollTo(0,0);statusCapa(j,i);
+  $("voltar").style.display="inline-block";posLista=scrollY;scrollTo(0,0);statusCapa(j,i);
 }
+function voltar(){limpar();scrollTo(0,posLista)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
 const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
