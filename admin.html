@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin do Catálogo</title>
+<style>
+:root{--bg:#e8ebf1;--fg:#1b2233;--card:#fff;--mu:#5d667a;--bd:#d3d8e3;--ac:#1d4ed8}
+@media(prefers-color-scheme:dark){:root{--bg:#12161f;--fg:#eef1f7;--card:#1b2130;--mu:#98a2b8;--bd:#2a3246}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 "Trebuchet MS",system-ui,sans-serif;padding:16px;max-width:760px;margin:auto}
+h1{font-size:1.6rem;margin:8px 0}
+details,.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin:12px 0}
+summary{cursor:pointer;font-weight:bold}
+label{display:block;margin-top:10px;font-size:.9rem;color:var(--mu)}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+button{padding:10px 16px;border:0;border-radius:8px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;margin:10px 8px 0 0}
+button.s{background:var(--bd);color:var(--fg)}
+button.d{background:#b42318}
+.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}
+.row span{flex:1}
+.row button{margin:0;padding:6px 12px}
+#msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
+</style>
+</head>
+<body>
+<h1>Admin do Catálogo</h1>
+
+<details id="cfg"><summary>Conexão com o GitHub</summary>
+  <label>Usuário<input id="user"></label>
+  <label>Repositório<input id="repo"></label>
+  <label>Branch<input id="branch" value="main"></label>
+  <label>Token (fine-grained, permissão Contents: leitura e escrita neste repositório)<input id="token" type="password" autocomplete="off"></label>
+  <button onclick="salvarCfg()">Salvar neste navegador</button>
+</details>
+
+<div class="box">
+  <b id="ft">Novo jogo</b>
+  <label>Título<input id="titulo"></label>
+  <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
+  <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
+  <label>Link<input id="link" type="url" placeholder="https://"></label>
+  <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
+  <label>Capa (imagem)<input id="arq" type="file" accept="image/*"></label>
+  <button onclick="salvarJogo()">Salvar jogo</button><button class="s" onclick="limpar()">Limpar</button>
+</div>
+
+<div class="box"><b>Jogos (<span id="n">0</span>)</b><div id="lista"></div>
+  <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
+</div>
+<div id="msg" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let jogos=[],edit=null,C=JSON.parse(localStorage.getItem("cfg")||"{}");
+["user","repo","branch","token"].forEach(k=>{if(C[k])$(k).value=C[k]});
+if(!C.token)$("cfg").open=true;
+
+function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",5000)}
+function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
+
+fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;lista()}).catch(()=>lista());
+
+function lista(){
+  $("n").textContent=jogos.length;
+  $("lista").innerHTML=jogos.map((j,i)=>`<div class="row"><span></span><button class="s" onclick="editar(${i})">Editar</button><button class="d" onclick="remover(${i})">Remover</button></div>`).join("");
+  document.querySelectorAll("#lista .row span").forEach((s,i)=>s.textContent=`${jogos[i].titulo} (${jogos[i].console.toUpperCase()})`);
+}
+function limpar(){edit=null;$("ft").textContent="Novo jogo";["titulo","genero","ano","link","descricao","arq"].forEach(k=>$(k).value="")}
+function editar(i){const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;["titulo","console","genero","ano","link","descricao"].forEach(k=>$(k).value=j[k]||"");scrollTo(0,0)}
+function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
+const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
+const enc=s=>btoa(unescape(encodeURIComponent(s)));
+
+async function api(p,o={}){
+  if(!C.token||!C.user||!C.repo)throw new Error("Preencha a conexão com o GitHub.");
+  const r=await fetch(`https://api.github.com/repos/${C.user}/${C.repo}/contents/${p}`,{...o,headers:{Authorization:"Bearer "+C.token,Accept:"application/vnd.github+json"}});
+  if(r.status===404)return null;
+  if(!r.ok)throw new Error("GitHub respondeu "+r.status);
+  return r.json();
+}
+async function enviar(p,conteudo,msg){
+  const cur=await api(p+"?ref="+C.branch);
+  await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});
+}
+
+async function salvarJogo(){
+  const titulo=$("titulo").value.trim();
+  if(!titulo)return aviso("Informe o título.");
+  const antigo=edit!==null?jogos[edit]:{};
+  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value),titulo,console:$("console").value,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),descricao:$("descricao").value.trim()};
+  const f=$("arq").files[0];
+  try{
+    if(f){
+      const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
+      j.capa=`capas/${j.console}/${slug(titulo)}.${ext}`;
+      aviso("Enviando capa...");
+      await enviar(j.capa,await b64(f),"Capa: "+titulo);
+    }
+    edit!==null?jogos[edit]=j:jogos.push(j);
+    limpar();lista();aviso("Jogo salvo na lista. Clique em Publicar para atualizar o site.");
+  }catch(e){aviso(e.message)}
+}
+async function publicar(){
+  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.")}catch(e){aviso(e.message)}
+}
+function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
+</script>
+</body>
+</html>

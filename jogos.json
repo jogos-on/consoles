@@ -1,0 +1,22 @@
+[
+  {
+    "id": "exemplo-ps1",
+    "titulo": "Exemplo PS1",
+    "console": "ps1",
+    "genero": "Ação / Plataforma",
+    "ano": "1998",
+    "link": "https://example.com",
+    "descricao": "Jogo de exemplo. Apague depois pelo admin.",
+    "capa": "capas/ps1/exemplo-ps1.jpg"
+  },
+  {
+    "id": "exemplo-snes",
+    "titulo": "Exemplo SNES",
+    "console": "snes",
+    "genero": "Plataforma",
+    "ano": "1994",
+    "link": "https://example.com",
+    "descricao": "",
+    "capa": "capas/snes/exemplo-snes.jpg"
+  }
+]
