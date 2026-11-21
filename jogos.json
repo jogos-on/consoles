@@ -43,16 +43,6 @@
     "capa": "capas/ps1/bomberman-fantasy-race.jpg"
   },
   {
-    "id": "resident-evil-2-pt-br-2-discos-ps1",
-    "titulo": "Resident Evil 2 (PT BR) 2 Discos",
-    "console": "ps1",
-    "popular": false,
-    "genero": "Survival Horror",
-    "ano": "1998",
-    "link": "https://www.mediafire.com/file/cvyr0evyeg1h2an/RE2_(PT-BR)[Dublado].rar/file",
-    "descricao": "Um clássico do survival horror que mergulha os jogadores em Raccoon City durante um apocalipse zumbi. Explore cenários aterrorizantes e desvende os mistérios por trás do surto viral."
-  },
-  {
     "id": "midnight-club-3-dub-edition-remix-ps2",
     "titulo": "Midnight Club 3: DUB Edition Remix",
     "console": "ps2",
