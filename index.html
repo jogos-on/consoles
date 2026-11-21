@@ -42,6 +42,11 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .top .ph{float:left;width:130px;margin:0 14px 8px 0;border-radius:6px}
 .g b{display:block;margin-top:8px;font:700 .95rem/1.15 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em}
 .g em{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:5px;font:normal 600 .72rem/1.3 Barlow,sans-serif;text-transform:uppercase;color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 22%,#0a0f1f)}
+.g.h{display:none!important}
+.pw{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--gold);border-radius:8px;color:var(--fg)}
+.pw b{color:var(--gold);user-select:all;overflow-wrap:anywhere}
+.btn.sm{padding:4px 12px;margin:0 0 0 8px;font-size:.85rem}
+#cpok{color:var(--gold);font-weight:600;margin-left:6px}
 .sub2{padding:12px 16px 0;color:var(--mu);font-weight:600}
 .nav{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:0 16px 16px}
 .nav button{padding:9px 18px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);border-radius:999px;background:#0d1224;color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
@@ -92,6 +97,7 @@ dialog::backdrop{background:#000a}
     <button class="chip" data-f="ps2" aria-pressed="false">PS2</button>
     <button class="chip" data-f="snes" aria-pressed="false">SNES</button>
   </div>
+  <div class="bar" id="cats" hidden style="padding-top:0"></div>
   <main id="grid"></main>
   <footer><div class="l cond">Escolha seu clássico<small class="cond">e boa jogatina!</small></div><div class="r cond">Game over?<small class="cond">Jamais.</small></div></footer>
 </div>
@@ -111,17 +117,22 @@ dialog::backdrop{background:#000a}
 const GISCUS={repo:"jogos-on/consoles",repoId:"R_kgDOV2o_fA",category:"Announcements",categoryId:"DIC_kwDOV2o_fM4DLp4_"};
 const SEC={ps1:["PS1","Clássicos que marcaram época!"],ps2:["PS2","Aventuras inesquecíveis!"],snes:["Super Nintendo","A era 16-bits!"]};
 const PROP={ps1:"1/1",ps2:"5/7",snes:"7/5"};
-const POP=6,PAGE=12;
+const LINHAS=2,MIN=6; // linhas visíveis antes de "Mostrar mais"
 const st={ps1:{ex:false,p:0},ps2:{ex:false,p:0},snes:{ex:false,p:0}};
-let jogos=[],filtro="todos";
+let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[{id:"jogos",nome:"Jogos"}];
+const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const seguro=u=>/^https?:\/\//i.test(u)?u:"";
 
-fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render()}).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
+const cfgP=fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
+function abrirLink(){const id=new URLSearchParams(location.search).get("jogo");if(id){const j=jogos.find(x=>x.id===id);if(j)abrir(j)}}
+fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
 
 function aplicarCfg(c){
   c=c||{};
+  if(Array.isArray(c.categorias)&&c.categorias.length){CATS=c.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
+  renderCats();
   if(c.titulo1)$("t1").textContent=c.titulo1;
   if(c.titulo2)$("t2").textContent=c.titulo2;
   if(c.subtitulo)$("st").textContent=c.subtitulo;
@@ -132,36 +143,45 @@ function aplicarCfg(c){
   document.documentElement.style.setProperty("--hero",src?`url("${encodeURI(src+(c.heroV?"?v="+c.heroV:""))}")`:"none");
   if(jogos.length)render();
 }
-fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
-
 function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
 function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
+function renderCats(){
+  const e=$("cats");e.hidden=CATS.length<2;
+  e.innerHTML=[{id:"todas",nome:"Todas"},...CATS].map(c=>`<button class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id===catF}">${esc(c.nome)}</button>`).join("");
+}
+const ordem=(a,b)=>(!!b.popular-!!a.popular)||a.titulo.localeCompare(b.titulo,"pt");
 function render(){
   const q=$("q").value.trim().toLowerCase();
   const html=Object.keys(SEC).filter(c=>filtro==="todos"||filtro===c).map(c=>{
-    const l=jogos.filter(j=>j.console===c&&j.titulo.toLowerCase().includes(q)).sort((a,b)=>a.titulo.localeCompare(b.titulo,"pt"));
+    const l=jogos.filter(j=>j.console===c&&(catF==="todas"||(j.categoria||"jogos")===catF)&&j.titulo.toLowerCase().includes(q)).sort(ordem);
     if(!l.length)return"";
-    const forcado=!!q||filtro!=="todos",ex=forcado||st[c].ex;
-    let itens,rotulo,nav="";
-    if(!ex){
-      let pop=l.filter(j=>j.popular);if(!pop.length)pop=l;
-      itens=pop.slice(0,POP);rotulo="Mais populares";
-      if(l.length>itens.length)nav=`<button data-a="mais" data-c="${c}">Mostrar mais (${l.length} jogos)</button>`;
-    }else{
-      const tot=Math.ceil(l.length/PAGE),pg=Math.min(st[c].p,tot-1);st[c].p=pg;
-      itens=l.slice(pg*PAGE,(pg+1)*PAGE);rotulo=q?"Resultados da busca":"Todos os jogos";
-      if(tot>1)nav+=`<button data-a="prev" data-c="${c}" aria-label="Página anterior" ${pg===0?"disabled":""}>&lsaquo;</button><span>${pg+1} / ${tot}</span><button data-a="next" data-c="${c}" aria-label="Próxima página" ${pg>=tot-1?"disabled":""}>&rsaquo;</button>`;
-      if(!forcado)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
-    }
-    return `<section class="sec ${c}" id="s-${c}"><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p></div><div class="sub2">${rotulo}</div><div class="row">${itens.map(j=>card(j,c)).join("")}</div>${nav?`<div class="nav">${nav}</div>`:""}</section>`;
+    const todos=!!q||filtro!=="todos"||catF!=="todas"||st[c].ex;
+    return `<section class="sec ${c}" id="s-${c}" data-c="${c}" data-ex="${todos?1:0}" data-forc="${(!!q||filtro!=="todos"||catF!=="todas")?1:0}"><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p></div><div class="row">${l.map(j=>card(j,c)).join("")}</div><div class="nav"></div></section>`;
   }).join("");
   $("grid").innerHTML=html||'<p class="vazio">Nenhum jogo encontrado.</p>';
+  ajustar();
 }
+// Esconde o que passa do espaço da grade (populares primeiro, depois A-Z) e mostra "Mostrar mais" só se houver excesso
+function ajustar(){
+  document.querySelectorAll("#grid .sec").forEach(sec=>{
+    const row=sec.querySelector(".row"),nav=sec.querySelector(".nav"),c=sec.dataset.c,cards=[...row.children];
+    if(sec.dataset.ex==="1"){
+      nav.innerHTML=sec.dataset.forc==="1"?"":`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
+    }else{
+      const cols=getComputedStyle(row).gridTemplateColumns.split(" ").length,lim=Math.max(cols*LINHAS,MIN);
+      cards.forEach((el,i)=>el.classList.toggle("h",i>=lim));
+      nav.innerHTML=cards.length>lim?`<button data-a="mais" data-c="${c}">Mostrar mais (${cards.length} jogos)</button>`:"";
+    }
+    nav.hidden=!nav.innerHTML;
+  });
+}
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,150)});
 
 $("q").oninput=render;
-document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
+$("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;catF=b.dataset.cat;renderCats();render()};
 $("grid").onclick=e=>{
   const n=e.target.closest("[data-a]");
   if(n){
@@ -214,11 +234,24 @@ async function copiarPix(){
   setTimeout(()=>$("pixok").textContent="",2500);
 }
 
+const urlJogo=j=>{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("jogo",j.id);return u.toString()};
+async function copiarTxt(t,m){
+  try{await navigator.clipboard.writeText(t)}
+  catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove()}
+  const o=$("cpok");if(o){o.textContent=m;setTimeout(()=>o.textContent="",2500)}
+}
+function copiarSenha(){if(atual)copiarTxt(atual.senha,"Senha copiada!")}
+async function compartilhar(){
+  if(!atual)return;const u=urlJogo(atual);
+  if(navigator.share){try{await navigator.share({title:atual.titulo,text:atual.titulo,url:u});return}catch(e){if(e.name==="AbortError")return}}
+  copiarTxt(u,"Link copiado!");
+}
+dlg.addEventListener("close",()=>{atual=null;history.replaceState(null,"",location.pathname)});
 function abrir(j){
-  if(!j)return;
+  if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
   const w={ps1:150,ps2:130,snes:170}[j.console]||130;
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar jogo</a>`:""}<button class="btn alt" onclick="abrirPix()">Doar uns trocados</button></div></div>`;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${(j.categoria||"jogos")!=="jogos"?" - "+esc(catNome(j.categoria)):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
   const im=$("det").querySelector(".top img");
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
   const s=document.createElement("script");
