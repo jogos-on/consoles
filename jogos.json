@@ -19,5 +19,25 @@
     "descricao": "Neste jogo de cartas estratégico, os jogadores viajam para o Antigo Egito para desvendar mistérios e duelar com poderosos oponentes. Colecione cartas e construa o baralho definitivo para se tornar o Mestre dos Duelistas.",
     "capa": "capas/ps1/yu-gi-oh-forbidden-memories.png",
     "popular": true
+  },
+  {
+    "id": "resident-evil-2-ps1",
+    "titulo": "Resident Evil 2",
+    "console": "ps1",
+    "genero": "Survival Horror",
+    "ano": "1998",
+    "link": "",
+    "descricao": "Um clássico do survival horror que mergulha os jogadores em Raccoon City durante um apocalipse zumbi. Explore cenários aterrorizantes e desvende os mistérios por trás do surto viral.",
+    "popular": false
+  },
+  {
+    "id": "bomberman-fantasy-race-ps1",
+    "titulo": "Bomberman Fantasy Race",
+    "console": "ps1",
+    "genero": "Corrida / Ação",
+    "ano": "1998",
+    "link": "",
+    "descricao": "Participe de corridas emocionantes com os personagens de Bomberman, utilizando itens e habilidades especiais para superar seus adversários. Escolha entre diversas criaturas para montar e competir em pistas coloridas.",
+    "popular": false
   }
 ]
