@@ -206,13 +206,24 @@ function renderLote(){
 <input data-i="${i}" data-k="genero" placeholder="Gênero">
 <input data-i="${i}" data-k="ano" placeholder="Ano" inputmode="numeric">
 <input data-i="${i}" data-k="link" type="url" placeholder="Link (opcional)">
+<label style="display:block;color:var(--mu);font-size:.9rem;margin-top:6px">Capa (imagem)<input type="file" accept="image/*" data-i="${i}" data-k="arq"></label><img class="lp" alt="" style="display:none;max-width:90px;max-height:90px;margin-top:6px;border-radius:6px">
 <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="popular"> Popular</label>`;
-    d.querySelectorAll("[data-k]").forEach(el=>{const v=x[el.dataset.k];if(el.type==="checkbox")el.checked=!!v;else el.value=v||""});
+    d.querySelectorAll("[data-k]").forEach(el=>{if(el.type==="file")return;const v=x[el.dataset.k];if(el.type==="checkbox")el.checked=!!v;else el.value=v||""});
     if(x.nota){const n=document.createElement("div");n.className="nt";n.textContent=x.nota;d.appendChild(n)}
     r.appendChild(d);
   });
 }
-const editarLote=e=>{const el=e.target;if(!el.dataset||!el.dataset.k)return;lote[+el.dataset.i][el.dataset.k]=el.type==="checkbox"?el.checked:el.value};
+const editarLote=e=>{
+  const el=e.target;if(!el.dataset||!el.dataset.k)return;
+  const it=lote[+el.dataset.i];
+  if(el.type==="file"){
+    it.arq=el.files[0]||null;
+    const im=el.closest(".lrow").querySelector(".lp");
+    if(im){if(it.arq){im.src=URL.createObjectURL(it.arq);im.style.display="block"}else im.style.display="none"}
+    return;
+  }
+  it[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;
+};
 $("lr").addEventListener("input",editarLote);$("lr").addEventListener("change",editarLote);
 
 async function gerarLote(){
@@ -249,17 +260,44 @@ async function gerarLote(){
   if(!falhou)setTimeout(()=>{if($("iad").open)$("iad").close()},1200);
 }
 
+function reduzirCapa(f){
+  return new Promise((ok,err)=>{
+    const img=new Image(),u=URL.createObjectURL(f);
+    img.onload=()=>{
+      const k=Math.min(1,800/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
+      const c=document.createElement("canvas");c.width=w;c.height=h;
+      const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(u);
+      c.toBlob(b=>b?ok(b):err(new Error("Falha ao processar a capa")),"image/jpeg",0.88);
+    };
+    img.onerror=()=>err(new Error("Imagem de capa inválida"));
+    img.src=u;
+  });
+}
+
 async function adicionarLote(pub){
-  let n=0;
-  lote.filter(x=>x.sel&&String(x.titulo).trim()).forEach(x=>{
-    const id=slug(String(x.titulo).trim()+"-"+loteC);
-    if(jogos.some(j=>j.id===id))return;
-    jogos.push({id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular});
-    n++;
+  const vistos=new Set();
+  const sel=lote.filter(x=>x.sel&&String(x.titulo).trim())
+    .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC)}))
+    .filter(o=>{if(jogos.some(j=>j.id===o.id)||vistos.has(o.id))return false;vistos.add(o.id);return true});
+  if(!sel.length)return aviso("Nenhum jogo novo para adicionar.");
+  try{
+    let k=0;
+    for(const o of sel){
+      k++;aviso(`Enviando jogo ${k} de ${sel.length}: ${String(o.x.titulo).trim()}...`);
+      if(!o.x.arq)continue;
+      o.capa=`capas/${loteC}/${slug(String(o.x.titulo).trim())}.jpg`;
+      await enviar(o.capa,await b64(await reduzirCapa(o.x.arq)),"Capa: "+String(o.x.titulo).trim());
+    }
+  }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
+  sel.forEach(o=>{
+    const x=o.x;
+    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular};
+    if(o.capa)j.capa=o.capa;
+    jogos.push(j);
   });
   lote=[];renderLote();$("lb").style.display="none";$("ln").value="";lista();
-  if(!n)return aviso("Nenhum jogo novo foi adicionado.");
-  if(pub)await publicar();else aviso(n+" jogo(s) adicionado(s). Toque em Publicar no GitHub para atualizar o site.");
+  if(pub)await publicar();else aviso(sel.length+" jogo(s) adicionado(s). Toque em Publicar no GitHub para atualizar o site.");
 }
 
 let CFG={};
@@ -309,7 +347,7 @@ async function salvarJogo(){
       await enviar(j.capa,await b64(f),"Capa: "+titulo);
     }
     edit!==null?jogos[edit]=j:jogos.push(j);
-    limpar();lista();aviso("Jogo salvo na lista. Clique em Publicar para atualizar o site.");
+    limpar();lista();await publicar();
   }catch(e){aviso(e.message)}
 }
 async function publicar(){
