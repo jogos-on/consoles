@@ -1,15 +1,5 @@
 [
   {
-    "id": "exemplo-ps1",
-    "titulo": "Exemplo PS1",
-    "console": "ps1",
-    "genero": "Ação / Plataforma",
-    "ano": "1998",
-    "link": "https://example.com",
-    "descricao": "Jogo de exemplo. Apague depois pelo admin.",
-    "capa": "capas/ps1/exemplo-ps1.jpg"
-  },
-  {
     "id": "exemplo-snes",
     "titulo": "Exemplo SNES",
     "console": "snes",
@@ -25,8 +15,9 @@
     "console": "ps1",
     "genero": "RPG / Estratégia",
     "ano": "2002",
-    "link": "",
+    "link": "https://www.mediafire.com/file/qqqr46apssxbqj4/[PS1]_Yu-Gi-Oh!+Forbidden+Memories+(PT-BR).rar/file",
     "descricao": "Neste jogo de cartas estratégico, os jogadores viajam para o Antigo Egito para desvendar mistérios e duelar com poderosos oponentes. Colecione cartas e construa o baralho definitivo para se tornar o Mestre dos Duelistas.",
-    "capa": "capas/ps1/yu-gi-oh-forbidden-memories.png"
+    "capa": "capas/ps1/yu-gi-oh-forbidden-memories.png",
+    "popular": true
   }
 ]
