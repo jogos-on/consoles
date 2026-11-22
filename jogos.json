@@ -1,16 +1,5 @@
 [
   {
-    "id": "exemplo-snes",
-    "titulo": "Exemplo SNES",
-    "console": "snes",
-    "genero": "Plataforma",
-    "ano": "1994",
-    "link": "https://example.com",
-    "descricao": "",
-    "capa": "capas/snes/exemplo-snes.jpg",
-    "popular": false
-  },
-  {
     "id": "yu-gi-oh-forbidden-memories-ps1",
     "titulo": "Yu-Gi-Oh! Forbidden Memories (PT BR)",
     "console": "ps1",
