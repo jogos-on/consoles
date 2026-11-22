@@ -153,7 +153,8 @@ const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",
 const SEC={},PROP={};
 const ROLO=5,PAG=10,MAXC=6; // 5 no rolo lateral; 10 por página na grade; máx. de colunas
 const st={};
-let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[{id:"jogos",nome:"Jogos"}];
+let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[];
+const catDe=j=>(j&&j.categoria&&j.categoria!=="jogos")?j.categoria:"";
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -196,7 +197,8 @@ function aplicarCfg(c){
   c=c||{};
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc))iniciarLike(c.gc);
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc)&&!document.getElementById("gcs")){const g=document.createElement("script");g.id="gcs";g.async=true;g.dataset.goatcounter="https://"+c.gc+".goatcounter.com/count";g.src="https://gc.zgo.at/count.js";document.head.appendChild(g)}
-  if(Array.isArray(c.categorias)&&c.categorias.length){CATS=c.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
+  if(Array.isArray(c.categorias))CATS=c.categorias.filter(x=>x&&x.id&&x.id!=="jogos");
+  if(catF!=="todas"&&!CATS.some(x=>x.id===catF))catF="todas";
   renderCats();
   if(c.titulo1)$("t1").textContent=c.titulo1;
   if(c.titulo2)$("t2").textContent=c.titulo2;
@@ -213,7 +215,7 @@ function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.t
 function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
 function renderCats(){
-  const e=$("cats");e.hidden=CATS.length<2;
+  const e=$("cats");e.hidden=CATS.length<1;
   e.innerHTML=[{id:"todas",nome:"Todas"},...CATS].map(c=>`<button class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id===catF}">${esc(c.nome)}</button>`).join("");
 }
 const ordem=(a,b)=>(!!b.popular-!!a.popular)||a.titulo.localeCompare(b.titulo,"pt");
@@ -221,7 +223,7 @@ function render(){
   const q=$("q").value.trim().toLowerCase();
   const forc=!!q||filtro!=="todos"||catF!=="todas";
   const html=Object.keys(SEC).filter(c=>filtro==="todos"||filtro===c).map(c=>{
-    const l=jogos.filter(j=>j.console===c&&(catF==="todas"||(j.categoria||"jogos")===catF)&&j.titulo.toLowerCase().includes(q)).sort(ordem);
+    const l=jogos.filter(j=>j.console===c&&(catF==="todas"||catDe(j)===catF)&&j.titulo.toLowerCase().includes(q)).sort(ordem);
     if(!l.length)return"";
     const ex=forc||st[c].ex;
     let itens,nav="",modo;
@@ -329,7 +331,7 @@ function abrir(j){
   if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
   const w=({"1/1":150,"5/7":130,"7/5":170})[PROP[j.console]]||130;
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${(j.categoria||"jogos")!=="jogos"?" - "+esc(catNome(j.categoria)):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
   const im=$("det").querySelector(".top img");
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
   const s=document.createElement("script");
