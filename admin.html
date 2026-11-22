@@ -5,40 +5,57 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Admin do Catálogo</title>
+<meta name="theme-color" content="#070a14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;1,800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#e8ebf1;--fg:#1b2233;--card:#fff;--mu:#5d667a;--bd:#d3d8e3;--ac:#1d4ed8}
-@media(prefers-color-scheme:dark){:root{--bg:#12161f;--fg:#eef1f7;--card:#1b2130;--mu:#98a2b8;--bd:#2a3246}}
+:root{--bg:#070a14;--fg:#eef1f8;--card:#0e1428;--mu:#8e98b3;--bd:#222b4a;--ac:#3b82f6;--gold:#e8b923;--ok:#22c55e;--er:#f87171;--ps1:#3b82f6;--ps2:#6366f1;--snes:#8b5cf6;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 "Trebuchet MS",system-ui,sans-serif;padding:16px;max-width:760px;margin:auto}
-h1{font-size:1.6rem;margin:8px 0}
-details,.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin:12px 0}
-summary{cursor:pointer;font-weight:bold}
-label{display:block;margin-top:10px;font-size:.9rem;color:var(--mu)}
-input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
-button{padding:10px 16px;border:0;border-radius:8px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;margin:10px 8px 0 0}
-button.s{background:var(--bd);color:var(--fg)}
-button.d{background:#b42318}
+body{margin:0 auto;background:radial-gradient(900px 420px at 85% -120px,#1a3a8a55,transparent),radial-gradient(700px 400px at -10% 30%,#3b1a8a33,transparent),var(--bg);background-attachment:fixed;color:var(--fg);font:16px/1.5 Barlow,"Trebuchet MS",system-ui,sans-serif;padding:16px;max-width:760px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:8px 0 4px}
+.top small{color:var(--gold);letter-spacing:.2em;font-weight:600}
+h1{font:italic 800 2.5rem/.95 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:2px 0 0;color:#fff}
+h1 span{display:block;color:var(--gold)}
+.stats{display:flex;gap:8px}
+.stats div{background:#ffffff0d;border:1px solid var(--bd);border-radius:12px;padding:6px 12px;text-align:center;min-width:64px}
+.stats b{display:block;font:800 1.5rem/1.1 "Barlow Condensed",sans-serif}
+.stats small{color:var(--mu);font-size:.75rem}
+.cta{width:100%;margin:12px 0 4px;padding:14px;border-radius:14px;background:linear-gradient(180deg,#f3c93a,#d9a313);color:#1a1300;font:800 1.3rem "Barlow Condensed",Barlow,sans-serif;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 6px 18px #e8b92333}
+details,.box{background:linear-gradient(180deg,#131b38,#0c1124);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 8px 24px #0006}
+summary,.bt{font:700 1.2rem "Barlow Condensed",Barlow,sans-serif;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+details>summary{list-style:none;display:flex;justify-content:space-between;align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"▾";color:var(--gold);transition:transform .15s}
+details:not([open])>summary::after{transform:rotate(-90deg)}
+.bt{cursor:default;color:#fff}
+#ft::before{content:"🎮 "}.lst::before{content:"📚 "}
+label{display:block;margin-top:12px;font-size:.88rem;color:var(--mu)}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:#080d1d;color:var(--fg);font:inherit}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px #e8b92333}
+input[type=checkbox]{accent-color:var(--gold)}
+button{padding:10px 18px;border:0;border-radius:10px;background:linear-gradient(180deg,#4f8bff,#2f64d8);color:#fff;font:600 1rem Barlow,sans-serif;cursor:pointer;margin:12px 8px 0 0;box-shadow:0 3px 10px #2f64d855}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.5}
+button.s{background:#1a2342;border:1px solid var(--bd);box-shadow:none;color:var(--fg)}
+button.d{background:linear-gradient(180deg,#ef4444,#b42318);box-shadow:none}
 .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}
-.row span{flex:1}
-.row button{margin:0;padding:6px 12px}
-dialog{width:min(520px,94vw);border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--fg);padding:16px}
-dialog::backdrop{background:#000a}
+.row span{flex:1}.row button{margin:0;padding:6px 12px}
+dialog{width:min(520px,94vw);border:1px solid var(--bd);border-radius:16px;background:#0e1428;color:var(--fg);padding:18px;box-shadow:0 20px 60px #000a}
+dialog::backdrop{background:#000b;backdrop-filter:blur(3px)}
 #ial{padding-left:18px;font-size:.92rem}
-#ial .ok{color:#15803d;font-weight:bold}
-#ial .er{color:#b42318}
+#ial .ok{color:var(--ok);font-weight:bold}#ial .er{color:var(--er)}
 #iao button{display:block;width:100%;text-align:left;margin:6px 0}
 .lrow{border-top:1px solid var(--bd);padding:10px 0}
 .lrow input{margin-top:6px}
-.lrow .nt{color:#b42318;font-size:.85rem;margin-top:4px}
-details.gr{margin-top:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);padding:0}
-details.gr>summary{padding:10px 12px;font-weight:bold;color:var(--ac);list-style:none;display:flex;justify-content:space-between}
-details.gr>summary::-webkit-details-marker{display:none}
-details.gr>summary::after{content:"▾";transition:transform .15s}
-details.gr:not([open])>summary::after{transform:rotate(-90deg)}
+.lrow .nt{color:var(--er);font-size:.85rem;margin-top:4px}
+details.gr{margin-top:10px;border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:10px;background:#0a1020;padding:0;box-shadow:none}
+details.gr[data-c=ps1]{border-left-color:var(--ps1)}details.gr[data-c=ps2]{border-left-color:var(--ps2)}details.gr[data-c=snes]{border-left-color:var(--snes)}
+details.gr>summary{padding:10px 12px;color:var(--gold);font-size:1.1rem}
 details.gr .it:first-of-type{border-top:1px solid var(--bd)}
 .it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--bd)}
 .it:last-child{border-bottom:0}
-.it img{width:34px;height:34px;object-fit:cover;border-radius:5px;background:var(--bd);flex:none}
+.it img{width:34px;height:34px;object-fit:cover;border-radius:6px;background:var(--bd);flex:none}
 .it .tt{flex:1;min-width:0}
 .it .tt b,.it .tt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .it .tt b{font-size:.95rem}.it small{color:var(--mu);font-size:.78rem}
@@ -46,16 +63,23 @@ details.gr .it:first-of-type{border-top:1px solid var(--bd)}
 #lista{margin-top:4px}
 .crow{display:flex;gap:8px;align-items:center;margin-top:6px}.crow input{flex:1;min-width:0}
 .crow small{color:var(--mu);white-space:nowrap}.crow button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1}
-.flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.flt>*{flex:1 1 140px}
-#capaInfo{display:none;margin-top:10px;font-size:.9rem}
-#capaInfo img{max-width:120px;max-height:120px;border-radius:6px;display:block;margin-bottom:6px}
-#msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.flt>*{flex:1 1 140px}
+#capaInfo{display:none;margin-top:10px;font-size:.9rem;color:var(--ok)}
+#capaInfo img{max-width:120px;max-height:120px;border-radius:8px;display:block;margin-bottom:6px}
+.cph{display:flex;justify-content:space-between;color:var(--mu);font-weight:600}
+#cpt{font:italic 800 1.9rem/1.05 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:12px 0 2px;color:#fff;overflow-wrap:anywhere}
+#cpm{color:var(--gold);font-weight:600}
+#cpi{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:12px auto 0}
+#cpi[hidden]{display:none}
+#msg{position:sticky;bottom:8px;padding:10px 14px;border-radius:12px;background:#1a2342;border:1px solid var(--gold);color:var(--fg);display:none;box-shadow:0 8px 24px #000a;z-index:5}
 </style>
 </head>
 <body>
-<h1>Admin do Catálogo</h1>
+<header class="top"><div><small>🎮 PAINEL</small><h1>Admin<span>do Catálogo</span></h1></div>
+<div class="stats"><div><b id="sTot">0</b><small>jogos</small></div><div><b id="sSem">0</b><small>sem capa</small></div></div></header>
+<button class="cta" id="capasBtn" onclick="abrirCapas()">🖼️ Completar capas</button>
 
-<details id="cfg"><summary>Conexão com o GitHub</summary>
+<details id="cfg"><summary>🔌 Conexão com o GitHub</summary>
   <label>Usuário<input id="user"></label>
   <label>Repositório<input id="repo"></label>
   <label>Branch<input id="branch" value="main"></label>
@@ -68,7 +92,7 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarCfg()">Salvar neste navegador</button>
 </details>
 
-<details id="pg"><summary>Configurações da página</summary>
+<details id="pg"><summary>⚙️ Configurações da página</summary>
   <label>Título, linha 1<input id="t1" placeholder="Catálogo"></label>
   <label>Título, linha 2 (em dourado)<input id="t2" placeholder="de jogos"></label>
   <label>Subtítulo<input id="st"></label>
@@ -81,13 +105,13 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarPagina()">Salvar e publicar configurações</button>
 </details>
 
-<details id="ct"><summary>Categorias</summary>
+<details id="ct"><summary>🏷️ Categorias</summary>
   <div id="catl"></div>
   <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
   <button class="s" onclick="addCat()">Adicionar</button><button onclick="salvarCats()">Salvar e publicar categorias</button>
 </details>
 
-<details id="lt"><summary>Cadastro em lote com IA</summary>
+<details id="lt"><summary>📦 Cadastro em lote com IA</summary>
   <label>Console de todos os jogos da lista<select id="lc"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
   <label>Categoria<select id="lcat"></select></label>
   <label>Nomes dos jogos, um por linha (pode haver erros de digitação)<textarea id="ln" rows="6" placeholder="crash bandicoot&#10;resident evil 2&#10;tekken 3"></textarea></label>
@@ -99,7 +123,7 @@ gemini-2.5-flash-lite</textarea></label>
 
 
 <div class="box">
-  <b id="ft">Novo jogo</b>
+  <b id="ft" class="bt">Novo jogo</b>
   <label>Título<input id="titulo"></label>
   <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
   <label>Categoria<select id="categoria"></select></label>
@@ -115,12 +139,19 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
 </div>
 
-<div class="box"><b>Jogos (<span id="n">0</span>)</b>
+<div class="box"><b class="bt lst">Jogos (<span id="n">0</span>)</b>
   <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
   <div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
 <dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
+<dialog id="cpd">
+  <div class="cph"><b>🖼️ COMPLETAR CAPAS</b><span id="cpn"></span></div>
+  <div id="cpt"></div><div id="cpm"></div>
+  <img id="cpi" alt="" hidden>
+  <label>Escolher capa<input id="cpf" type="file" accept="image/*"></label>
+  <button id="cps" onclick="cpSalvar()">Salvar e próximo</button><button class="s" onclick="cpPular()">Pular</button><button class="s" onclick="$('cpd').close()">Fechar</button>
+</dialog>
 <div id="msg" role="status"></div>
 
 <script>
@@ -177,8 +208,50 @@ async function salvarCats(){
   catch(e){aviso(e.message)}
 }
 
+let cpFila=[],cpI=0,cpBusy=false;
+const cpAtual=()=>jogos.find(j=>j.id===cpFila[cpI]);
+function abrirCapas(){
+  cpFila=jogos.filter(j=>!j.capa).map(j=>j.id);
+  if(!cpFila.length)return aviso("Todos os jogos já têm capa.");
+  cpI=0;cpMostrar();$("cpd").showModal();
+}
+function cpMostrar(){
+  while(cpI<cpFila.length&&!cpAtual())cpI++;
+  const j=cpAtual();
+  if(!j){if($("cpd").open)$("cpd").close();aviso("Fim da lista de capas.");lista();return}
+  $("cpn").textContent=(cpI+1)+" de "+cpFila.length;
+  $("cpt").textContent=j.titulo;
+  $("cpm").textContent=j.console.toUpperCase()+" · "+catNome(j.categoria||"jogos");
+  $("cpf").value="";$("cpi").hidden=true;
+}
+$("cpf").onchange=()=>{const f=$("cpf").files[0],im=$("cpi");if(f){im.src=URL.createObjectURL(f);im.hidden=false}else im.hidden=true};
+function cpPular(){cpI++;cpMostrar()}
+async function cpSalvar(){
+  if(cpBusy)return;
+  const j=cpAtual(),f=$("cpf").files[0];
+  if(!j)return;
+  if(!f)return aviso("Escolha uma imagem ou toque em Pular.");
+  cpBusy=true;$("cps").disabled=true;$("cps").textContent="Salvando...";
+  try{
+    const dados=await capaJpg(f);
+    if(!dados)throw new Error("formato de imagem não suportado (use JPG, PNG ou WEBP)");
+    const suf=(j.categoria||"jogos")!=="jogos"?"-"+j.categoria:"";
+    const caminho=`capas/${j.console}/${slug(j.titulo)}${suf}.jpg`;
+    await enviar(caminho,dados,"Capa: "+j.titulo);
+    j.capa=caminho;
+    await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Capa de "+j.titulo);
+    cpI++;lista();cpMostrar();
+  }catch(e){aviso("Falha ao salvar a capa: "+e.message)}
+  cpBusy=false;$("cps").disabled=false;$("cps").textContent="Salvar e próximo";
+}
 const abertos=new Set();let posLista=0;
+function atualizarStats(){
+  const sem=jogos.filter(j=>!j.capa).length;
+  $("sTot").textContent=jogos.length;$("sSem").textContent=sem;
+  $("capasBtn").textContent=sem?`🖼️ Completar capas (${sem})`:"✅ Todos os jogos têm capa";
+}
 function lista(){
+  atualizarStats();
   const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
   const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
   idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
@@ -188,7 +261,7 @@ function lista(){
   const forcar=!!(q||fc||fk);
   ["ps1","ps2","snes"].forEach(c=>{
     const doC=idx.filter(i=>jogos[i].console===c);if(!doC.length)return;
-    const g=document.createElement("details");g.className="gr";g.open=forcar||abertos.has(c);
+    const g=document.createElement("details");g.className="gr";g.dataset.c=c;g.open=forcar||abertos.has(c);
     const sm=document.createElement("summary");sm.textContent=c.toUpperCase()+" ("+doC.length+")";
     sm.onclick=()=>{g.open?abertos.delete(c):abertos.add(c)};
     g.appendChild(sm);
