@@ -3,508 +3,309 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Admin do Catálogo</title>
+<title>Catálogo de Jogos</title>
+<meta name="description" content="Explore nossa coleção de jogos retrô para PS1, PS2 e Super Nintendo. Escolha seu jogo e divirta-se!">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jogos-on.github.io/consoles/">
+<meta property="og:title" content="CATÁLOGO DE JOGOS">
+<meta property="og:description" content="Explore nossa coleção de jogos retrô para PS1, PS2 e Super Nintendo. Escolha seu jogo e divirta-se!">
+<meta property="og:image" content="https://jogos-on.github.io/consoles/assets/preview-catalogo.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CATÁLOGO DE JOGOS">
+<meta name="twitter:description" content="Explore nossa coleção de jogos retrô para PS1, PS2 e Super Nintendo.">
+<meta name="twitter:image" content="https://jogos-on.github.io/consoles/assets/preview-catalogo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;1,800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#e8ebf1;--fg:#1b2233;--card:#fff;--mu:#5d667a;--bd:#d3d8e3;--ac:#1d4ed8}
-@media(prefers-color-scheme:dark){:root{--bg:#12161f;--fg:#eef1f7;--card:#1b2130;--mu:#98a2b8;--bd:#2a3246}}
+:root{--hero:url("hero.png");--bg:#070a14;--fg:#eef1f8;--mu:#8e98b3;--gold:#e8b923;--ps1:#3b82f6;--ps2:#4f7cff;--snes:#8b5cf6}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 "Trebuchet MS",system-ui,sans-serif;padding:16px;max-width:760px;margin:auto}
-h1{font-size:1.6rem;margin:8px 0}
-details,.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin:12px 0}
-summary{cursor:pointer;font-weight:bold}
-label{display:block;margin-top:10px;font-size:.9rem;color:var(--mu)}
-input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
-button{padding:10px 16px;border:0;border-radius:8px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;margin:10px 8px 0 0}
-button.s{background:var(--bd);color:var(--fg)}
-button.d{background:#b42318}
-.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}
-.row span{flex:1}
-.row button{margin:0;padding:6px 12px}
-dialog{width:min(520px,94vw);border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--fg);padding:16px}
+body{margin:0;color:var(--fg);font:16px/1.45 Barlow,"Trebuchet MS",system-ui,sans-serif;
+  background:radial-gradient(900px 420px at 85% -80px,#1b3a8a66,transparent),radial-gradient(700px 400px at 0 100%,#4c1d9533,transparent),var(--bg)}
+.wrap{max-width:1100px;margin:auto;padding:0 16px}
+h1,h2,.cond{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:28px 0 8px}
+h1{margin:0;font-style:italic;font-weight:800;font-size:clamp(3rem,13vw,6.5rem);line-height:.9;letter-spacing:-.01em}
+h1 span{display:block}
+h1 .a{background:linear-gradient(#fff,#aeb6c8);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:1.15rem}
+.sub i{width:28px;height:5px;border-radius:3px;background:var(--ps1)}
+.hero img{flex:0 1 46%;width:46%;aspect-ratio:1000/540;max-height:300px;object-fit:contain}
+.bar{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0}
+.bar input{flex:1 1 180px;padding:10px 14px;border:1px solid #2a3350;border-radius:10px;background:#0d1224;color:var(--fg);font:inherit}
+.chip{padding:9px 16px;border:1px solid #2a3350;border-radius:999px;background:#0d1224;color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#1a1300}
+.chip:focus-visible,.g:focus-visible,.x:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sec{--c:var(--ps1);border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:16px;background:#0a0f1fcc;margin:18px 0;overflow:hidden}
+.sec.ps2{--c:var(--ps2)}.sec.snes{--c:var(--snes)}
+.sec.ps1{--ar:1/1}.sec.ps2{--ar:5/7;--min:140px}.sec.snes{--ar:7/5}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 16px 0 0;border-bottom:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.sh h2{margin:0;padding:12px 44px 12px 20px;font-style:italic;font-size:1.9rem;line-height:1;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,#000),color-mix(in srgb,var(--c) 25%,#000));clip-path:polygon(0 0,calc(100% - 26px) 0,100% 100%,0 100%)}
+.sh p{margin:0;color:var(--c);font-weight:700;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-size:1.1rem;filter:brightness(1.4)}
+.sec{--n:2}
+@media(min-width:560px){.sec{--n:3}}
+@media(min-width:900px){.sec{--n:5}}
+.row{gap:14px;padding:16px;align-items:flex-start}
+.row.grade{align-items:start}
+.row.grade{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.row.rolo{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+.row.rolo .g{flex:0 0 calc((100% - (var(--n) - 1)*14px)/var(--n));scroll-snap-align:start}
+.row.rolo.peek .g{flex-basis:calc((100% - var(--n)*14px)/(var(--n) + .3))}
+.sh p{margin-left:auto}
+.cc{display:flex;gap:6px}
+.cb{width:34px;height:34px;padding:0;border-radius:8px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);background:#0d1224;color:var(--fg);font:700 1.2rem/1 Barlow,sans-serif;cursor:pointer}
+.cb:disabled{opacity:.35;cursor:default}
+.cb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:560px){.sh p{order:3;flex-basis:100%;margin:0 0 10px;padding-left:20px}.cc{order:2;margin-left:auto}}
+.g{all:unset;cursor:pointer;display:block;text-align:center}
+.cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
+.star{position:absolute;top:3px;left:5px;z-index:1;font:normal 700 17px/1 Barlow,sans-serif;background:linear-gradient(180deg,#fff3b0 0%,#f0c230 50%,#b9830a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 1.5px #000d);pointer-events:none}
+.cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:fill;display:block}
+.ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
+.ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
+.top .ph{float:left;width:130px;margin:0 14px 8px 0;border-radius:6px}
+.g b{display:block;margin-top:8px;font:700 .95rem/1.15 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em}
+.g em{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:5px;font:normal 600 .72rem/1.3 Barlow,sans-serif;text-transform:uppercase;color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 22%,#0a0f1f)}
+.pw{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--gold);border-radius:8px;color:var(--fg)}
+.pw b{color:var(--gold);user-select:all;overflow-wrap:anywhere}
+.btn.sm{padding:4px 12px;margin:0 0 0 8px;font-size:.85rem}
+#cpok{color:var(--gold);font-weight:600;margin-left:6px}
+.sub2{padding:12px 16px 0;color:var(--mu);font-weight:600}
+.nav{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:0 16px 16px}
+.nav button{padding:9px 18px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);border-radius:999px;background:#0d1224;color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.nav span{color:var(--mu);min-width:60px;text-align:center}
+.vazio{text-align:center;color:var(--mu);padding:40px 0}
+footer{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 0 48px;font-weight:700;font-size:1.5rem;line-height:1.1}
+footer .l{color:var(--gold)}footer .r{color:var(--snes);text-align:right}
+footer small{display:block;color:var(--fg);font-size:1.1rem}
+dialog{width:min(640px,94vw);max-height:92vh;border:1px solid #2a3350;border-radius:14px;padding:0;background:#0d1224;color:var(--fg)}
 dialog::backdrop{background:#000a}
-#ial{padding-left:18px;font-size:.92rem}
-#ial .ok{color:#15803d;font-weight:bold}
-#ial .er{color:#b42318}
-#iao button{display:block;width:100%;text-align:left;margin:6px 0}
-.lrow{border-top:1px solid var(--bd);padding:10px 0}
-.lrow input{margin-top:6px}
-.lrow .nt{color:#b42318;font-size:.85rem;margin-top:4px}
-details.gr{margin-top:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);padding:0}
-details.gr>summary{padding:10px 12px;font-weight:bold;color:var(--ac);list-style:none;display:flex;justify-content:space-between}
-details.gr>summary::-webkit-details-marker{display:none}
-details.gr>summary::after{content:"▾";transition:transform .15s}
-details.gr:not([open])>summary::after{transform:rotate(-90deg)}
-details.gr .it:first-of-type{border-top:1px solid var(--bd)}
-.it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--bd)}
-.it:last-child{border-bottom:0}
-.it img{width:34px;height:34px;object-fit:cover;border-radius:5px;background:var(--bd);flex:none}
-.it .tt{flex:1;min-width:0}
-.it .tt b,.it .tt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.it .tt b{font-size:.95rem}.it small{color:var(--mu);font-size:.78rem}
-.it button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1;flex:none}
-#lista{margin-top:4px}
-.crow{display:flex;gap:8px;align-items:center;margin-top:6px}.crow input{flex:1;min-width:0}
-.crow small{color:var(--mu);white-space:nowrap}.crow button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1}
-.flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.flt>*{flex:1 1 140px}
-#capaInfo{display:none;margin-top:10px;font-size:.9rem}
-#capaInfo img{max-width:120px;max-height:120px;border-radius:6px;display:block;margin-bottom:6px}
-#msg{position:sticky;bottom:8px;padding:10px;border-radius:8px;background:var(--fg);color:var(--bg);display:none}
+.in{padding:18px}
+.top{display:flow-root}
+.top img{float:left;width:130px;height:auto;margin:0 14px 8px 0;object-fit:fill;border-radius:6px}
+.top h3{margin:0 0 4px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+.acts{display:block}
+.btn{display:inline-block;margin:10px 8px 0 0;padding:10px 18px;border:0;border-radius:8px;background:var(--gold);color:#1a1300;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.btn:focus-visible{outline:3px solid var(--snes);outline-offset:2px}
+#pix{width:min(380px,94vw);text-align:center}
+#pix h3{margin:0 0 8px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+#pixqr{min-height:60px;margin:12px 0;color:var(--mu)}
+#pixqr img{width:220px;height:220px;image-rendering:pixelated;background:#fff;border-radius:8px;padding:6px}
+.cod{margin:4px 0;padding:8px 10px;border:1px dashed #39425e;border-radius:8px;color:var(--mu);font:.8rem/1.3 monospace;word-break:break-all}
+#pixok{min-height:1.4em;color:var(--gold);font-weight:600}
+#pix .nt{margin:6px 0 0;color:var(--mu);font-size:.85rem}
+.x{float:right;border:0;background:none;color:var(--mu);font-size:1.7rem;cursor:pointer}
+@media(prefers-reduced-motion:no-preference){.g .cv{transition:transform .15s}.g:hover .cv{transform:translateY(-3px)}}
+@media(max-width:700px){
+.hero{position:relative;flex-direction:row;align-items:flex-start;min-height:210px}
+.hero>div{position:relative;z-index:1}
+.hero img{position:absolute;top:0;right:-8px;z-index:0;flex:none;width:68%;max-width:340px;margin:0}
+}
+@media(max-width:560px){.sh h2{font-size:1.5rem}}
+@media(max-width:400px){.top img,.top .ph{width:40%!important}}
 </style>
 </head>
 <body>
-<h1>Admin do Catálogo</h1>
-
-<details id="cfg"><summary>Conexão com o GitHub</summary>
-  <label>Usuário<input id="user"></label>
-  <label>Repositório<input id="repo"></label>
-  <label>Branch<input id="branch" value="main"></label>
-  <label>Token (fine-grained, permissão Contents: leitura e escrita neste repositório)<input id="token" type="password" autocomplete="off"></label>
-  <label>Chave da API do Google AI (opcional, usada em "Preencher com IA")<input id="akey" type="password" autocomplete="off" placeholder="AIza..."></label>
-  <label>Modelos da IA, um por linha (tenta na ordem até um funcionar)<textarea id="gmodel" rows="4">gemini-flash-latest
-gemini-flash-lite-latest
-gemini-2.5-flash
-gemini-2.5-flash-lite</textarea></label>
-  <button onclick="salvarCfg()">Salvar neste navegador</button>
-</details>
-
-<details id="pg"><summary>Configurações da página</summary>
-  <label>Título, linha 1<input id="t1" placeholder="Catálogo"></label>
-  <label>Título, linha 2 (em dourado)<input id="t2" placeholder="de jogos"></label>
-  <label>Subtítulo<input id="st"></label>
-  <label>Frase do PS1<input id="f_ps1"></label>
-  <label>Frase do PS2<input id="f_ps2"></label>
-  <label>Frase do SNES<input id="f_snes"></label>
-  <label>Imagem do topo (ideal: 1000 × 540 px, PNG com fundo transparente)<input id="hf" type="file" accept="image/*"></label>
-  <img id="hp" alt="" style="max-width:100%;max-height:140px;margin-top:8px;display:none">
-  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="hrm" type="checkbox" style="width:auto"> Remover a imagem do topo</label>
-  <button onclick="salvarPagina()">Salvar e publicar configurações</button>
-</details>
-
-<details id="ct"><summary>Categorias</summary>
-  <div id="catl"></div>
-  <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
-  <button class="s" onclick="addCat()">Adicionar</button><button onclick="salvarCats()">Salvar e publicar categorias</button>
-</details>
-
-<details id="lt"><summary>Cadastro em lote com IA</summary>
-  <label>Console de todos os jogos da lista<select id="lc"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
-  <label>Categoria<select id="lcat"></select></label>
-  <label>Nomes dos jogos, um por linha (pode haver erros de digitação)<textarea id="ln" rows="6" placeholder="crash bandicoot&#10;resident evil 2&#10;tekken 3"></textarea></label>
-  <button onclick="gerarLote()">Preencher lista com IA</button>
-  <div id="lr"></div>
-  <div id="lb" style="display:none"><button onclick="adicionarLote(false)">Adicionar selecionados à lista</button><button class="s" onclick="adicionarLote(true)">Adicionar e publicar</button></div>
-</details>
-
-
-
-<div class="box">
-  <b id="ft">Novo jogo</b>
-  <label>Título<input id="titulo"></label>
-  <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
-  <label>Categoria<select id="categoria"></select></label>
-  <button class="s" onclick="preencherIA()">Preencher com IA</button>
-  <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
-  <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
-  <label>Link<input id="link" type="url" placeholder="https://"></label>
-  <label>Senha para descompactar (opcional, ex.: dubsgamer.com)<input id="senha" autocomplete="off"></label>
-  <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
-  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
-  <div id="capaInfo"><img id="capaPrev" alt="" style="display:none"><div id="capaTxt"></div></div>
-  <label>Capa (imagem)<span id="trocar" style="display:none"> — se quiser trocar</span><input id="arq" type="file" accept="image/*"></label>
-  <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1><span class="a" id="t1">Catálogo</span><span class="b" id="t2">de jogos</span></h1>
+      <div class="sub"><i></i><span id="st">Reviva grandes clássicos!</span><i></i></div>
+    </div>
+    <img id="hero" alt="" hidden onerror="this.remove()">
+  </div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Buscar jogo" aria-label="Buscar jogo">
+    <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
+    <button class="chip" data-f="ps1" aria-pressed="false">PS1</button>
+    <button class="chip" data-f="ps2" aria-pressed="false">PS2</button>
+    <button class="chip" data-f="snes" aria-pressed="false">SNES</button>
+  </div>
+  <div class="bar" id="cats" hidden style="padding-top:0"></div>
+  <main id="grid"></main>
+  <footer><div class="l cond">Escolha seu clássico<small class="cond">e boa jogatina!</small></div><div class="r cond">Game over?<small class="cond">Jamais.</small></div></footer>
 </div>
-
-<div class="box"><b>Jogos (<span id="n">0</span>)</b>
-  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
-  <div id="lista"></div>
-  <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
-</div>
-<dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
-<div id="msg" role="status"></div>
+<dialog id="dlg"><div class="in"><button class="x" aria-label="Fechar" onclick="dlg.close()">×</button><div id="det"></div><div id="cm" style="margin-top:16px"></div></div></dialog>
+<dialog id="pix"><div class="in"><button class="x" aria-label="Fechar" onclick="document.getElementById('pix').close()">×</button>
+  <h3>Doar uns trocados</h3>
+  <div>Nome: <b id="pxn"></b><br>Banco: <b id="pxb"></b></div>
+  <div id="pixqr"></div>
+  <div class="cod" id="pixv"></div>
+  <button class="btn" onclick="copiarPix()">Copiar Pix copia e cola</button>
+  <div id="pixok" role="status"></div>
+  <p class="nt">Sem valor definido: doe quanto quiser, digitando o valor no app do seu banco.</p>
+</div></dialog>
 
 <script>
-const $=id=>document.getElementById(id);
-let jogos=[],edit=null,C=JSON.parse(localStorage.getItem("cfg")||"{}");
-["user","repo","branch","token","akey","gmodel"].forEach(k=>{if(C[k])$(k).value=C[k]});
-if(!C.token)$("cfg").open=true;
-
-function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não/i.test(t)?20000:5000)}
-function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
-
-fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarCats();lista()}).catch(()=>lista());
-
-let CATS=[{id:"jogos",nome:"Jogos"}];
+// Preencha com os dados de https://giscus.app (repositório público com Discussions ativadas)
+const GISCUS={repo:"jogos-on/consoles",repoId:"R_kgDOV2o_fA",category:"Announcements",categoryId:"DIC_kwDOV2o_fM4DLp4_"};
+const SEC={ps1:["PS1","Clássicos que marcaram época!"],ps2:["PS2","Aventuras inesquecíveis!"],snes:["Super Nintendo","A era 16-bits!"]};
+const PROP={ps1:"1/1",ps2:"5/7",snes:"7/5"};
+const ROLO=5,PAG=10,MAXC=6; // 5 no rolo lateral; 10 por página na grade; máx. de colunas
+const st={ps1:{ex:false,p:0},ps2:{ex:false,p:0},snes:{ex:false,p:0}};
+Object.keys(st).forEach(c=>{try{const v=+localStorage.getItem("cols:"+c);if(v>=1&&v<=MAXC)st[c].cols=v}catch(e){}});
+let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[{id:"jogos",nome:"Jogos"}];
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
-let jogosMudou=false;
-function iniciarCats(){
-  jogos.forEach(j=>{const id=j.categoria||"jogos";if(!CATS.some(c=>c.id===id))CATS.push({id,nome:id})});
-  [["categoria",0],["lcat",0],["fcat",1]].forEach(([id,todas])=>{
-    const e=$(id),v=e.value;e.replaceChildren();
-    if(todas)e.add(new Option("Todas as categorias",""));
-    CATS.forEach(c=>e.add(new Option(c.nome,c.id)));
-    if([...e.options].some(o=>o.value===v))e.value=v;
-  });
-  const l=$("catl");l.replaceChildren();
-  CATS.forEach(c=>{
-    const d=document.createElement("div");d.className="crow";
-    const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.setAttribute("aria-label","Nome da categoria");
-    const n=jogos.filter(j=>(j.categoria||"jogos")===c.id).length;
-    const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
-    d.append(i,m);
-    if(c.id!=="jogos"){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
-    l.appendChild(d);
-  });
-}
-function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n})}
-function addCat(){
-  lerCats();const n=$("catnovo").value.trim();if(!n)return aviso("Digite o nome da categoria.");
-  const id=slug(n);if(!id||CATS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Essa categoria já existe.");
-  CATS.push({id,nome:n});$("catnovo").value="";iniciarCats();aviso("Adicionada. Toque em Salvar e publicar categorias.");
-}
-function delCat(id){
-  lerCats();const c=CATS.find(x=>x.id===id);if(!c)return;
-  const n=jogos.filter(j=>j.categoria===id).length;
-  if(!confirm(`Excluir a categoria "${c.nome}"?`+(n?` Os ${n} jogo(s) dela voltarão para "Jogos".`:"")))return;
-  jogos.forEach(j=>{if(j.categoria===id)j.categoria="jogos"});
-  if(n)jogosMudou=true;
-  CATS=CATS.filter(x=>x.id!==id);iniciarCats();lista();
-  aviso("Excluída. Toque em Salvar e publicar categorias para confirmar.");
-}
-async function salvarCats(){
-  lerCats();
-  try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;if(jogosMudou){await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");jogosMudou=false}iniciarCats();lista();aviso("Categorias publicadas.")}
-  catch(e){aviso(e.message)}
-}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const seguro=u=>/^https?:\/\//i.test(u)?u:"";
 
-const abertos=new Set();let posLista=0;
-function lista(){
-  const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
-  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
-  idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
-  $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
-  const box=$("lista");box.replaceChildren();
-  if(!idx.length){box.textContent="Nenhum jogo encontrado.";return}
-  const forcar=!!(q||fc||fk);
-  ["ps1","ps2","snes"].forEach(c=>{
-    const doC=idx.filter(i=>jogos[i].console===c);if(!doC.length)return;
-    const g=document.createElement("details");g.className="gr";g.open=forcar||abertos.has(c);
-    const sm=document.createElement("summary");sm.textContent=c.toUpperCase()+" ("+doC.length+")";
-    sm.onclick=()=>{g.open?abertos.delete(c):abertos.add(c)};
-    g.appendChild(sm);
-    doC.forEach(i=>{
-      const j=jogos[i],d=document.createElement("div");d.className="it";
-      const im=document.createElement("img");im.alt="";im.loading="lazy";
-      if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
-      const t=document.createElement("div");t.className="tt";
-      const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
-      const m=document.createElement("small");m.textContent=[catNome(j.categoria||"jogos"),j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
-      t.append(b,m);
-      const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
-      const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
-      d.append(im,t,e,r);g.appendChild(d);
-    });
-    box.appendChild(g);
-  });
-}
-function limpar(){
-  edit=null;$("ft").textContent="Novo jogo";
-  ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("categoria").value="jogos";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
-}
-async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
-async function acharCapa(j){
-  const s=slug(j.titulo),cand=[j.capa,...["jpg","jpeg","png","webp"].map(x=>`capas/${j.console}/${s}.${x}`)].filter(Boolean);
-  for(const p of cand)if(await existe(p))return p;
-  if(C.token&&C.user&&C.repo)for(const p of cand){try{if(await api(p+"?ref="+C.branch))return p}catch(e){}}
-  return "";
-}
-async function statusCapa(j,i){
-  const box=$("capaInfo"),im=$("capaPrev"),tx=$("capaTxt");
-  box.style.display="block";im.style.display="none";$("trocar").style.display="none";tx.textContent="Verificando capa...";
-  const p=await acharCapa(j);
-  if(edit!==i)return;
-  if(p){
-    const nova=j.capa!==p;j.capa=p;im.src=p;im.style.display="block";
-    tx.textContent="✔ Capa já cadastrada";$("trocar").style.display="inline";
-    if(nova)lista();
-  }else tx.textContent="Sem capa cadastrada.";
-}
-function editar(i){
-  const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
-  ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
-  $("categoria").value=j.categoria||"jogos";$("popular").checked=!!j.popular;$("arq").value="";
-  $("voltar").style.display="inline-block";posLista=scrollY;scrollTo(0,0);statusCapa(j,i);
-}
-function voltar(){limpar();scrollTo(0,posLista)}
-function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
-const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
-async function capaJpg(f){
-  try{
-    const bm=await createImageBitmap(f),w=Math.min(700,bm.width),h=Math.round(bm.height*w/bm.width);
-    const c=document.createElement("canvas");c.width=w;c.height=h;
-    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(bm,0,0,w,h);
-    const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));
-    if(b)return await b64(b);
-  }catch(e){}
-  return null;
-}
-const enc=s=>btoa(unescape(encodeURIComponent(s)));
+const cfgP=fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
+function abrirLink(){const id=new URLSearchParams(location.search).get("jogo");if(id){const j=jogos.find(x=>x.id===id);if(j)abrir(j)}}
+fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
 
-async function api(p,o={}){
-  if(!C.token||!C.user||!C.repo)throw new Error("Preencha a conexão com o GitHub.");
-  const r=await fetch(`https://api.github.com/repos/${C.user}/${C.repo}/contents/${p}`,{...o,headers:{Authorization:"Bearer "+C.token,Accept:"application/vnd.github+json"}});
-  if(r.status===404&&(!o.method||o.method==="GET"))return null;
-  if(!r.ok){
-    const d=await r.json().catch(()=>({}));
-    const dica={401:"token inválido ou expirado",403:"token sem permissão de escrita ou limite atingido",404:"usuário, repositório ou branch incorretos",409:"conflito, tente salvar de novo",413:"arquivo grande demais",422:"dados recusados pelo GitHub"}[r.status]||"";
-    throw new Error("GitHub "+r.status+(dica?" ("+dica+")":"")+(d.message?": "+d.message:""));
-  }
-  return r.json();
+function aplicarCfg(c){
+  c=c||{};
+  if(Array.isArray(c.categorias)&&c.categorias.length){CATS=c.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
+  renderCats();
+  if(c.titulo1)$("t1").textContent=c.titulo1;
+  if(c.titulo2)$("t2").textContent=c.titulo2;
+  if(c.subtitulo)$("st").textContent=c.subtitulo;
+  if(c.titulo1||c.titulo2)document.title=((c.titulo1||"")+" "+(c.titulo2||"")).trim();
+  Object.keys(c.frases||{}).forEach(k=>{if(SEC[k]&&c.frases[k])SEC[k][1]=c.frases[k]});
+  const h=$("hero"),src=c.hero===undefined?"hero.png":c.hero;
+  if(src){h.src=src+(c.heroV?"?v="+c.heroV:"");h.hidden=false}
+  document.documentElement.style.setProperty("--hero",src?`url("${encodeURI(src+(c.heroV?"?v="+c.heroV:""))}")`:"none");
+  if(jogos.length)render();
 }
-async function enviar(p,conteudo,msg){
-  for(let t=0;t<3;t++){
-    const cur=await api(p+"?ref="+C.branch);
-    try{await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});return}
-    catch(e){if(t<2&&/GitHub (409|422)/.test(e.message)){await espera(1200);continue}throw e}
-  }
+function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
+
+function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
+
+function renderCats(){
+  const e=$("cats");e.hidden=CATS.length<2;
+  e.innerHTML=[{id:"todas",nome:"Todas"},...CATS].map(c=>`<button class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id===catF}">${esc(c.nome)}</button>`).join("");
 }
-
-
-const GAPI="https://generativelanguage.googleapis.com/v1beta/models";
-const MODELOS_PADRAO=["gemini-flash-latest","gemini-flash-lite-latest","gemini-2.5-flash","gemini-2.5-flash-lite"];
-function logIA(t,cls){const li=document.createElement("li");li.textContent=t;if(cls)li.className=cls;$("ial").appendChild(li);return li}
-async function tentarModelo(m,prompt){
-  const r=await fetch(`${GAPI}/${m}:generateContent`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":C.akey},
-    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json",temperature:0.2}})});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok)throw new Error(r.status+(d.error?.message?" - "+d.error.message.slice(0,90):""));
-  const txt=(d.candidates?.[0]?.content?.parts||[]).map(x=>x.text||"").join("").replace(/```json|```/g,"").trim();
-  return JSON.parse(txt);
-}
-const norm=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
-let ultimoOk="",lote=[],loteC="";
-const espera=ms=>new Promise(r=>setTimeout(r,ms));
-
-async function consultarIA(prompt){
-  let fila=(C.gmodel||"").split(/[\s,]+/).filter(Boolean);
-  if(!fila.length)fila=[...MODELOS_PADRAO];
-  if(ultimoOk){fila=fila.filter(x=>x!==ultimoOk);fila.unshift(ultimoOk)}
-  const feitos=new Set();let res=null,buscou=false;
-  while(!res){
-    const m=fila.shift();
-    if(!m){
-      if(buscou)break;
-      buscou=true;logIA("Buscando outros modelos disponíveis...");
-      try{
-        const r=await fetch(GAPI+"?pageSize=200",{headers:{"x-goog-api-key":C.akey}});
-        const d=await r.json();
-        fila=(d.models||[]).filter(x=>(x.supportedGenerationMethods||[]).includes("generateContent")).map(x=>x.name.replace("models/","")).filter(x=>/flash/.test(x)&&!/image|tts|audio|live/.test(x)&&!feitos.has(x)).slice(0,6);
-      }catch(e){}
-      if(!fila.length)break;
-      continue;
+const ordem=(a,b)=>(!!b.popular-!!a.popular)||a.titulo.localeCompare(b.titulo,"pt");
+function render(){
+  const q=$("q").value.trim().toLowerCase();
+  const forc=!!q||filtro!=="todos"||catF!=="todas";
+  const html=Object.keys(SEC).filter(c=>filtro==="todos"||filtro===c).map(c=>{
+    const l=jogos.filter(j=>j.console===c&&(catF==="todas"||(j.categoria||"jogos")===catF)&&j.titulo.toLowerCase().includes(q)).sort(ordem);
+    if(!l.length)return"";
+    const ex=forc||st[c].ex;
+    let itens,nav="",modo;
+    if(!ex){
+      modo="rolo";itens=l.slice(0,ROLO);
+      if(l.length>ROLO)nav=`<button data-a="mais" data-c="${c}">Mostrar mais (${l.length} jogos)</button>`;
+    }else{
+      modo="grade";
+      const pgs=Math.ceil(l.length/PAG);st[c].p=Math.min(Math.max(st[c].p,0),pgs-1);
+      itens=l.slice(st[c].p*PAG,st[c].p*PAG+PAG);
+      if(pgs>1)nav=`<button data-a="prev" data-c="${c}"${st[c].p===0?" disabled":""}>‹ Voltar</button><span>${st[c].p+1} / ${pgs}</span><button data-a="next" data-c="${c}"${st[c].p>=pgs-1?" disabled":""}>Avançar ›</button>`;
+      if(!forc)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
     }
-    if(feitos.has(m))continue;
-    feitos.add(m);
-    const li=logIA("Tentando "+m+"...");
-    try{res=await tentarModelo(m,prompt);ultimoOk=m;li.textContent="✔ "+m+": deu certo";li.className="ok"}
-    catch(e){
-      li.textContent="✘ "+m+": "+e.message;li.className="er";
-      if(/API key|API_KEY/i.test(e.message)){logIA("Chave inválida. Verifique a chave do Google AI.","er");break}
-    }
-  }
-  return res;
+    const n=st[c].cols?` style="--n:${st[c].cols}"`:"";
+    return `<section class="sec ${c}" id="s-${c}" data-c="${c}"${n}><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p><div class="cc"><button class="cb" data-a="col-" data-c="${c}" aria-label="Mais colunas, capas menores">−</button><button class="cb" data-a="col+" data-c="${c}" aria-label="Menos colunas, capas maiores">+</button></div></div><div class="row ${modo}">${itens.map(j=>card(j,c)).join("")}</div><div class="nav"${nav?"":" hidden"}>${nav}</div></section>`;
+  }).join("");
+  $("grid").innerHTML=html||'<p class="vazio">Nenhum jogo encontrado.</p>';
+  document.querySelectorAll("#grid .sec").forEach(ajustarCols);
+}
+const nCols=sec=>parseInt(getComputedStyle(sec).getPropertyValue("--n"))||2;
+// "peek": no rolo, deixa um pedaço do próximo jogo aparecendo quando há mais jogos do que colunas
+function ajustarCols(sec){
+  const n=nCols(sec),row=sec.querySelector(".row");
+  row.classList.toggle("peek",row.classList.contains("rolo")&&row.children.length>n);
+  sec.querySelectorAll(".cb").forEach(b=>b.disabled=(b.dataset.a==="col+"&&n<=1)||(b.dataset.a==="col-"&&n>=MAXC));
+}
+function mudarCols(c,d){
+  const sec=document.getElementById("s-"+c);if(!sec)return;
+  const n=Math.min(MAXC,Math.max(1,nCols(sec)+d));
+  st[c].cols=n;sec.style.setProperty("--n",n);
+  try{localStorage.setItem("cols:"+c,n)}catch(e){}
+  ajustarCols(sec);
 }
 
-async function preencherIA(){
-  const t=$("titulo").value.trim(),c=$("console").selectedOptions[0].text;
-  if(!t)return aviso("Informe o título antes.");
-  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
-  $("ial").innerHTML="";$("iao").innerHTML="";$("iat").textContent="Consultando a IA...";$("iad").showModal();
-  const prompt=`Jogo digitado: "${t}". Plataforma: ${c}. O texto pode ter erros de grafia. Responda SOMENTE com JSON: {"opcoes":[{"titulo":"nome oficial do jogo, com a grafia e pontuação corretas","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers"}]} com de 1 a 3 jogos dessa plataforma que mais provavelmente correspondem ao texto digitado, do mais provável ao menos provável. Se nenhum jogo existir, responda {"opcoes":[]}.`;
-  const res=await consultarIA(prompt);
-  if(!res){$("iat").textContent="Nenhum modelo funcionou. Preencha manualmente.";return}
-  const ops=(Array.isArray(res.opcoes)?res.opcoes:[]).filter(o=>o&&o.titulo).slice(0,3);
-  if(!ops.length){$("iat").textContent="A IA não reconheceu o jogo. Preencha manualmente.";return}
-  const aplicar=o=>{$("titulo").value=o.titulo;["genero","ano","descricao"].forEach(k=>{if(o[k])$(k).value=o[k]})};
-  if(norm(ops[0].titulo)===norm(t)){aplicar(ops[0]);$("iat").textContent="Preenchido. Revise antes de salvar.";return}
-  $("iat").textContent="Você quis dizer:";
-  ops.forEach(o=>{
-    const b=document.createElement("button");
-    b.textContent=o.titulo+(o.ano?" ("+o.ano+")":"");
-    b.onclick=()=>{aplicar(o);$("iad").close();aviso("Preenchido. Revise antes de salvar.")};
-    $("iao").appendChild(b);
-  });
-  const k=document.createElement("button");
-  k.className="s";k.textContent="Manter o que digitei";k.onclick=()=>$("iad").close();
-  $("iao").appendChild(k);
-}
-
-function renderLote(){
-  const r=$("lr");r.innerHTML="";
-  lote.forEach((x,i)=>{
-    const d=document.createElement("div");d.className="lrow";
-    d.innerHTML=`<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="sel"> Incluir</label>
-<input data-i="${i}" data-k="titulo" placeholder="Título">
-<input data-i="${i}" data-k="genero" placeholder="Gênero">
-<input data-i="${i}" data-k="ano" placeholder="Ano" inputmode="numeric">
-<input data-i="${i}" data-k="link" type="url" placeholder="Link (opcional)">
-<label style="display:block;color:var(--mu);font-size:.9rem;margin-top:6px">Capa (imagem)<input type="file" accept="image/*" data-i="${i}" data-k="arq"></label><img class="lp" alt="" style="display:none;max-width:90px;max-height:90px;margin-top:6px;border-radius:6px">
-<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="popular"> Popular</label>`;
-    d.querySelectorAll("[data-k]").forEach(el=>{if(el.type==="file")return;const v=x[el.dataset.k];if(el.type==="checkbox")el.checked=!!v;else el.value=v||""});
-    if(x.nota){const n=document.createElement("div");n.className="nt";n.textContent=x.nota;d.appendChild(n)}
-    r.appendChild(d);
-  });
-}
-const editarLote=e=>{
-  const el=e.target;if(!el.dataset||!el.dataset.k)return;
-  const it=lote[+el.dataset.i];
-  if(el.type==="file"){
-    it.arq=el.files[0]||null;
-    const im=el.closest(".lrow").querySelector(".lp");
-    if(im){if(it.arq){im.src=URL.createObjectURL(it.arq);im.style.display="block"}else im.style.display="none"}
+$("q").oninput=render;
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
+$("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;catF=b.dataset.cat;renderCats();render()};
+$("grid").onclick=e=>{
+  const n=e.target.closest("[data-a]");
+  if(n){
+    const c=n.dataset.c,a=n.dataset.a;
+    if(a==="col-"||a==="col+"){mudarCols(c,a==="col+"?-1:1);return}
+    if(a==="mais")st[c].ex=true,st[c].p=0;
+    if(a==="menos")st[c].ex=false,st[c].p=0;
+    if(a==="prev")st[c].p--;
+    if(a==="next")st[c].p++;
+    render();
+    const sec=document.getElementById("s-"+c);if(sec)sec.scrollIntoView({block:"start"});
     return;
   }
-  it[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;
+  const b=e.target.closest(".g");if(b)abrir(jogos.find(j=>j.id===b.dataset.id));
 };
-$("lr").addEventListener("input",editarLote);$("lr").addEventListener("change",editarLote);
 
-async function gerarLote(){
-  const c=$("lc").value,cn=$("lc").selectedOptions[0].text;
-  const nomes=$("ln").value.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,60);
-  if(!nomes.length)return aviso("Cole ao menos um nome de jogo.");
-  if(!C.akey)return aviso("Cole a chave do Google AI em Conexão e salve.");
-  lote=[];loteC=c;renderLote();$("lb").style.display="none";
-  $("iao").innerHTML="";$("iad").showModal();
-  const grupos=[];for(let i=0;i<nomes.length;i+=8)grupos.push(nomes.slice(i,i+8));
-  let falhou=false;
-  for(let g=0;g<grupos.length;g++){
-    $("ial").innerHTML="";$("iat").textContent=`Lote ${g+1} de ${grupos.length}...`;
-    const lista_=grupos[g].map((n,k)=>`${k+1}. ${n}`).join("\n");
-    const prompt=`Plataforma: ${cn}. Lista de jogos digitados (podem ter erros de grafia):\n${lista_}\nResponda SOMENTE com JSON: {"itens":[{"titulo":"nome oficial do jogo nessa plataforma, com a grafia e pontuação corretas, ou \"\" se não existir","genero":"até 2 gêneros separados por ' / ', em português","ano":"ano de lançamento nessa plataforma, só números","descricao":"1 a 2 frases em português do Brasil, sem spoilers","popular":true ou false}]} com exatamente um item por jogo, na mesma ordem da lista. Use popular=true só para jogos muito conhecidos e marcantes da plataforma.`;
-    const res=await consultarIA(prompt);
-    const itens=Array.isArray(res&&res.itens)?res.itens:null;
-    if(!itens){
-      falhou=true;
-      grupos.slice(g).flat().forEach(n=>lote.push({entrada:n,titulo:n,sel:false,nota:"Não preenchido: a IA falhou. Preencha à mão ou tente de novo."}));
-      break;
-    }
-    grupos[g].forEach((n,k)=>{
-      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c+($("lcat").value!=="jogos"?"-"+$("lcat").value:""));
-      const dup=!!t&&jogos.some(j=>j.id===id);
-      lote.push({entrada:n,titulo:t||n,genero:it.genero||"",ano:String(it.ano||""),descricao:it.descricao||"",popular:!!it.popular,link:"",sel:!!t&&!dup,nota:!t?"A IA não reconheceu este jogo. Confira o nome.":dup?"Este jogo já está na lista.":""});
-    });
-    renderLote();
-    if(g<grupos.length-1)await espera(3000);
-  }
-  renderLote();
-  $("lb").style.display=lote.length?"block":"none";
-  $("iat").textContent=falhou?"Parte da lista não foi preenchida. Veja os avisos na lista.":"Pronto. Revise a lista abaixo.";
-  if(!falhou)setTimeout(()=>{if($("iad").open)$("iad").close()},1200);
+// Dados do PIX (a cidade e a chave não aparecem na tela; vão apenas dentro do código gerado)
+const PIX={nome:"Johnny Mary",banco:"Nubank",cidade:"Extremoz",chave:"hypertv1000@gmail.com"};
+let pixCode="";
+function crc16(t){let c=0xFFFF;for(let i=0;i<t.length;i++){c^=t.charCodeAt(i)<<8;for(let b=0;b<8;b++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
+const tlv=(id,v)=>id+String(v.length).padStart(2,"0")+v;
+function pixPayload(){
+  const conta=tlv("00","br.gov.bcb.pix")+tlv("01",PIX.chave);
+  const p=tlv("00","01")+tlv("01","11")+tlv("26",conta)+tlv("52","0000")+tlv("53","986")+tlv("58","BR")+tlv("59",PIX.nome)+tlv("60",PIX.cidade)+tlv("62",tlv("05","***"))+"6304";
+  return p+crc16(p);
 }
-
-function reduzirCapa(f){
-  return new Promise((ok,err)=>{
-    const img=new Image(),u=URL.createObjectURL(f);
-    img.onload=()=>{
-      const k=Math.min(1,800/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
-      const c=document.createElement("canvas");c.width=w;c.height=h;
-      const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
-      URL.revokeObjectURL(u);
-      c.toBlob(b=>b?ok(b):err(new Error("Falha ao processar a capa")),"image/jpeg",0.88);
-    };
-    img.onerror=()=>err(new Error("Imagem de capa inválida"));
-    img.src=u;
+function carregarQR(){
+  return window.qrcode?Promise.resolve():new Promise((ok,err)=>{
+    const t=document.createElement("script");
+    t.src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+    t.onload=ok;t.onerror=err;document.head.appendChild(t);
   });
 }
-
-async function adicionarLote(pub){
-  const vistos=new Set(),cat=$("lcat").value,suf=cat!=="jogos"?"-"+cat:"";
-  const sel=lote.filter(x=>x.sel&&String(x.titulo).trim())
-    .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC+suf)}))
-    .filter(o=>{if(jogos.some(j=>j.id===o.id)||vistos.has(o.id))return false;vistos.add(o.id);return true});
-  if(!sel.length)return aviso("Nenhum jogo novo para adicionar.");
+async function abrirPix(){
+  pixCode=pixPayload();
+  $("pxn").textContent=PIX.nome;$("pxb").textContent=PIX.banco;
+  $("pixv").textContent=pixCode.slice(0,24)+"...";
+  $("pixok").textContent="";$("pixqr").textContent="Gerando QR Code...";
+  $("pix").showModal();
   try{
-    let k=0;
-    for(const o of sel){
-      k++;aviso(`Enviando jogo ${k} de ${sel.length}: ${String(o.x.titulo).trim()}...`);
-      if(!o.x.arq)continue;
-      o.capa=`capas/${loteC}/${slug(String(o.x.titulo).trim())}${suf}.jpg`;
-      await enviar(o.capa,await b64(await reduzirCapa(o.x.arq)),"Capa: "+String(o.x.titulo).trim());
-    }
-  }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
-  sel.forEach(o=>{
-    const x=o.x;
-    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular,categoria:cat};
-    if(o.capa)j.capa=o.capa;
-    jogos.push(j);
-  });
-  lote=[];renderLote();$("lb").style.display="none";$("ln").value="";lista();
-  if(pub)await publicar();else aviso(sel.length+" jogo(s) adicionado(s). Toque em Publicar no GitHub para atualizar o site.");
+    await carregarQR();
+    const q=qrcode(0,"M");q.addData(pixCode);q.make();
+    $("pixqr").innerHTML=q.createImgTag(5,2);
+    const im=$("pixqr").querySelector("img");if(im)im.alt="QR Code Pix";
+  }catch(e){$("pixqr").textContent="Não foi possível gerar o QR Code. Use o botão para copiar o código."}
+}
+async function copiarPix(){
+  try{await navigator.clipboard.writeText(pixCode)}
+  catch(e){const t=document.createElement("textarea");t.value=pixCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}
+  $("pixok").textContent="Código copiado!";
+  setTimeout(()=>$("pixok").textContent="",2500);
 }
 
-let CFG={};
-fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
-  CFG=c||{};const f=CFG.frases||{};
-  if(Array.isArray(CFG.categorias)&&CFG.categorias.length){CATS=CFG.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
-  iniciarCats();lista();
-  $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
-  $("f_ps1").value=f.ps1||"Clássicos que marcaram época!";$("f_ps2").value=f.ps2||"Aventuras inesquecíveis!";$("f_snes").value=f.snes||"A era 16-bits!";
-  if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
-});
-$("hf").onchange=()=>{const f=$("hf").files[0];if(f){const h=$("hp");h.src=URL.createObjectURL(f);h.style.display="block"}};
-function redimensionar(f){
-  return new Promise((ok,err)=>{
-    const img=new Image(),u=URL.createObjectURL(f);
-    img.onload=()=>{
-      const k=Math.min(1,1000/img.width,600/img.height),w=Math.round(img.width*k),h=Math.round(img.height*k);
-      const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);
-      URL.revokeObjectURL(u);c.toBlob(b=>b?ok(b):err(new Error("Falha ao processar a imagem")),"image/png");
-    };
-    img.onerror=()=>err(new Error("Imagem inválida"));
-    img.src=u;
-  });
+const urlJogo=j=>{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("jogo",j.id);return u.toString()};
+async function copiarTxt(t,m){
+  try{await navigator.clipboard.writeText(t)}
+  catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove()}
+  const o=$("cpok");if(o){o.textContent=m;setTimeout(()=>o.textContent="",2500)}
 }
-async function salvarPagina(){
-  try{
-    aviso("Publicando...");
-    const c={...CFG,titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim(),frases:{ps1:$("f_ps1").value.trim(),ps2:$("f_ps2").value.trim(),snes:$("f_snes").value.trim()}};
-    const f=$("hf").files[0];
-    if($("hrm").checked)c.hero="";
-    else if(f){await enviar("hero.png",await b64(await redimensionar(f)),"Imagem do topo");c.hero="hero.png";c.heroV=Date.now()}
-    await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza configurações da página");
-    CFG=c;$("hf").value="";$("hrm").checked=false;
-    aviso("Publicado. O site atualiza em cerca de 1 minuto.");
-  }catch(e){aviso(e.message)}
+function copiarSenha(){if(atual)copiarTxt(atual.senha,"Senha copiada!")}
+async function compartilhar(){
+  if(!atual)return;const u=urlJogo(atual);
+  if(navigator.share){try{await navigator.share({title:atual.titulo,text:atual.titulo,url:u});return}catch(e){if(e.name==="AbortError")return}}
+  copiarTxt(u,"Link copiado!");
 }
-
-async function salvarJogo(){
-  const titulo=$("titulo").value.trim();
-  if(!titulo)return aviso("Informe o título.");
-  const antigo=edit!==null?jogos[edit]:{};
-  const cat=$("categoria").value||"jogos",suf=cat!=="jogos"?"-"+cat:"";
-  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
-  if(!j.senha)delete j.senha;
-  const f=$("arq").files[0];
-  try{
-    if(f){
-      aviso("Preparando capa...");
-      const dados=await capaJpg(f);
-      if(!dados)throw new Error("Falha na capa: formato de imagem não suportado. Use JPG, PNG ou WEBP.");
-      j.capa=`capas/${j.console}/${slug(titulo)}${suf}.jpg`;
-      aviso("Enviando capa...");
-      await enviar(j.capa,dados,"Capa: "+titulo);
-    }
-    edit!==null?jogos[edit]=j:jogos.push(j);
-    limpar();lista();await publicar();
-  }catch(e){aviso("Falha ao salvar: "+e.message)}
+dlg.addEventListener("close",()=>{atual=null;history.replaceState(null,"",location.pathname)});
+function abrir(j){
+  if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
+  const link=seguro(j.link);
+  const w={ps1:150,ps2:130,snes:170}[j.console]||130;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${(j.categoria||"jogos")!=="jogos"?" - "+esc(catNome(j.categoria)):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
+  const im=$("det").querySelector(".top img");
+  if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
+  const s=document.createElement("script");
+  s.src="https://giscus.app/client.js";s.async=true;s.crossOrigin="anonymous";
+  Object.entries({repo:GISCUS.repo,"repo-id":GISCUS.repoId,category:GISCUS.category,"category-id":GISCUS.categoryId,mapping:"specific",term:j.id,"reactions-enabled":"1","input-position":"top",theme:"dark",lang:"pt",loading:"lazy"}).forEach(([k,v])=>s.setAttribute("data-"+k,v));
+  $("cm").replaceChildren(s);
+  dlg.showModal();
 }
-async function publicar(){
-  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.")}catch(e){aviso(e.message)}
-}
-function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
-iniciarCats();
 </script>
 </body>
 </html>
