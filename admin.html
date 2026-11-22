@@ -254,7 +254,7 @@ const enc=s=>btoa(unescape(encodeURIComponent(s)));
 
 async function api(p,o={}){
   if(!C.token||!C.user||!C.repo)throw new Error("Preencha a conexão com o GitHub.");
-  const r=await fetch(`https://api.github.com/repos/${C.user}/${C.repo}/contents/${p}`,{...o,headers:{Authorization:"Bearer "+C.token,Accept:"application/vnd.github+json"}});
+  const r=await fetch(`https://api.github.com/repos/${C.user}/${C.repo}/contents/${p}${(!o.method||o.method==="GET")?(p.includes("?")?"&":"?")+"_="+Date.now():""}`,{...o,cache:"no-store",headers:{Authorization:"Bearer "+C.token,Accept:"application/vnd.github+json"}});
   if(r.status===404&&(!o.method||o.method==="GET"))return null;
   if(!r.ok){
     const d=await r.json().catch(()=>({}));
@@ -487,21 +487,28 @@ async function salvarJogo(){
   const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
   if(!j.senha)delete j.senha;
   const f=$("arq").files[0];
+  let erroCapa="";
   try{
     if(f){
-      aviso("Preparando capa...");
-      const dados=await capaJpg(f);
-      if(!dados)throw new Error("Falha na capa: formato de imagem não suportado. Use JPG, PNG ou WEBP.");
-      j.capa=`capas/${j.console}/${slug(titulo)}${suf}.jpg`;
-      aviso("Enviando capa...");
-      await enviar(j.capa,dados,"Capa: "+titulo);
+      try{
+        aviso("Preparando capa...");
+        const dados=await capaJpg(f);
+        if(!dados)throw new Error("formato de imagem não suportado (use JPG, PNG ou WEBP)");
+        const caminho=`capas/${j.console}/${slug(titulo)}${suf}.jpg`;
+        aviso("Enviando capa...");
+        await enviar(caminho,dados,"Capa: "+titulo);
+        j.capa=caminho;
+      }catch(e){erroCapa=e.message}
     }
     edit!==null?jogos[edit]=j:jogos.push(j);
-    limpar();lista();await publicar();
+    $("busca").value="";$("fc").value="";$("fcat").value="";abertos.add(j.console);
+    limpar();lista();
+    const ok=await publicar();
+    if(ok&&erroCapa)aviso("Jogo publicado, mas a capa falhou: "+erroCapa+". Edite o jogo e tente enviar a capa de novo.");
   }catch(e){aviso("Falha ao salvar: "+e.message)}
 }
 async function publicar(){
-  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.")}catch(e){aviso(e.message)}
+  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.");return true}catch(e){aviso("Falha ao publicar: "+e.message);return false}
 }
 function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
 iniciarCats();
