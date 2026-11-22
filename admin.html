@@ -187,6 +187,7 @@ gemini-2.5-flash-lite</textarea></label>
 <dialog id="cpd">
   <div class="cph"><b>🖼️ COMPLETAR CAPAS</b><span id="cpn"></span></div>
   <div id="cpt"></div><div id="cpm"></div>
+  <div id="cpu" style="display:none;color:var(--mu);font-size:.9rem;margin:6px 0"></div>
   <img id="cpi" alt="" hidden>
   <label>Escolher capa<input id="cpf" type="file" accept="image/*"></label>
   <button class="s" id="cpq" onclick="cpPesquisar()">🔎 Pesquisar capa</button>
@@ -418,23 +419,39 @@ $("cpf").onchange=()=>{const j=cpAtual();if(j)escolherCapa($("cpf"),j.console,cp
 $("arq").onchange=()=>escolherCapa($("arq"),$("console").value,salvarJogo);
 function cpPesquisar(){const j=cpAtual();if(!j)return;window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(j.titulo+" cover "+conNome(j.console).replace(/[^\p{L}\p{N} ]/gu,"").trim()),"_blank","noopener")}
 function cpPular(){cpI++;cpMostrar()}
-async function cpSalvar(){
-  if(cpBusy)return;
+const filaCapas=[];let filaOn=false;
+function cpStatus(){const e=$("cpu"),n=filaCapas.length+(filaOn?1:0);e.textContent=n?"⏳ Enviando "+n+" capa"+(n>1?"s":"")+" em segundo plano...":"";e.style.display=n?"block":"none"}
+async function rodarFila(){
+  if(filaOn)return;filaOn=true;
+  try{
+    while(filaCapas.length){
+      let ok=0,falhou=0;
+      while(filaCapas.length){
+        const t=filaCapas.shift();cpStatus();
+        try{await enviar(t.caminho,t.dados,"Capa: "+t.titulo,t.novo);ok++}
+        catch(e){falhou++;if(t.j.capa===t.caminho)t.j.capa=t.antes;aviso("Falha ao enviar a capa de "+t.titulo+": "+e.message);lista()}
+      }
+      if(ok){
+        try{await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Capas do catálogo");if(!falhou)aviso("Capas publicadas. O site atualiza em cerca de 1 minuto.")}
+        catch(e){aviso("Capas enviadas, mas falhou ao atualizar o catálogo: "+e.message)}
+      }
+    }
+  }finally{filaOn=false;cpStatus()}
+}
+window.addEventListener("beforeunload",e=>{if(filaOn||filaCapas.length){e.preventDefault();e.returnValue=""}});
+function cpSalvar(){
   const j=cpAtual(),f=$("cpf").files[0];
   if(!j)return;
   if(!f)return aviso("Escolha uma imagem ou toque em Pular.");
-  cpBusy=true;$("cps").disabled=true;$("cps").textContent="Salvando...";
-  try{
-    const dados=await capaJpg(f);
+  $("cps").disabled=true;
+  capaJpg(f).then(dados=>{
     if(!dados)throw new Error("formato de imagem não suportado (use JPG, PNG ou WEBP)");
     const suf=(j.categoria||"jogos")!=="jogos"?"-"+j.categoria:"";
     const caminho=`capas/${j.console}/${slug(j.titulo)}${suf}.jpg`;
-    await enviar(caminho,dados,"Capa: "+j.titulo);
+    filaCapas.push({j,caminho,dados,titulo:j.titulo,novo:!j.capa,antes:j.capa});
     j.capa=caminho;
-    await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Capa de "+j.titulo);
-    cpI++;lista();cpMostrar();
-  }catch(e){aviso("Falha ao salvar a capa: "+e.message)}
-  cpBusy=false;$("cps").disabled=false;$("cps").textContent="Salvar e próximo";
+    cpI++;lista();cpMostrar();rodarFila();cpStatus();
+  }).catch(e=>aviso("Falha ao preparar a capa: "+e.message)).finally(()=>{$("cps").disabled=false});
 }
 const abertos=new Set();let posLista=0;
 function atualizarStats(){
@@ -549,11 +566,21 @@ async function api(p,o={}){
   }
   return r.json();
 }
-async function enviar(p,conteudo,msg){
+const SHAS={};
+async function enviar(p,conteudo,msg,semGet){
   for(let t=0;t<3;t++){
-    const cur=await api(p+"?ref="+C.branch);
-    try{await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha:cur?.sha})});return}
-    catch(e){if(t<2&&/GitHub (409|422)/.test(e.message)){await espera(1200);continue}throw e}
+    let sha;
+    if(t===0&&(SHAS[p]||semGet))sha=SHAS[p];
+    else sha=(await api(p+"?ref="+C.branch))?.sha;
+    try{
+      const r=await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha})});
+      if(r&&r.content)SHAS[p]=r.content.sha;
+      return;
+    }catch(e){
+      delete SHAS[p];
+      if(t<2&&/GitHub (409|422)/.test(e.message)){await espera(t?1200:300);continue}
+      throw e;
+    }
   }
 }
 
@@ -722,7 +749,7 @@ async function adicionarLote(pub){
       k++;aviso(`Enviando jogo ${k} de ${sel.length}: ${String(o.x.titulo).trim()}...`);
       if(!o.x.arq)continue;
       o.capa=`capas/${loteC}/${slug(String(o.x.titulo).trim())}${suf}.jpg`;
-      await enviar(o.capa,await b64(await reduzirCapa(o.x.arq)),"Capa: "+String(o.x.titulo).trim());
+      await enviar(o.capa,await b64(await reduzirCapa(o.x.arq)),"Capa: "+String(o.x.titulo).trim(),true);
     }
   }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
   sel.forEach(o=>{
@@ -806,7 +833,7 @@ async function salvarJogo(){
         if(!dados)throw new Error("formato de imagem não suportado (use JPG, PNG ou WEBP)");
         const caminho=`capas/${j.console}/${slug(titulo)}${suf}.jpg`;
         aviso("Enviando capa...");
-        await enviar(caminho,dados,"Capa: "+titulo);
+        await enviar(caminho,dados,"Capa: "+titulo,!j.capa);
         j.capa=caminho;
       }catch(e){erroCapa=e.message}
     }
