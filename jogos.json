@@ -128,5 +128,29 @@
     "link": "https://www.mediafire.com/file/d98u6yq2ioz5kzk/BATTLEFIELD_2.rar/file",
     "descricao": "Este jogo leva a aclamada série Battlefield para os consoles, oferecendo intensos combates modernos com veículos e infantaria. Os jogadores podem experimentar batalhas em larga escala em diversos cenários.",
     "capa": "capas/ps2/battlefield-2-modern-combat.jpg"
+  },
+  {
+    "id": "downhill-domination-pt-br-ps2",
+    "titulo": "Downhill Domination PT BR",
+    "console": "ps2",
+    "genero": "Esporte / Corrida",
+    "ano": "2003",
+    "link": "https://www.mediafire.com/file/0mqouvahaad2yot/Downhill_Domination_%2528PT-BR%2529_PS2.7z/file",
+    "descricao": "Um jogo de corrida de bicicleta radical que permite aos jogadores realizar manobras insanas e competir em descidas perigosas. Oferece uma experiência de alta velocidade com muita ação e adrenalina.",
+    "popular": false,
+    "categoria": "jogos",
+    "capa": "capas/ps2/downhill-domination-pt-br.jpg"
+  },
+  {
+    "id": "gta-sa-brasil-v1-2-ps2",
+    "titulo": "GTA SA Brasil v1.2",
+    "console": "ps2",
+    "genero": "RPG / Mundo Aberto",
+    "ano": "2004",
+    "link": "https://www.mediafire.com/file/dv5ciz3a70brz15/GTA+BRASIL+v1.2+PS2.iso/file",
+    "descricao": "Um épico jogo de mundo aberto onde o jogador explora o estado fictício de San Andreas, assumindo o papel de Carl 'CJ' Johnson. Combina elementos de tiro, direção e exploração em uma narrativa envolvente.",
+    "popular": true,
+    "categoria": "jogos",
+    "capa": "capas/ps2/gta-sa-brasil-v1-2.jpg"
   }
 ]
