@@ -50,7 +50,8 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .sec{--n:2}
 @media(min-width:560px){.sec{--n:3}}
 @media(min-width:900px){.sec{--n:5}}
-.row{gap:14px;padding:16px}
+.row{gap:14px;padding:16px;align-items:flex-start}
+.row.grade{align-items:start}
 .row.grade{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
 .row.rolo{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding-bottom:12px}
 .row.rolo .g{flex:0 0 calc((100% - (var(--n) - 1)*14px)/var(--n));scroll-snap-align:start}
