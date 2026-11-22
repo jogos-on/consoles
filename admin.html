@@ -38,7 +38,11 @@ button{padding:10px 18px;border:0;border-radius:10px;background:linear-gradient(
 button:active{transform:translateY(1px)}
 button:disabled{opacity:.5}
 #ajd .crow button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
-#ajd canvas{width:100%;max-width:320px;display:block;margin:10px auto;border:1px solid var(--bd);border-radius:8px;touch-action:none;background:#fff;cursor:grab}
+#ajd .aw{position:relative;margin:10px auto;max-width:340px;overflow:hidden;touch-action:none;border-radius:6px;line-height:0;background:#000}
+#ajd .aw img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#ajd .ab{position:absolute;border:2px solid var(--gold);box-shadow:0 0 0 9999px #000b;cursor:move;touch-action:none;box-sizing:border-box}
+#ajd .ah{position:absolute;width:30px;height:30px;background:#e8b923cc;border:2px solid #000;border-radius:6px;touch-action:none}
+#ajd .ah.tl{left:2px;top:2px;cursor:nwse-resize}#ajd .ah.tr{right:2px;top:2px;cursor:nesw-resize}#ajd .ah.bl{left:2px;bottom:2px;cursor:nesw-resize}#ajd .ah.br{right:2px;bottom:2px;cursor:nwse-resize}
 button.s{background:#1a2342;border:1px solid var(--bd);box-shadow:none;color:var(--fg)}
 button.d{background:linear-gradient(180deg,#ef4444,#b42318);box-shadow:none}
 .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}
@@ -187,10 +191,10 @@ gemini-2.5-flash-lite</textarea></label>
   <button id="cps" onclick="cpSalvar()">Salvar e próximo</button><button class="s" onclick="cpPular()">Pular</button><button class="s" onclick="$('cpd').close()">Fechar</button>
 </dialog>
 <dialog id="ajd">
-  <div class="cph"><b>✂️ AJUSTAR CAPA</b><span id="ajn"></span></div>
-  <canvas id="ajc"></canvas>
-  <div class="crow" style="justify-content:center"><button class="s" id="ajm1" aria-pressed="true">Esticar</button><button class="s" id="ajm2" aria-pressed="false">Preencher</button></div>
-  <label id="ajzl" style="display:none">Zoom (arraste a imagem para mover)<input id="ajz" type="range" min="1" max="4" step="0.01" value="1" style="padding:0"></label>
+  <div class="cph"><b>✂️ RECORTAR CAPA</b><span id="ajn"></span></div>
+  <div class="crow" style="justify-content:center"><button class="s" id="ajm1" aria-pressed="true">Recortar</button><button class="s" id="ajm2" aria-pressed="false">Esticar tudo</button></div>
+  <div class="aw" id="ajw"><img id="aji" alt=""><div class="ab" id="ajb"><i class="ah tl" data-h="tl"></i><i class="ah tr" data-h="tr"></i><i class="ah bl" data-h="bl"></i><i class="ah br" data-h="br"></i></div></div>
+  <label id="ajzl">Tamanho do recorte<input id="ajz" type="range" min="10" max="100" step="1" value="100" style="padding:0"></label>
   <div id="ajh" style="color:var(--mu);font-size:.9rem;margin:6px 0"></div>
   <button id="ajs">Salvar e publicar</button><button class="s" id="ajx">Fechar</button>
 </dialog>
@@ -334,33 +338,39 @@ function ajDim(id){
   const p=(CONS.find(c=>c.id===id)||{prop:"1/1"}).prop||"1/1",[a,b]=p.split("/").map(Number),ar=a/b;
   return ar>=1?[700,Math.round(700/ar)]:[Math.round(700*ar),700];
 }
-function ajDesenha(){
-  const c=$("ajc"),g=c.getContext("2d"),W=c.width,H=c.height,im=AJ.img;
-  g.fillStyle="#fff";g.fillRect(0,0,W,H);
-  if(AJ.modo==="esticar"){g.drawImage(im,0,0,W,H);return}
-  const s=Math.max(W/im.width,H/im.height)*AJ.z,dw=im.width*s,dh=im.height*s;
-  AJ.ox=Math.min(Math.max(AJ.ox,-(dw-W)/2),(dw-W)/2);AJ.oy=Math.min(Math.max(AJ.oy,-(dh-H)/2),(dh-H)/2);
-  g.drawImage(im,(W-dw)/2+AJ.ox,(H-dh)/2+AJ.oy,dw,dh);
+function ajMostra(){
+  const b=$("ajb");
+  b.style.left=AJ.x/AJ.iw*100+"%";b.style.top=AJ.y/AJ.ih*100+"%";b.style.width=AJ.w/AJ.iw*100+"%";b.style.height=AJ.h/AJ.ih*100+"%";
+  $("ajz").value=Math.round(AJ.w/AJ.maxW*100);
+}
+function ajMax(){
+  AJ.maxW=Math.min(AJ.iw,AJ.ih*AJ.ar);AJ.w=AJ.maxW;AJ.h=AJ.w/AJ.ar;
+  AJ.x=(AJ.iw-AJ.w)/2;AJ.y=(AJ.ih-AJ.h)/2;ajMostra();
 }
 function ajModo(m){
-  AJ.modo=m;$("ajm1").setAttribute("aria-pressed",m==="esticar");$("ajm2").setAttribute("aria-pressed",m==="preencher");
-  $("ajzl").style.display=m==="preencher"?"block":"none";
-  $("ajh").textContent=m==="esticar"?"A imagem é esticada para caber exatamente no tamanho da capa.":"A imagem cobre toda a capa mantendo a proporção. Arraste para escolher o enquadramento.";
-  ajDesenha();
+  AJ.modo=m;$("ajm1").setAttribute("aria-pressed",m==="recortar");$("ajm2").setAttribute("aria-pressed",m==="esticar");
+  $("ajb").style.display=m==="recortar"?"block":"none";$("ajzl").style.display=m==="recortar"?"block":"none";
+  $("ajh").textContent=m==="recortar"?"Arraste o recorte para mover. Use os cantos ou o controle de tamanho para escolher a área. O recorte mantém o formato da capa.":"A imagem inteira é esticada para caber exatamente no tamanho da capa.";
 }
 function ajustarCapa(file,consoleId,rotulo){
   return new Promise((res,rej)=>{
-    const u=URL.createObjectURL(file),im=new Image();
+    const u=URL.createObjectURL(file),im=$("aji");
     im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("Imagem inválida (use JPG, PNG ou WEBP)"))};
     im.onload=()=>{
-      const [W,H]=ajDim(consoleId),c=$("ajc");c.width=W;c.height=H;
-      Object.assign(AJ,{img:im,z:1,ox:0,oy:0,feito:false});$("ajz").value=1;
+      const [W,H]=ajDim(consoleId);
+      Object.assign(AJ,{iw:im.naturalWidth,ih:im.naturalHeight,ar:W/H,W,H,feito:false});
       $("ajn").textContent=conNome(consoleId)+" · "+W+"×"+H;
-      ajModo("esticar");$("ajs").textContent=rotulo||"Salvar e publicar";
+      $("ajs").textContent=rotulo||"Salvar e publicar";
+      ajMax();ajModo("recortar");
       const fim=ok=>{
         if(AJ.feito)return;AJ.feito=true;
-        if(!ok){URL.revokeObjectURL(u);$("ajd").close();return res(null)}
-        c.toBlob(b=>{URL.revokeObjectURL(u);$("ajd").close();res(b)},"image/jpeg",0.9);
+        const fecha=b=>{URL.revokeObjectURL(u);im.removeAttribute("src");$("ajd").close();res(b)};
+        if(!ok)return fecha(null);
+        const c=document.createElement("canvas");c.width=W;c.height=H;
+        const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);
+        if(AJ.modo==="esticar")g.drawImage(im,0,0,W,H);
+        else g.drawImage(im,AJ.x,AJ.y,AJ.w,AJ.h,0,0,W,H);
+        c.toBlob(b=>fecha(b),"image/jpeg",0.9);
       };
       $("ajs").onclick=()=>fim(true);$("ajx").onclick=()=>fim(false);
       $("ajd").oncancel=()=>fim(false);
@@ -369,13 +379,35 @@ function ajustarCapa(file,consoleId,rotulo){
     im.src=u;
   });
 }
-$("ajm1").onclick=()=>ajModo("esticar");$("ajm2").onclick=()=>ajModo("preencher");
-$("ajz").oninput=()=>{AJ.z=+$("ajz").value;ajDesenha()};
+$("ajm1").onclick=()=>ajModo("recortar");$("ajm2").onclick=()=>ajModo("esticar");
+$("ajz").oninput=()=>{
+  const cx=AJ.x+AJ.w/2,cy=AJ.y+AJ.h/2;
+  AJ.w=Math.max(AJ.maxW*.1,AJ.maxW*(+$("ajz").value)/100);AJ.h=AJ.w/AJ.ar;
+  AJ.x=Math.min(Math.max(cx-AJ.w/2,0),AJ.iw-AJ.w);AJ.y=Math.min(Math.max(cy-AJ.h/2,0),AJ.ih-AJ.h);ajMostra();
+};
 (()=>{
-  const c=$("ajc");let p=null;
-  c.onpointerdown=e=>{if(AJ.modo!=="preencher")return;p={x:e.clientX,y:e.clientY};c.setPointerCapture(e.pointerId);c.style.cursor="grabbing"};
-  c.onpointermove=e=>{if(!p)return;const k=c.width/c.getBoundingClientRect().width;AJ.ox+=(e.clientX-p.x)*k;AJ.oy+=(e.clientY-p.y)*k;p={x:e.clientX,y:e.clientY};ajDesenha()};
-  c.onpointerup=c.onpointercancel=()=>{p=null;c.style.cursor="grab"};
+  const bx=$("ajb");let d=null;
+  const k=()=>AJ.iw/$("aji").getBoundingClientRect().width;
+  bx.onpointerdown=e=>{
+    d={m:e.target.dataset.h||"move",x:e.clientX,y:e.clientY,b:{x:AJ.x,y:AJ.y,w:AJ.w,h:AJ.h}};
+    bx.setPointerCapture(e.pointerId);e.preventDefault();
+  };
+  bx.onpointermove=e=>{
+    if(!d)return;const f=k(),dx=(e.clientX-d.x)*f,dy=(e.clientY-d.y)*f,o=d.b;
+    if(d.m==="move"){
+      AJ.x=Math.min(Math.max(o.x+dx,0),AJ.iw-o.w);AJ.y=Math.min(Math.max(o.y+dy,0),AJ.ih-o.h);
+    }else{
+      const L=d.m[1]==="l",T=d.m[0]==="t";
+      const ox=L?o.x+o.w:o.x,oy=T?o.y+o.h:o.y;
+      const px=(L?o.x:o.x+o.w)+dx,py=(T?o.y:o.y+o.h)+dy;
+      let w=Math.max(Math.abs(px-ox),Math.abs(py-oy)*AJ.ar);
+      w=Math.min(w,L?ox:AJ.iw-ox,(T?oy:AJ.ih-oy)*AJ.ar);
+      w=Math.max(w,AJ.maxW*.1);const h=w/AJ.ar;
+      AJ.w=w;AJ.h=h;AJ.x=L?ox-w:ox;AJ.y=T?oy-h:oy;
+    }
+    ajMostra();
+  };
+  bx.onpointerup=bx.onpointercancel=()=>{d=null};
 })();
 async function escolherCapa(input,consoleId,aoSalvar){
   const f=input.files[0];if(!f)return;
