@@ -114,6 +114,14 @@ gemini-2.5-flash-lite</textarea></label>
   <button onclick="salvarPagina()">Salvar e publicar configurações</button>
 </details>
 
+<details id="vs"><summary>📈 Visitas do site</summary>
+  <div id="vsn" style="font-size:2rem;font-weight:700;margin:8px 0">—</div>
+  <div id="vsm" style="color:var(--mu);font-size:.9rem"></div>
+  <label>Código do GoatCounter (a parte antes de .goatcounter.com)<input id="gc" placeholder="meusite" autocapitalize="none" autocomplete="off"></label>
+  <button class="s" onclick="carregarVisitas()">Atualizar</button><button onclick="salvarGc()">Salvar código</button>
+  <a id="vsl" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;color:var(--ac,#f5c518)">Abrir painel completo</a>
+</details>
+
 <details id="ct"><summary>🏷️ Categorias</summary>
   <div id="catl"></div>
   <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
@@ -561,6 +569,7 @@ async function adicionarLote(pub){
   if(pub)await publicar();else aviso(sel.length+" jogo(s) adicionado(s). Toque em Publicar no GitHub para atualizar o site.");
 }
 
+try{localStorage.setItem("skipgc","t")}catch(e){}
 let CFG={};
 fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
   CFG=c||{};const f=CFG.frases||{};
@@ -568,6 +577,7 @@ fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("f_ps1").value=f.ps1||"Clássicos que marcaram época!";$("f_ps2").value=f.ps2||"Aventuras inesquecíveis!";$("f_snes").value=f.snes||"A era 16-bits!";
+  $("gc").value=CFG.gc||"";carregarVisitas();
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
 });
 $("hf").onchange=()=>{const f=$("hf").files[0];if(f){const h=$("hp");h.src=URL.createObjectURL(f);h.style.display="block"}};
@@ -582,6 +592,22 @@ function redimensionar(f){
     img.onerror=()=>err(new Error("Imagem inválida"));
     img.src=u;
   });
+}
+async function carregarVisitas(){
+  const g=($("gc").value||"").trim(),n=$("vsn"),m=$("vsm"),l=$("vsl");
+  if(!/^[a-z0-9-]+$/i.test(g)){n.textContent="—";m.textContent="Informe o código do GoatCounter abaixo para começar a contar.";l.style.display="none";return}
+  l.href="https://"+g+".goatcounter.com";l.style.display="inline";n.textContent="…";m.textContent="";
+  try{
+    const r=await fetch("https://"+g+".goatcounter.com/counter/TOTAL.json?"+Date.now());
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();n.textContent=d.count;m.textContent="visitas no total ("+(d.count_unique||"?")+" visitantes únicos)";
+  }catch(e){n.textContent="—";m.textContent="Não consegui ler. No GoatCounter, ative Settings › \"Allow adding visitor counts on your website\" e confira o código."}
+}
+async function salvarGc(){
+  const g=$("gc").value.trim();
+  if(g&&!/^[a-z0-9-]+$/i.test(g)){aviso("Código inválido");return}
+  try{aviso("Publicando...");const c={...CFG,gc:g};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza contador de visitas");CFG=c;aviso("Salvo!");carregarVisitas()}
+  catch(e){aviso("Erro: "+e.message)}
 }
 async function salvarPagina(){
   try{
