@@ -105,9 +105,6 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Título, linha 1<input id="t1" placeholder="Catálogo"></label>
   <label>Título, linha 2 (em dourado)<input id="t2" placeholder="de jogos"></label>
   <label>Subtítulo<input id="st"></label>
-  <label>Frase do PS1<input id="f_ps1"></label>
-  <label>Frase do PS2<input id="f_ps2"></label>
-  <label>Frase do SNES<input id="f_snes"></label>
   <label>Imagem do topo (ideal: 1000 × 540 px, PNG com fundo transparente)<input id="hf" type="file" accept="image/*"></label>
   <img id="hp" alt="" style="max-width:100%;max-height:140px;margin-top:8px;display:none">
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="hrm" type="checkbox" style="width:auto"> Remover a imagem do topo</label>
@@ -124,6 +121,14 @@ gemini-2.5-flash-lite</textarea></label>
   <a id="vsl" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;color:var(--ac,#f5c518)">Abrir painel completo</a>
 </details>
 
+<details id="cs"><summary>🎮 Consoles</summary>
+  <p style="color:var(--mu);margin:6px 0">Renomeie (pode usar emoji, ex.: 🎶PS1), troque a cor ou crie novos, como APPS.</p>
+  <div id="csl"></div>
+  <label>Novo console (ex.: APPS)<input id="csnovo"></label>
+  <label>Formato das capas<select id="csprop"><option value="1/1">Quadrada (como PS1)</option><option value="5/7">Retrato (como PS2)</option><option value="7/5">Paisagem (como SNES)</option></select></label>
+  <button class="s" onclick="addCons()">Adicionar</button><button onclick="salvarConsoles()">Salvar e publicar consoles</button>
+</details>
+
 <details id="ct"><summary>🏷️ Categorias</summary>
   <div id="catl"></div>
   <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
@@ -131,7 +136,7 @@ gemini-2.5-flash-lite</textarea></label>
 </details>
 
 <details id="lt"><summary>📦 Cadastro em lote com IA</summary>
-  <label>Console de todos os jogos da lista<select id="lc"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Console de todos os jogos da lista<select id="lc"></select></label>
   <label>Categoria<select id="lcat"></select></label>
   <label>Nomes dos jogos, um por linha (pode haver erros de digitação)<textarea id="ln" rows="6" placeholder="crash bandicoot&#10;resident evil 2&#10;tekken 3"></textarea></label>
   <button onclick="gerarLote()">Preencher lista com IA</button>
@@ -144,7 +149,7 @@ gemini-2.5-flash-lite</textarea></label>
 <div class="box">
   <b id="ft" class="bt">Novo jogo</b>
   <label>Título<input id="titulo"></label>
-  <label>Console<select id="console"><option value="ps1">PS1</option><option value="snes">SNES</option><option value="ps2">PS2</option></select></label>
+  <label>Console<select id="console"></select></label>
   <label>Categoria<select id="categoria"></select></label>
   <button class="s" onclick="preencherIA()">Preencher com IA</button>
   <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
@@ -159,7 +164,7 @@ gemini-2.5-flash-lite</textarea></label>
 </div>
 
 <div class="box"><b class="bt lst">Jogos (<span id="n">0</span>)</b>
-  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
+  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"></select><select id="fcat" onchange="lista()"></select></div>
   <button class="s" id="selBtn" onclick="modoSel()">☑️ Seleção em massa</button>
   <div id="selBar" hidden>
     <div id="selN">0 marcado(s) como popular</div>
@@ -190,9 +195,72 @@ if(!C.token)$("cfg").open=true;
 function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não/i.test(t)?20000:5000)}
 function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
-fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarCats();lista()}).catch(()=>lista());
+fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista()}).catch(()=>lista());
 
 let CATS=[{id:"jogos",nome:"Jogos"}];
+const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",prop:"1/1",cor:"#3b82f6"},{id:"ps2",nome:"PS2",frase:"Aventuras inesquecíveis!",prop:"5/7",cor:"#4f7cff"},{id:"snes",nome:"Super Nintendo",frase:"A era 16-bits!",prop:"7/5",cor:"#8b5cf6"}];
+const CORES_NOVAS=["#f97316","#10b981","#ec4899","#eab308","#06b6d4","#ef4444"];
+let CONS=CONS_PADRAO.map(x=>({...x}));
+function consDe(c){
+  if(Array.isArray(c.consoles)&&c.consoles.length)return c.consoles.map(x=>({...x}));
+  const f=c.frases||{};return CONS_PADRAO.map(x=>({...x,frase:f[x.id]||x.frase}));
+}
+const conNome=id=>(CONS.find(c=>c.id===id)||{nome:String(id).toUpperCase()}).nome;
+const conCor=id=>(CONS.find(c=>c.id===id)||{cor:"#3b82f6"}).cor;
+function iniciarConsoles(){
+  jogos.forEach(j=>{if(j.console&&!CONS.some(c=>c.id===j.console))CONS.push({id:j.console,nome:String(j.console).toUpperCase(),frase:"",prop:"1/1",cor:CORES_NOVAS[CONS.length%CORES_NOVAS.length]})});
+  [["lc",0],["console",0],["fc",1]].forEach(([id,todos])=>{
+    const e=$(id),v=e.value;e.replaceChildren();
+    if(todos)e.add(new Option("Todos os consoles",""));
+    CONS.forEach(c=>e.add(new Option(c.nome,c.id)));
+    if([...e.options].some(o=>o.value===v))e.value=v;
+  });
+  const l=$("csl");l.replaceChildren();
+  CONS.forEach(c=>{
+    const bx=document.createElement("div");bx.className="cbx";bx.dataset.id=c.id;bx.style.cssText="border:1px solid var(--bd);border-radius:10px;padding:8px;margin-top:8px";
+    const r1=document.createElement("div");r1.className="crow";r1.style.marginTop="0";
+    const cor=document.createElement("input");cor.type="color";cor.value=/^#[0-9a-f]{6}$/i.test(c.cor)?c.cor:"#3b82f6";cor.dataset.k="cor";cor.style.cssText="flex:0 0 46px;height:40px;padding:2px";cor.setAttribute("aria-label","Cor");
+    const nm=document.createElement("input");nm.value=c.nome;nm.dataset.k="nome";nm.setAttribute("aria-label","Nome do console");
+    const n=jogos.filter(j=>j.console===c.id).length;
+    r1.append(cor,nm);
+    const r2=document.createElement("div");r2.className="crow";
+    const pr=document.createElement("select");pr.dataset.k="prop";[["1/1","Capa quadrada"],["5/7","Capa retrato"],["7/5","Capa paisagem"]].forEach(([v,t])=>pr.add(new Option(t,v)));pr.value=c.prop||"1/1";pr.style.flex="1";
+    const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
+    r2.append(pr,m);
+    if(!n&&CONS.length>1){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCons(c.id);r2.appendChild(b)}
+    const r3=document.createElement("div");r3.className="crow";
+    const fr=document.createElement("input");fr.value=c.frase||"";fr.dataset.k="frase";fr.placeholder="Frase da seção no site";fr.setAttribute("aria-label","Frase");
+    r3.append(fr);
+    bx.append(r1,r2,r3);l.appendChild(bx);
+  });
+}
+function lerConsoles(){
+  document.querySelectorAll("#csl .cbx").forEach(bx=>{
+    const c=CONS.find(x=>x.id===bx.dataset.id);if(!c)return;
+    const g=k=>bx.querySelector('[data-k="'+k+'"]').value;
+    const n=g("nome").trim();if(n)c.nome=n;
+    c.cor=g("cor");c.prop=g("prop");c.frase=g("frase").trim();
+  });
+}
+function addCons(){
+  lerConsoles();const n=$("csnovo").value.trim();if(!n)return aviso("Digite o nome do console.");
+  let id=slug(n)||("c"+Date.now().toString(36));
+  if(CONS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Esse console já existe.");
+  CONS.push({id,nome:n,frase:"",prop:$("csprop").value,cor:CORES_NOVAS[CONS.length%CORES_NOVAS.length]});
+  $("csnovo").value="";iniciarConsoles();aviso("Adicionado. Toque em Salvar e publicar consoles.");
+}
+function delCons(id){
+  lerConsoles();const c=CONS.find(x=>x.id===id);if(!c)return;
+  if(jogos.some(j=>j.console===id))return aviso("Mova os jogos deste console antes de excluir.");
+  if(!confirm('Excluir o console "'+c.nome+'"?'))return;
+  CONS=CONS.filter(x=>x.id!==id);iniciarConsoles();lista();aviso("Excluído. Toque em Salvar e publicar consoles para confirmar.");
+}
+async function salvarConsoles(){
+  lerConsoles();
+  try{aviso("Publicando...");const c={...CFG,consoles:CONS.map(({id,nome,frase,prop,cor})=>({id,nome,frase,prop,cor}))};
+    await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza consoles");CFG=c;iniciarConsoles();lista();aviso("Consoles salvos!")}
+  catch(e){aviso("Erro: "+e.message)}
+}
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 let jogosMudou=false;
 function iniciarCats(){
@@ -207,19 +275,14 @@ function iniciarCats(){
   CATS.forEach(c=>{
     const d=document.createElement("div");d.className="crow";
     const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.setAttribute("aria-label","Nome da categoria");
-    const sc=document.createElement("select");sc.dataset.cc=c.id;sc.setAttribute("aria-label","Console da categoria");
-    [["","Console: livre"],["ps1","PS1"],["ps2","PS2"],["snes","SNES"]].forEach(([v,t])=>sc.add(new Option(t,v)));sc.value=c.console||"";
     const n=jogos.filter(j=>(j.categoria||"jogos")===c.id).length;
     const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
-    d.append(i,sc,m);
+    d.append(i,m);
     if(c.id!=="jogos"){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
     l.appendChild(d);
   });
 }
-function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n});document.querySelectorAll("#catl select").forEach(e=>{const c=CATS.find(x=>x.id===e.dataset.cc);if(c){if(e.value)c.console=e.value;else delete c.console}})}
-function autoConsole(selCat,selCon){const c=CATS.find(x=>x.id===$(selCat).value);if(c&&c.console)$(selCon).value=c.console}
-$("categoria").addEventListener("change",()=>autoConsole("categoria","console"));
-$("lcat").addEventListener("change",()=>autoConsole("lcat","lc"));
+function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n})}
 function addCat(){
   lerCats();const n=$("catnovo").value.trim();if(!n)return aviso("Digite o nome da categoria.");
   const id=slug(n);if(!id||CATS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Essa categoria já existe.");
@@ -253,11 +316,11 @@ function cpMostrar(){
   if(!j){if($("cpd").open)$("cpd").close();aviso("Fim da lista de capas.");lista();return}
   $("cpn").textContent=(cpI+1)+" de "+cpFila.length;
   $("cpt").textContent=j.titulo;
-  $("cpm").textContent=j.console.toUpperCase()+" · "+catNome(j.categoria||"jogos");
+  $("cpm").textContent=conNome(j.console)+" · "+catNome(j.categoria||"jogos");
   $("cpf").value="";$("cpi").hidden=true;
 }
 $("cpf").onchange=()=>{const f=$("cpf").files[0],im=$("cpi");if(f){im.src=URL.createObjectURL(f);im.hidden=false}else im.hidden=true};
-function cpPesquisar(){const j=cpAtual();if(!j)return;window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(j.titulo+" cover "+j.console),"_blank","noopener")}
+function cpPesquisar(){const j=cpAtual();if(!j)return;window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(j.titulo+" cover "+conNome(j.console).replace(/[^\p{L}\p{N} ]/gu,"").trim()),"_blank","noopener")}
 function cpPular(){cpI++;cpMostrar()}
 async function cpSalvar(){
   if(cpBusy)return;
@@ -307,10 +370,10 @@ function lista(){
   const box=$("lista");box.replaceChildren();
   if(!idx.length){box.textContent="Nenhum jogo encontrado.";return}
   const forcar=!!(q||fc||fk);
-  ["ps1","ps2","snes"].forEach(c=>{
+  CONS.map(x=>x.id).forEach(c=>{
     const doC=idx.filter(i=>jogos[i].console===c);if(!doC.length)return;
-    const g=document.createElement("details");g.className="gr";g.dataset.c=c;g.open=forcar||selMode||abertos.has(c);
-    const sm=document.createElement("summary");sm.textContent=c.toUpperCase()+" ("+doC.length+")";
+    const g=document.createElement("details");g.className="gr";g.dataset.c=c;g.style.borderLeftColor=conCor(c);g.open=forcar||selMode||abertos.has(c);
+    const sm=document.createElement("summary");sm.textContent=conNome(c)+" ("+doC.length+")";
     sm.onclick=()=>{g.open?abertos.delete(c):abertos.add(c)};
     g.appendChild(sm);
     doC.forEach(i=>{
@@ -574,11 +637,10 @@ async function adicionarLote(pub){
 try{localStorage.setItem("skipgc","t")}catch(e){}
 let CFG={};
 fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
-  CFG=c||{};const f=CFG.frases||{};
+  CFG=c||{};CONS=consDe(CFG);iniciarConsoles();
   if(Array.isArray(CFG.categorias)&&CFG.categorias.length){CATS=CFG.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
-  $("f_ps1").value=f.ps1||"Clássicos que marcaram época!";$("f_ps2").value=f.ps2||"Aventuras inesquecíveis!";$("f_snes").value=f.snes||"A era 16-bits!";
   $("gc").value=CFG.gc||"";carregarVisitas();
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
 });
@@ -599,7 +661,8 @@ async function carregarVisitas(){
   const g=($("gc").value||"").trim(),n=$("vsn"),m=$("vsm"),l=$("vsl");
   if(!/^[a-z0-9-]+$/i.test(g)){n.textContent="—";$("vsl2").textContent="—";m.textContent="Informe o código do GoatCounter abaixo para começar a contar.";l.style.display="none";return}
   l.href="https://"+g+".goatcounter.com";l.style.display="inline";n.textContent="…";m.textContent="";$("vsl2").textContent="…";
-  fetch("https://"+g+".goatcounter.com/counter/curtir.json?"+Date.now()).then(r=>r.ok?r.json():{count:"0"}).catch(()=>({count:"—"})).then(d=>{$("vsl2").textContent=d.count});
+  const ler=p=>fetch("https://"+g+".goatcounter.com/counter/"+p+".json?"+Date.now()).then(r=>r.ok?r.json():{count:"0"}).then(d=>parseInt(String(d.count).replace(/\D/g,""),10)||0);
+  ler("curtir").then(a=>{$("vsl2").textContent=a.toLocaleString("pt-BR")}).catch(()=>{$("vsl2").textContent="—"});
   try{
     const r=await fetch("https://"+g+".goatcounter.com/counter/TOTAL.json?"+Date.now());
     if(!r.ok)throw new Error(r.status);
@@ -615,7 +678,7 @@ async function salvarGc(){
 async function salvarPagina(){
   try{
     aviso("Publicando...");
-    const c={...CFG,titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim(),frases:{ps1:$("f_ps1").value.trim(),ps2:$("f_ps2").value.trim(),snes:$("f_snes").value.trim()}};
+    const c={...CFG,titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim()};
     const f=$("hf").files[0];
     if($("hrm").checked)c.hero="";
     else if(f){await enviar("hero.png",await b64(await redimensionar(f)),"Imagem do topo");c.hero="hero.png";c.heroV=Date.now()}
@@ -657,7 +720,7 @@ async function publicar(){
   try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.");return true}catch(e){aviso("Falha ao publicar: "+e.message);return false}
 }
 function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
-iniciarCats();
+iniciarConsoles();iniciarCats();
 </script>
 </body>
 </html>
