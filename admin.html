@@ -64,6 +64,11 @@ details.gr .it:first-of-type{border-top:1px solid var(--bd)}
 #selBar{margin-top:10px;padding:10px 12px;border:1px dashed var(--gold);border-radius:12px}
 #selBar[hidden]{display:none}#selBar button{margin-top:8px}
 #selN{color:var(--gold);font-weight:600}
+#selFab{position:fixed;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#121a38ee;border:1px solid var(--gold);border-radius:999px;box-shadow:0 10px 30px #000c;backdrop-filter:blur(6px);width:max-content;max-width:94vw}
+#selFab[hidden]{display:none}
+#selFab button{margin:0;padding:10px 16px;border-radius:999px;white-space:nowrap}
+#selFab span{color:var(--gold);font-weight:700;padding:0 4px 0 8px;white-space:nowrap}
+body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 .it input[type=checkbox]{width:22px;height:22px;flex:none;margin:0}
 .crow{display:flex;gap:8px;align-items:center;margin-top:6px}.crow input{flex:1;min-width:0}
 .crow small{color:var(--mu);white-space:nowrap}.crow button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1}
@@ -147,14 +152,15 @@ gemini-2.5-flash-lite</textarea></label>
   <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
   <button class="s" id="selBtn" onclick="modoSel()">☑️ Seleção em massa</button>
   <div id="selBar" hidden>
-    <div id="selN">0 selecionados</div>
+    <div id="selN">0 marcado(s) como popular</div>
+    <small style="color:var(--mu)">Os jogos marcados são os populares. Marque ou desmarque e use os botões flutuantes Salvar ou Fechar.</small>
     <button class="s" onclick="selTodos()">Selecionar todos</button><button class="s" onclick="selLimpar()">Limpar</button>
-    <button onclick="aplicarPop(true)">★ Marcar popular</button><button class="s" onclick="aplicarPop(false)">☆ Tirar popular</button>
   </div>
   <div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
 <dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
+<div id="selFab" hidden><span id="selFabN">★ 0</span><button onclick="salvarPop()">💾 Salvar</button><button class="s" onclick="fecharSel()">✖ Fechar</button></div>
 <dialog id="cpd">
   <div class="cph"><b>🖼️ COMPLETAR CAPAS</b><span id="cpn"></span></div>
   <div id="cpt"></div><div id="cpm"></div>
@@ -261,15 +267,18 @@ function atualizarStats(){
   $("capasBtn").textContent=sem?`🖼️ Completar capas (${sem})`:"✅ Todos os jogos têm capa";
 }
 let selMode=false,ultimoIdx=[];const sel=new Set();
-function selInfo(){$("selN").textContent=sel.size+" selecionado(s)"}
-function modoSel(){selMode=!selMode;sel.clear();$("selBar").hidden=!selMode;$("selBtn").textContent=selMode?"✖ Sair da seleção":"☑️ Seleção em massa";selInfo();lista()}
+function selInfo(){$("selN").textContent=sel.size+" marcado(s) como popular";$("selFabN").textContent="★ "+sel.size}
+function modoSel(){selMode=!selMode;sel.clear();if(selMode)jogos.forEach(j=>{if(j.popular)sel.add(j.id)});$("selBar").hidden=!selMode;$("selFab").hidden=!selMode;document.body.classList.toggle("sel",selMode);$("selBtn").textContent=selMode?"✖ Sair da seleção":"☑️ Seleção em massa";selInfo();lista()}
 function selTodos(){ultimoIdx.forEach(id=>sel.add(id));lista()}
 function selLimpar(){sel.clear();lista()}
-async function aplicarPop(v){
-  if(!sel.size)return aviso("Selecione ao menos um jogo.");
-  jogos.forEach(j=>{if(sel.has(j.id))j.popular=v});
-  sel.clear();lista();
-  await publicar();
+const difPop=()=>({add:jogos.filter(j=>sel.has(j.id)&&!j.popular).length,rem:jogos.filter(j=>!sel.has(j.id)&&j.popular).length});
+function fecharSel(){const d=difPop();if((d.add||d.rem)&&!confirm("Sair sem salvar as alterações dos populares?"))return;modoSel()}
+async function salvarPop(){
+  const {add,rem}=difPop();
+  if(!add&&!rem)return aviso("Nenhuma alteração nos populares.");
+  if(!confirm(`Salvar populares? ${add} novo(s) e ${rem} removido(s).`))return;
+  jogos.forEach(j=>{j.popular=sel.has(j.id)});
+  if(await publicar()&&selMode)modoSel();
 }
 function lista(){
   atualizarStats();
