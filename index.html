@@ -129,9 +129,7 @@ dialog::backdrop{background:#000a}
   <div class="bar">
     <input id="q" type="search" placeholder="Buscar jogo" aria-label="Buscar jogo">
     <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
-    <button class="chip" data-f="ps1" aria-pressed="false">PS1</button>
-    <button class="chip" data-f="ps2" aria-pressed="false">PS2</button>
-    <button class="chip" data-f="snes" aria-pressed="false">SNES</button>
+    <span id="cchips" style="display:contents"></span>
   </div>
   <div class="bar" id="cats" hidden style="padding-top:0"></div>
   <main id="grid"></main>
@@ -151,17 +149,30 @@ dialog::backdrop{background:#000a}
 <script>
 // Preencha com os dados de https://giscus.app (repositório público com Discussions ativadas)
 const GISCUS={repo:"jogos-on/consoles",repoId:"R_kgDOV2o_fA",category:"Announcements",categoryId:"DIC_kwDOV2o_fM4DLp4_"};
-const SEC={ps1:["PS1","Clássicos que marcaram época!"],ps2:["PS2","Aventuras inesquecíveis!"],snes:["Super Nintendo","A era 16-bits!"]};
-const PROP={ps1:"1/1",ps2:"5/7",snes:"7/5"};
+const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",prop:"1/1",cor:"#3b82f6"},{id:"ps2",nome:"PS2",frase:"Aventuras inesquecíveis!",prop:"5/7",cor:"#4f7cff"},{id:"snes",nome:"Super Nintendo",frase:"A era 16-bits!",prop:"7/5",cor:"#8b5cf6"}];
+const SEC={},PROP={};
 const ROLO=5,PAG=10,MAXC=6; // 5 no rolo lateral; 10 por página na grade; máx. de colunas
-const st={ps1:{ex:false,p:0},ps2:{ex:false,p:0},snes:{ex:false,p:0}};
-Object.keys(st).forEach(c=>{try{const v=+localStorage.getItem("cols:"+c);if(v>=1&&v<=MAXC)st[c].cols=v}catch(e){}});
+const st={};
 let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[{id:"jogos",nome:"Jogos"}];
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const seguro=u=>/^https?:\/\//i.test(u)?u:"";
 
+function aplicarCons(lista){
+  Object.keys(SEC).forEach(k=>delete SEC[k]);Object.keys(PROP).forEach(k=>delete PROP[k]);
+  lista.forEach(x=>{
+    if(!x||!/^[a-z0-9-]+$/i.test(x.id||"")||!x.nome)return;
+    SEC[x.id]=[String(x.nome),String(x.frase||"")];
+    PROP[x.id]=["1/1","5/7","7/5"].includes(x.prop)?x.prop:"1/1";
+    if(/^#[0-9a-f]{6}$/i.test(x.cor||""))document.documentElement.style.setProperty("--"+x.id,x.cor);
+    if(!st[x.id]){st[x.id]={ex:false,p:0};try{const v=+localStorage.getItem("cols:"+x.id);if(v>=1&&v<=MAXC)st[x.id].cols=v}catch(e){}}
+  });
+  if(filtro!=="todos"&&!SEC[filtro])filtro="todos";
+  $("cchips").innerHTML=Object.keys(SEC).map(c=>`<button class="chip" data-f="${esc(c)}" aria-pressed="${filtro===c}">${esc(SEC[c][0])}</button>`).join("");
+  document.querySelector('[data-f="todos"]').setAttribute("aria-pressed",filtro==="todos");
+}
+aplicarCons(CONS_PADRAO);
 const cfgP=fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
 function abrirLink(){const id=new URLSearchParams(location.search).get("jogo");if(id){const j=jogos.find(x=>x.id===id);if(j)abrir(j)}}
 fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
@@ -172,7 +183,8 @@ function iniciarLike(gc){
   let n=null,ja=false;try{ja=localStorage.getItem(K)==="1"}catch(e){}
   const pinta=()=>{b.hidden=false;b.setAttribute("aria-pressed",ja);$("lkt").textContent=ja?"Você curtiu":"Curtir o site";$("lkn").textContent=n===null?"":n.toLocaleString("pt-BR")};
   pinta();
-  fetch(base+"/counter/curtir.json?"+Date.now()).then(r=>r.ok?r.json():{count:"0"}).catch(()=>({count:"0"})).then(d=>{n=parseInt(String(d.count).replace(/\D/g,""),10)||0;pinta()});
+  const ler=p=>fetch(base+"/counter/"+p+".json?"+Date.now()).then(r=>r.ok?r.json():{count:"0"}).catch(()=>({count:"0"})).then(d=>parseInt(String(d.count).replace(/\D/g,""),10)||0);
+  ler("curtir").then(a=>{n=Math.max(a,ja?1:0);pinta()});
   b.onclick=()=>{
     if(ja)return;ja=true;n=(n||0)+1;
     try{localStorage.setItem(K,"1")}catch(e){}
@@ -190,7 +202,7 @@ function aplicarCfg(c){
   if(c.titulo2)$("t2").textContent=c.titulo2;
   if(c.subtitulo)$("st").textContent=c.subtitulo;
   if(c.titulo1||c.titulo2)document.title=((c.titulo1||"")+" "+(c.titulo2||"")).trim();
-  Object.keys(c.frases||{}).forEach(k=>{if(SEC[k]&&c.frases[k])SEC[k][1]=c.frases[k]});
+  aplicarCons(Array.isArray(c.consoles)&&c.consoles.length?c.consoles:CONS_PADRAO.map(x=>({...x,frase:(c.frases||{})[x.id]||x.frase})));
   const h=$("hero"),src=c.hero===undefined?"hero.png":c.hero;
   if(src){h.src=src+(c.heroV?"?v="+c.heroV:"");h.hidden=false}
   document.documentElement.style.setProperty("--hero",src?`url("${encodeURI(src+(c.heroV?"?v="+c.heroV:""))}")`:"none");
@@ -223,7 +235,7 @@ function render(){
       if(pgs>1)nav=`<button data-a="prev" data-c="${c}"${st[c].p===0?" disabled":""}>‹ Voltar</button><span>${st[c].p+1} / ${pgs}</span><button data-a="next" data-c="${c}"${st[c].p>=pgs-1?" disabled":""}>Avançar ›</button>`;
       if(!forc)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
     }
-    const n=st[c].cols?` style="--n:${st[c].cols}"`:"";
+    const n=` style="--c:var(--${c});--ar:${PROP[c]}${st[c].cols?";--n:"+st[c].cols:""}"`;
     return `<section class="sec ${c}" id="s-${c}" data-c="${c}"${n}><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p><div class="cc"><button class="cb" data-a="col-" data-c="${c}" aria-label="Mais colunas, capas menores">−</button><button class="cb" data-a="col+" data-c="${c}" aria-label="Menos colunas, capas maiores">+</button></div></div><div class="row ${modo}">${itens.map(j=>card(j,c)).join("")}</div><div class="nav"${nav?"":" hidden"}>${nav}</div></section>`;
   }).join("");
   $("grid").innerHTML=html||'<p class="vazio">Nenhum jogo encontrado.</p>';
@@ -245,7 +257,7 @@ function mudarCols(c,d){
 }
 
 $("q").oninput=render;
-document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
+document.querySelector(".bar").onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;filtro=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()};
 $("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(!b)return;catF=b.dataset.cat;renderCats();render()};
 $("grid").onclick=e=>{
   const n=e.target.closest("[data-a]");
@@ -316,7 +328,7 @@ dlg.addEventListener("close",()=>{atual=null;history.replaceState(null,"",locati
 function abrir(j){
   if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
-  const w={ps1:150,ps2:130,snes:170}[j.console]||130;
+  const w=({"1/1":150,"5/7":130,"7/5":170})[PROP[j.console]]||130;
   $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${(j.categoria||"jogos")!=="jogos"?" - "+esc(catNome(j.categoria)):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
   const im=$("det").querySelector(".top img");
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
