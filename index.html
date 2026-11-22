@@ -34,6 +34,9 @@ h1 span{display:block}
 h1 .a{background:linear-gradient(#fff,#aeb6c8);-webkit-background-clip:text;background-clip:text;color:transparent}
 h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:1.15rem}
+.like{margin-top:14px;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--gold);background:transparent;color:var(--gold);font:700 1rem Barlow,system-ui,sans-serif;cursor:pointer}
+.like b{color:var(--fg);font-weight:700}.like[aria-pressed=true]{background:var(--gold);color:#1a1300}.like[aria-pressed=true] b{color:#1a1300}
+.like:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .sub i{width:28px;height:5px;border-radius:3px;background:var(--ps1)}
 .hero img{flex:0 1 46%;width:46%;aspect-ratio:1000/540;max-height:300px;object-fit:contain}
 .bar{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0}
@@ -65,7 +68,7 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .g{all:unset;cursor:pointer;display:block;text-align:center}
 .cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
 .star{position:absolute;top:3px;left:5px;z-index:1;font:normal 700 17px/1 Barlow,sans-serif;background:linear-gradient(180deg,#fff3b0 0%,#f0c230 50%,#b9830a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 1.5px #000d);pointer-events:none}
-.cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:fill;display:block}
+.cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:fill!important;display:block}
 .ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
 .ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
 .top .ph{float:left;width:130px;margin:0 14px 8px 0;border-radius:6px}
@@ -89,7 +92,7 @@ dialog{width:min(640px,94vw);max-height:92vh;border:1px solid #2a3350;border-rad
 dialog::backdrop{background:#000a}
 .in{padding:18px}
 .top{display:flow-root}
-.top img{float:left;width:130px;height:auto;margin:0 14px 8px 0;object-fit:fill;border-radius:6px}
+.top img{float:left;width:130px;height:auto;margin:0 14px 8px 0;object-fit:fill!important;border-radius:6px}
 .top h3{margin:0 0 4px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
 .acts{display:block}
 .btn{display:inline-block;margin:10px 8px 0 0;padding:10px 18px;border:0;border-radius:8px;background:var(--gold);color:#1a1300;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
@@ -119,6 +122,7 @@ dialog::backdrop{background:#000a}
     <div>
       <h1><span class="a" id="t1">Catálogo</span><span class="b" id="t2">de jogos</span></h1>
       <div class="sub"><i></i><span id="st">Reviva grandes clássicos!</span><i></i></div>
+      <button type="button" id="lk" class="like" hidden aria-pressed="false"><span class="ic">👍</span> <span id="lkt">Curtir o site</span> <b id="lkn"></b></button>
     </div>
     <img id="hero" alt="" hidden onerror="this.remove()">
   </div>
@@ -162,8 +166,24 @@ const cfgP=fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>
 function abrirLink(){const id=new URLSearchParams(location.search).get("jogo");if(id){const j=jogos.find(x=>x.id===id);if(j)abrir(j)}}
 fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
 
+function iniciarLike(gc){
+  const b=$("lk");if(!b||b.dataset.on)return;b.dataset.on="1";
+  const base="https://"+gc+".goatcounter.com",K="siteCurtido";
+  let n=null,ja=false;try{ja=localStorage.getItem(K)==="1"}catch(e){}
+  const pinta=()=>{b.hidden=false;b.setAttribute("aria-pressed",ja);$("lkt").textContent=ja?"Você curtiu":"Curtir o site";$("lkn").textContent=n===null?"":n.toLocaleString("pt-BR")};
+  pinta();
+  fetch(base+"/counter/curtir.json?"+Date.now()).then(r=>r.ok?r.json():{count:"0"}).catch(()=>({count:"0"})).then(d=>{n=parseInt(String(d.count).replace(/\D/g,""),10)||0;pinta()});
+  b.onclick=()=>{
+    if(ja)return;ja=true;n=(n||0)+1;
+    try{localStorage.setItem(K,"1")}catch(e){}
+    new Image().src=base+"/count?p=curtir&e=true&t=Curtida&rnd="+Math.random().toString(36).slice(2,7);
+    pinta();
+  };
+}
 function aplicarCfg(c){
   c=c||{};
+  if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc))iniciarLike(c.gc);
+  if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc)&&!document.getElementById("gcs")){const g=document.createElement("script");g.id="gcs";g.async=true;g.dataset.goatcounter="https://"+c.gc+".goatcounter.com/count";g.src="https://gc.zgo.at/count.js";document.head.appendChild(g)}
   if(Array.isArray(c.categorias)&&c.categorias.length){CATS=c.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
   renderCats();
   if(c.titulo1)$("t1").textContent=c.titulo1;
