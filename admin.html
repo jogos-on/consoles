@@ -61,6 +61,10 @@ details.gr .it:first-of-type{border-top:1px solid var(--bd)}
 .it .tt b{font-size:.95rem}.it small{color:var(--mu);font-size:.78rem}
 .it button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1;flex:none}
 #lista{margin-top:4px}
+#selBar{margin-top:10px;padding:10px 12px;border:1px dashed var(--gold);border-radius:12px}
+#selBar[hidden]{display:none}#selBar button{margin-top:8px}
+#selN{color:var(--gold);font-weight:600}
+.it input[type=checkbox]{width:22px;height:22px;flex:none;margin:0}
 .crow{display:flex;gap:8px;align-items:center;margin-top:6px}.crow input{flex:1;min-width:0}
 .crow small{color:var(--mu);white-space:nowrap}.crow button{margin:0;padding:6px 9px;font-size:1.05rem;line-height:1}
 .flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.flt>*{flex:1 1 140px}
@@ -141,6 +145,12 @@ gemini-2.5-flash-lite</textarea></label>
 
 <div class="box"><b class="bt lst">Jogos (<span id="n">0</span>)</b>
   <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"><option value="">Todos os consoles</option><option value="ps1">PS1</option><option value="ps2">PS2</option><option value="snes">SNES</option></select><select id="fcat" onchange="lista()"></select></div>
+  <button class="s" id="selBtn" onclick="modoSel()">☑️ Seleção em massa</button>
+  <div id="selBar" hidden>
+    <div id="selN">0 selecionados</div>
+    <button class="s" onclick="selTodos()">Selecionar todos</button><button class="s" onclick="selLimpar()">Limpar</button>
+    <button onclick="aplicarPop(true)">★ Marcar popular</button><button class="s" onclick="aplicarPop(false)">☆ Tirar popular</button>
+  </div>
   <div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
@@ -250,23 +260,41 @@ function atualizarStats(){
   $("sTot").textContent=jogos.length;$("sSem").textContent=sem;
   $("capasBtn").textContent=sem?`🖼️ Completar capas (${sem})`:"✅ Todos os jogos têm capa";
 }
+let selMode=false,ultimoIdx=[];const sel=new Set();
+function selInfo(){$("selN").textContent=sel.size+" selecionado(s)"}
+function modoSel(){selMode=!selMode;sel.clear();$("selBar").hidden=!selMode;$("selBtn").textContent=selMode?"✖ Sair da seleção":"☑️ Seleção em massa";selInfo();lista()}
+function selTodos(){ultimoIdx.forEach(id=>sel.add(id));lista()}
+function selLimpar(){sel.clear();lista()}
+async function aplicarPop(v){
+  if(!sel.size)return aviso("Selecione ao menos um jogo.");
+  jogos.forEach(j=>{if(sel.has(j.id))j.popular=v});
+  sel.clear();lista();
+  await publicar();
+}
 function lista(){
   atualizarStats();
   const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
   const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
   idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
+  ultimoIdx=idx.map(i=>jogos[i].id);
   $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
   const box=$("lista");box.replaceChildren();
   if(!idx.length){box.textContent="Nenhum jogo encontrado.";return}
   const forcar=!!(q||fc||fk);
   ["ps1","ps2","snes"].forEach(c=>{
     const doC=idx.filter(i=>jogos[i].console===c);if(!doC.length)return;
-    const g=document.createElement("details");g.className="gr";g.dataset.c=c;g.open=forcar||abertos.has(c);
+    const g=document.createElement("details");g.className="gr";g.dataset.c=c;g.open=forcar||selMode||abertos.has(c);
     const sm=document.createElement("summary");sm.textContent=c.toUpperCase()+" ("+doC.length+")";
     sm.onclick=()=>{g.open?abertos.delete(c):abertos.add(c)};
     g.appendChild(sm);
     doC.forEach(i=>{
       const j=jogos[i],d=document.createElement("div");d.className="it";
+      if(selMode){
+        const cb=document.createElement("input");cb.type="checkbox";cb.checked=sel.has(j.id);
+        cb.onchange=()=>{cb.checked?sel.add(j.id):sel.delete(j.id);selInfo()};
+        d.onclick=e=>{if(e.target!==cb){cb.checked=!cb.checked;cb.onchange()}};
+        d.appendChild(cb);
+      }
       const im=document.createElement("img");im.alt="";im.loading="lazy";
       if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
@@ -275,7 +303,7 @@ function lista(){
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
       const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
-      d.append(im,t,e,r);g.appendChild(d);
+      selMode?d.append(im,t):d.append(im,t,e,r);g.appendChild(d);
     });
     box.appendChild(g);
   });
