@@ -91,5 +91,18 @@
     "senha": "dubsgamer.com",
     "descricao": "Este aclamado jogo de plataforma 3D continua as aventuras de Crash, que viaja no tempo para impedir os planos malignos de seus inimigos. Ele oferece uma grande variedade de fases e novas habilidades para o protagonista.",
     "capa": "capas/ps1/crash-bandicoot-3-warped-dublado-e-traduzido-pt-br.jpg"
+  },
+  {
+    "id": "pes-efotball-treme-terra-2027-ps2",
+    "titulo": "PES eFotball Treme Terra 2027",
+    "console": "ps2",
+    "categoria": "jogos",
+    "popular": false,
+    "genero": "Esporte / Futebol",
+    "ano": "2027",
+    "link": "https://www.mediafire.com/file/c867d32i2hxinvd/PatchTremedorTerras+27.rar/file?action=check",
+    "senha": "dubsgamer.com",
+    "descricao": "A última edição da aclamada série de futebol lançada para o PlayStation 2, trazendo os times e jogadores da temporada 2013-2014. Oferece uma experiência de jogo refinada com foco na física da bola e movimentos dos jogadores.",
+    "capa": "capas/ps2/pes-efotball-treme-terra-2027.jpg"
   }
 ]
