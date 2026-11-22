@@ -598,8 +598,7 @@
     "genero": "Luta",
     "ano": "2006",
     "link": "https://www.mediafire.com/file/i886uqdk1au3jh3/Mortal+Kombat+Armageddon+PT-BR.iso/file",
-    "descricao": "O capítulo final da fase 3D de Mortal Kombat, com elenco gigante e modo Konquest. Em português.",
-    "capa": "capas/ps2/mortal-kombat-armageddon-pt-br.jpg"
+    "descricao": "O capítulo final da fase 3D de Mortal Kombat, com elenco gigante e modo Konquest. Em português."
   },
   {
     "id": "pes-2014-ps2",
@@ -610,8 +609,7 @@
     "genero": "Esporte / Futebol",
     "ano": "2013",
     "link": "https://www.mediafire.com/file/rtk0tkfnzvye4lp/PES_2014.rar/file",
-    "descricao": "Pro Evolution Soccer 2014 com partidas e modos clássicos de futebol.",
-    "capa": "capas/ps2/pes-2014.jpg"
+    "descricao": "Pro Evolution Soccer 2014 com partidas e modos clássicos de futebol."
   },
   {
     "id": "carros-dub-ps2",
@@ -622,8 +620,7 @@
     "genero": "Corrida / Aventura",
     "ano": "2006",
     "link": "https://www.mediafire.com/file/0vwtlpxv1yabojm/Carros_Dublado_PT-BR_DVD_ISO_PS2.rar/file?dkey=hsmmybsiqhz&r=676",
-    "descricao": "Relâmpago McQueen e os amigos de Radiator Springs em corridas e minigames. Versão dublada.",
-    "capa": "capas/ps2/carros-dub.jpg"
+    "descricao": "Relâmpago McQueen e os amigos de Radiator Springs em corridas e minigames. Versão dublada."
   },
   {
     "id": "obscure-2-pt-br-ps2",
@@ -635,8 +632,7 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/g3h8mm658ipmj2x/ObsCure_2_ISO_PT-BR_PS2.rar/file?dkey=7jbxn7hd06l&r=1001",
     "senha": "PS2-Nostalgia",
-    "descricao": "Obscure: The Aftermath: estudantes enfrentam criaturas dentro de uma universidade. Em português.",
-    "capa": "capas/ps2/obscure-2-pt-br.jpg"
+    "descricao": "Obscure: The Aftermath: estudantes enfrentam criaturas dentro de uma universidade. Em português."
   },
   {
     "id": "x-men-origins-ps2",
@@ -647,8 +643,7 @@
     "genero": "Ação / Briga de rua",
     "ano": "2009",
     "link": "https://www.mediafire.com/file/wy620xgz2ei4jhh/X_Men_Origins_DVD_ISO_PS2.iso/file?dkey=rvnxre1vpzk&r=29",
-    "descricao": "Wolverine revela sua origem e enfrenta inimigos com garras e fúria.",
-    "capa": "capas/ps2/x-men-origins.jpg"
+    "descricao": "Wolverine revela sua origem e enfrenta inimigos com garras e fúria."
   },
   {
     "id": "ghost-rider-pt-br-ps2",
@@ -659,12 +654,11 @@
     "genero": "Ação / Aventura",
     "ano": "2007",
     "link": "https://www.mediafire.com/file/yfwscxdl5je7b3v/Ghost_Rider__Motoqueiro_%2528PTBR%2529.rar/file?dkey=4tpzzcz07jn&r=1112",
-    "descricao": "Johnny Blaze vira o Motoqueiro Fantasma e enfrenta demônios em fases de ação. Em português.",
-    "capa": "capas/ps2/ghost-rider-pt-br.jpg"
+    "descricao": "Johnny Blaze vira o Motoqueiro Fantasma e enfrenta demônios em fases de ação. Em português."
   },
   {
     "id": "devil-my-cry-3-dub-ps2",
-    "titulo": "Devil My Cry 3 (DUB)",
+    "titulo": "Devil May Cry 3 (DUB)",
     "console": "ps2",
     "categoria": "jogos",
     "popular": false,
