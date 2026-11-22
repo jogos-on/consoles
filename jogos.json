@@ -116,5 +116,17 @@
     "link": "https://archive.org/download/4_20210106/22.zip",
     "descricao": "É um jogo de corrida de kart estrelado pelos personagens da série Crash Bandicoot. Os jogadores competem em diversas pistas e modos de jogo para impedir o vilão Nitrous Oxide.",
     "capa": "capas/ps1/crash-team-racing-dublado-legendado.jpg"
+  },
+  {
+    "id": "battlefield-2-modern-combat-ps2",
+    "titulo": "Battlefield 2: Modern Combat",
+    "console": "ps2",
+    "categoria": "jogos",
+    "popular": false,
+    "genero": "Tiro em Primeira Pessoa / Ação",
+    "ano": "2005",
+    "link": "https://www.mediafire.com/file/d98u6yq2ioz5kzk/BATTLEFIELD_2.rar/file",
+    "descricao": "Este jogo leva a aclamada série Battlefield para os consoles, oferecendo intensos combates modernos com veículos e infantaria. Os jogadores podem experimentar batalhas em larga escala em diversos cenários.",
+    "capa": "capas/ps2/battlefield-2-modern-combat.jpg"
   }
 ]
