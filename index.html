@@ -199,7 +199,7 @@ function render(){
       if(!forc)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
     }
     const n=st[c].cols?` style="--n:${st[c].cols}"`:"";
-    return `<section class="sec ${c}" id="s-${c}" data-c="${c}"${n}><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p><div class="cc"><button class="cb" data-a="col-" data-c="${c}" aria-label="Menos colunas">−</button><button class="cb" data-a="col+" data-c="${c}" aria-label="Mais colunas">+</button></div></div><div class="row ${modo}">${itens.map(j=>card(j,c)).join("")}</div><div class="nav"${nav?"":" hidden"}>${nav}</div></section>`;
+    return `<section class="sec ${c}" id="s-${c}" data-c="${c}"${n}><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p><div class="cc"><button class="cb" data-a="col-" data-c="${c}" aria-label="Mais colunas, capas menores">−</button><button class="cb" data-a="col+" data-c="${c}" aria-label="Menos colunas, capas maiores">+</button></div></div><div class="row ${modo}">${itens.map(j=>card(j,c)).join("")}</div><div class="nav"${nav?"":" hidden"}>${nav}</div></section>`;
   }).join("");
   $("grid").innerHTML=html||'<p class="vazio">Nenhum jogo encontrado.</p>';
   document.querySelectorAll("#grid .sec").forEach(ajustarCols);
@@ -209,7 +209,7 @@ const nCols=sec=>parseInt(getComputedStyle(sec).getPropertyValue("--n"))||2;
 function ajustarCols(sec){
   const n=nCols(sec),row=sec.querySelector(".row");
   row.classList.toggle("peek",row.classList.contains("rolo")&&row.children.length>n);
-  sec.querySelectorAll(".cb").forEach(b=>b.disabled=(b.dataset.a==="col-"&&n<=1)||(b.dataset.a==="col+"&&n>=MAXC));
+  sec.querySelectorAll(".cb").forEach(b=>b.disabled=(b.dataset.a==="col+"&&n<=1)||(b.dataset.a==="col-"&&n>=MAXC));
 }
 function mudarCols(c,d){
   const sec=document.getElementById("s-"+c);if(!sec)return;
@@ -226,7 +226,7 @@ $("grid").onclick=e=>{
   const n=e.target.closest("[data-a]");
   if(n){
     const c=n.dataset.c,a=n.dataset.a;
-    if(a==="col-"||a==="col+"){mudarCols(c,a==="col+"?1:-1);return}
+    if(a==="col-"||a==="col+"){mudarCols(c,a==="col+"?-1:1);return}
     if(a==="mais")st[c].ex=true,st[c].p=0;
     if(a==="menos")st[c].ex=false,st[c].p=0;
     if(a==="prev")st[c].p--;
