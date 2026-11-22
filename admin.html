@@ -166,6 +166,7 @@ gemini-2.5-flash-lite</textarea></label>
   <div id="cpt"></div><div id="cpm"></div>
   <img id="cpi" alt="" hidden>
   <label>Escolher capa<input id="cpf" type="file" accept="image/*"></label>
+  <button class="s" id="cpq" onclick="cpPesquisar()">🔎 Pesquisar capa</button>
   <button id="cps" onclick="cpSalvar()">Salvar e próximo</button><button class="s" onclick="cpPular()">Pular</button><button class="s" onclick="$('cpd').close()">Fechar</button>
 </dialog>
 <div id="msg" role="status"></div>
@@ -196,14 +197,19 @@ function iniciarCats(){
   CATS.forEach(c=>{
     const d=document.createElement("div");d.className="crow";
     const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.setAttribute("aria-label","Nome da categoria");
+    const sc=document.createElement("select");sc.dataset.cc=c.id;sc.setAttribute("aria-label","Console da categoria");
+    [["","Console: livre"],["ps1","PS1"],["ps2","PS2"],["snes","SNES"]].forEach(([v,t])=>sc.add(new Option(t,v)));sc.value=c.console||"";
     const n=jogos.filter(j=>(j.categoria||"jogos")===c.id).length;
     const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
-    d.append(i,m);
+    d.append(i,sc,m);
     if(c.id!=="jogos"){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
     l.appendChild(d);
   });
 }
-function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n})}
+function lerCats(){document.querySelectorAll("#catl input").forEach(i=>{const c=CATS.find(x=>x.id===i.dataset.id),n=i.value.trim();if(c&&n)c.nome=n});document.querySelectorAll("#catl select").forEach(e=>{const c=CATS.find(x=>x.id===e.dataset.cc);if(c){if(e.value)c.console=e.value;else delete c.console}})}
+function autoConsole(selCat,selCon){const c=CATS.find(x=>x.id===$(selCat).value);if(c&&c.console)$(selCon).value=c.console}
+$("categoria").addEventListener("change",()=>autoConsole("categoria","console"));
+$("lcat").addEventListener("change",()=>autoConsole("lcat","lc"));
 function addCat(){
   lerCats();const n=$("catnovo").value.trim();if(!n)return aviso("Digite o nome da categoria.");
   const id=slug(n);if(!id||CATS.some(c=>c.id===id||c.nome.toLowerCase()===n.toLowerCase()))return aviso("Essa categoria já existe.");
@@ -241,6 +247,7 @@ function cpMostrar(){
   $("cpf").value="";$("cpi").hidden=true;
 }
 $("cpf").onchange=()=>{const f=$("cpf").files[0],im=$("cpi");if(f){im.src=URL.createObjectURL(f);im.hidden=false}else im.hidden=true};
+function cpPesquisar(){const j=cpAtual();if(!j)return;window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(j.titulo+" cover "+j.console),"_blank","noopener")}
 function cpPular(){cpI++;cpMostrar()}
 async function cpSalvar(){
   if(cpBusy)return;
