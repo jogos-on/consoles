@@ -110,7 +110,7 @@
     "titulo": "Crash Team Racing Dublado & Legendado",
     "console": "ps1",
     "categoria": "jogos",
-    "popular": false,
+    "popular": true,
     "genero": "Corrida / Kart",
     "ano": "1999",
     "link": "https://archive.org/download/4_20210106/22.zip",
@@ -137,7 +137,7 @@
     "ano": "2003",
     "link": "https://www.mediafire.com/file/0mqouvahaad2yot/Downhill_Domination_%2528PT-BR%2529_PS2.7z/file",
     "descricao": "Um jogo de corrida de bicicleta radical que permite aos jogadores realizar manobras insanas e competir em descidas perigosas. Oferece uma experiência de alta velocidade com muita ação e adrenalina.",
-    "popular": false,
+    "popular": true,
     "categoria": "jogos",
     "capa": "capas/ps2/downhill-domination-pt-br.jpg"
   },
