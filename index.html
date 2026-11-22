@@ -63,7 +63,8 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .cb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media(max-width:560px){.sh p{order:3;flex-basis:100%;margin:0 0 10px;padding-left:20px}.cc{order:2;margin-left:auto}}
 .g{all:unset;cursor:pointer;display:block;text-align:center}
-.cv{display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
+.cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
+.star{position:absolute;top:6px;left:6px;z-index:1;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#1a1300;font:700 15px/1 Barlow,sans-serif;box-shadow:0 2px 8px #000a}
 .cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:cover;display:block}
 .ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
 .ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
@@ -177,7 +178,7 @@ function aplicarCfg(c){
 }
 function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
-function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
+function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
 function renderCats(){
   const e=$("cats");e.hidden=CATS.length<2;
