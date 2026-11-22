@@ -47,7 +47,20 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .sh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 16px 0 0;border-bottom:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
 .sh h2{margin:0;padding:12px 44px 12px 20px;font-style:italic;font-size:1.9rem;line-height:1;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,#000),color-mix(in srgb,var(--c) 25%,#000));clip-path:polygon(0 0,calc(100% - 26px) 0,100% 100%,0 100%)}
 .sh p{margin:0;color:var(--c);font-weight:700;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-size:1.1rem;filter:brightness(1.4)}
-.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--min,150px),1fr));gap:14px;padding:16px}
+.sec{--n:2}
+@media(min-width:560px){.sec{--n:3}}
+@media(min-width:900px){.sec{--n:5}}
+.row{gap:14px;padding:16px}
+.row.grade{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.row.rolo{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+.row.rolo .g{flex:0 0 calc((100% - (var(--n) - 1)*14px)/var(--n));scroll-snap-align:start}
+.row.rolo.peek .g{flex-basis:calc((100% - var(--n)*14px)/(var(--n) + .3))}
+.sh p{margin-left:auto}
+.cc{display:flex;gap:6px}
+.cb{width:34px;height:34px;padding:0;border-radius:8px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);background:#0d1224;color:var(--fg);font:700 1.2rem/1 Barlow,sans-serif;cursor:pointer}
+.cb:disabled{opacity:.35;cursor:default}
+.cb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:560px){.sh p{order:3;flex-basis:100%;margin:0 0 10px;padding-left:20px}.cc{order:2;margin-left:auto}}
 .g{all:unset;cursor:pointer;display:block;text-align:center}
 .cv{display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
 .cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:cover;display:block}
@@ -56,7 +69,6 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .top .ph{float:left;width:130px;margin:0 14px 8px 0;border-radius:6px}
 .g b{display:block;margin-top:8px;font:700 .95rem/1.15 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em}
 .g em{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:5px;font:normal 600 .72rem/1.3 Barlow,sans-serif;text-transform:uppercase;color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 22%,#0a0f1f)}
-.g.h{display:none!important}
 .pw{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--gold);border-radius:8px;color:var(--fg)}
 .pw b{color:var(--gold);user-select:all;overflow-wrap:anywhere}
 .btn.sm{padding:4px 12px;margin:0 0 0 8px;font-size:.85rem}
@@ -131,8 +143,9 @@ dialog::backdrop{background:#000a}
 const GISCUS={repo:"jogos-on/consoles",repoId:"R_kgDOV2o_fA",category:"Announcements",categoryId:"DIC_kwDOV2o_fM4DLp4_"};
 const SEC={ps1:["PS1","Clássicos que marcaram época!"],ps2:["PS2","Aventuras inesquecíveis!"],snes:["Super Nintendo","A era 16-bits!"]};
 const PROP={ps1:"1/1",ps2:"5/7",snes:"7/5"};
-const LINHAS=2,MIN=6; // linhas visíveis antes de "Mostrar mais"
+const ROLO=5,PAG=10,MAXC=6; // 5 no rolo lateral; 10 por página na grade; máx. de colunas
 const st={ps1:{ex:false,p:0},ps2:{ex:false,p:0},snes:{ex:false,p:0}};
+Object.keys(st).forEach(c=>{try{const v=+localStorage.getItem("cols:"+c);if(v>=1&&v<=MAXC)st[c].cols=v}catch(e){}});
 let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[{id:"jogos",nome:"Jogos"}];
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 const $=id=>document.getElementById(id);
@@ -168,30 +181,42 @@ function renderCats(){
 const ordem=(a,b)=>(!!b.popular-!!a.popular)||a.titulo.localeCompare(b.titulo,"pt");
 function render(){
   const q=$("q").value.trim().toLowerCase();
+  const forc=!!q||filtro!=="todos"||catF!=="todas";
   const html=Object.keys(SEC).filter(c=>filtro==="todos"||filtro===c).map(c=>{
     const l=jogos.filter(j=>j.console===c&&(catF==="todas"||(j.categoria||"jogos")===catF)&&j.titulo.toLowerCase().includes(q)).sort(ordem);
     if(!l.length)return"";
-    const todos=!!q||filtro!=="todos"||catF!=="todas"||st[c].ex;
-    return `<section class="sec ${c}" id="s-${c}" data-c="${c}" data-ex="${todos?1:0}" data-forc="${(!!q||filtro!=="todos"||catF!=="todas")?1:0}"><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p></div><div class="row">${l.map(j=>card(j,c)).join("")}</div><div class="nav"></div></section>`;
+    const ex=forc||st[c].ex;
+    let itens,nav="",modo;
+    if(!ex){
+      modo="rolo";itens=l.slice(0,ROLO);
+      if(l.length>ROLO)nav=`<button data-a="mais" data-c="${c}">Mostrar mais (${l.length} jogos)</button>`;
+    }else{
+      modo="grade";
+      const pgs=Math.ceil(l.length/PAG);st[c].p=Math.min(Math.max(st[c].p,0),pgs-1);
+      itens=l.slice(st[c].p*PAG,st[c].p*PAG+PAG);
+      if(pgs>1)nav=`<button data-a="prev" data-c="${c}"${st[c].p===0?" disabled":""}>‹ Voltar</button><span>${st[c].p+1} / ${pgs}</span><button data-a="next" data-c="${c}"${st[c].p>=pgs-1?" disabled":""}>Avançar ›</button>`;
+      if(!forc)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
+    }
+    const n=st[c].cols?` style="--n:${st[c].cols}"`:"";
+    return `<section class="sec ${c}" id="s-${c}" data-c="${c}"${n}><div class="sh"><h2>${SEC[c][0]}</h2><p>${SEC[c][1]}</p><div class="cc"><button class="cb" data-a="col-" data-c="${c}" aria-label="Menos colunas">−</button><button class="cb" data-a="col+" data-c="${c}" aria-label="Mais colunas">+</button></div></div><div class="row ${modo}">${itens.map(j=>card(j,c)).join("")}</div><div class="nav"${nav?"":" hidden"}>${nav}</div></section>`;
   }).join("");
   $("grid").innerHTML=html||'<p class="vazio">Nenhum jogo encontrado.</p>';
-  ajustar();
+  document.querySelectorAll("#grid .sec").forEach(ajustarCols);
 }
-// Esconde o que passa do espaço da grade (populares primeiro, depois A-Z) e mostra "Mostrar mais" só se houver excesso
-function ajustar(){
-  document.querySelectorAll("#grid .sec").forEach(sec=>{
-    const row=sec.querySelector(".row"),nav=sec.querySelector(".nav"),c=sec.dataset.c,cards=[...row.children];
-    if(sec.dataset.ex==="1"){
-      nav.innerHTML=sec.dataset.forc==="1"?"":`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
-    }else{
-      const cols=getComputedStyle(row).gridTemplateColumns.split(" ").length,lim=Math.max(cols*LINHAS,MIN);
-      cards.forEach((el,i)=>el.classList.toggle("h",i>=lim));
-      nav.innerHTML=cards.length>lim?`<button data-a="mais" data-c="${c}">Mostrar mais (${cards.length} jogos)</button>`:"";
-    }
-    nav.hidden=!nav.innerHTML;
-  });
+const nCols=sec=>parseInt(getComputedStyle(sec).getPropertyValue("--n"))||2;
+// "peek": no rolo, deixa um pedaço do próximo jogo aparecendo quando há mais jogos do que colunas
+function ajustarCols(sec){
+  const n=nCols(sec),row=sec.querySelector(".row");
+  row.classList.toggle("peek",row.classList.contains("rolo")&&row.children.length>n);
+  sec.querySelectorAll(".cb").forEach(b=>b.disabled=(b.dataset.a==="col-"&&n<=1)||(b.dataset.a==="col+"&&n>=MAXC));
 }
-let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,150)});
+function mudarCols(c,d){
+  const sec=document.getElementById("s-"+c);if(!sec)return;
+  const n=Math.min(MAXC,Math.max(1,nCols(sec)+d));
+  st[c].cols=n;sec.style.setProperty("--n",n);
+  try{localStorage.setItem("cols:"+c,n)}catch(e){}
+  ajustarCols(sec);
+}
 
 $("q").oninput=render;
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
@@ -200,8 +225,9 @@ $("grid").onclick=e=>{
   const n=e.target.closest("[data-a]");
   if(n){
     const c=n.dataset.c,a=n.dataset.a;
+    if(a==="col-"||a==="col+"){mudarCols(c,a==="col+"?1:-1);return}
     if(a==="mais")st[c].ex=true,st[c].p=0;
-    if(a==="menos")st[c].ex=false;
+    if(a==="menos")st[c].ex=false,st[c].p=0;
     if(a==="prev")st[c].p--;
     if(a==="next")st[c].p++;
     render();
