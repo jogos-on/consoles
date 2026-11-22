@@ -213,7 +213,8 @@ function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista()}).catch(()=>lista());
 
-let CATS=[{id:"jogos",nome:"Jogos"}];
+let CATS=[];
+const catDe=j=>(j&&j.categoria&&j.categoria!=="jogos")?j.categoria:"";
 const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",prop:"1/1",cor:"#3b82f6"},{id:"ps2",nome:"PS2",frase:"Aventuras inesquecíveis!",prop:"5/7",cor:"#4f7cff"},{id:"snes",nome:"Super Nintendo",frase:"A era 16-bits!",prop:"7/5",cor:"#8b5cf6"}];
 const CORES_NOVAS=["#f97316","#10b981","#ec4899","#eab308","#06b6d4","#ef4444"];
 let CONS=CONS_PADRAO.map(x=>({...x}));
@@ -280,10 +281,11 @@ async function salvarConsoles(){
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
 let jogosMudou=false;
 function iniciarCats(){
-  jogos.forEach(j=>{const id=j.categoria||"jogos";if(!CATS.some(c=>c.id===id))CATS.push({id,nome:id})});
+  jogos.forEach(j=>{const id=catDe(j);if(id&&!CATS.some(c=>c.id===id))CATS.push({id,nome:id})});
   [["categoria",0],["lcat",0],["fcat",1]].forEach(([id,todas])=>{
     const e=$(id),v=e.value;e.replaceChildren();
-    if(todas)e.add(new Option("Todas as categorias",""));
+    if(todas){e.add(new Option("Todas as categorias",""));e.add(new Option("Sem categoria","__sem"))}
+    else e.add(new Option("Sem categoria",""));
     CATS.forEach(c=>e.add(new Option(c.nome,c.id)));
     if([...e.options].some(o=>o.value===v))e.value=v;
   });
@@ -291,10 +293,10 @@ function iniciarCats(){
   CATS.forEach(c=>{
     const d=document.createElement("div");d.className="crow";
     const i=document.createElement("input");i.value=c.nome;i.dataset.id=c.id;i.setAttribute("aria-label","Nome da categoria");
-    const n=jogos.filter(j=>(j.categoria||"jogos")===c.id).length;
+    const n=jogos.filter(j=>catDe(j)===c.id).length;
     const m=document.createElement("small");m.textContent=n+" jogo"+(n===1?"":"s");
     d.append(i,m);
-    if(c.id!=="jogos"){const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
+    {const b=document.createElement("button");b.className="d";b.textContent="🗑️";b.title="Excluir";b.setAttribute("aria-label","Excluir "+c.nome);b.onclick=()=>delCat(c.id);d.appendChild(b)}
     l.appendChild(d);
   });
 }
@@ -306,15 +308,16 @@ function addCat(){
 }
 function delCat(id){
   lerCats();const c=CATS.find(x=>x.id===id);if(!c)return;
-  const n=jogos.filter(j=>j.categoria===id).length;
-  if(!confirm(`Excluir a categoria "${c.nome}"?`+(n?` Os ${n} jogo(s) dela voltarão para "Jogos".`:"")))return;
-  jogos.forEach(j=>{if(j.categoria===id)j.categoria="jogos"});
+  const n=jogos.filter(j=>catDe(j)===id).length;
+  if(!confirm(`Excluir a categoria "${c.nome}"?`+(n?` Os ${n} jogo(s) dela ficarão sem categoria.`:"")))return;
+  jogos.forEach(j=>{if(catDe(j)===id)delete j.categoria});
   if(n)jogosMudou=true;
   CATS=CATS.filter(x=>x.id!==id);iniciarCats();lista();
   aviso("Excluída. Toque em Salvar e publicar categorias para confirmar.");
 }
 async function salvarCats(){
   lerCats();
+  jogos.forEach(j=>{if(j.categoria==="jogos"){delete j.categoria;jogosMudou=true}});
   try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;if(jogosMudou){await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");jogosMudou=false}iniciarCats();lista();aviso("Categorias publicadas.")}
   catch(e){aviso(e.message)}
 }
@@ -332,7 +335,7 @@ function cpMostrar(){
   if(!j){if($("cpd").open)$("cpd").close();aviso("Fim da lista de capas.");lista();return}
   $("cpn").textContent=(cpI+1)+" de "+cpFila.length;
   $("cpt").textContent=j.titulo;
-  $("cpm").textContent=conNome(j.console)+" · "+catNome(j.categoria||"jogos");
+  $("cpm").textContent=conNome(j.console)+(catDe(j)?" · "+catNome(catDe(j)):"");
   $("cpf").value="";$("cpi").hidden=true;
 }
 const AJ={};
@@ -446,7 +449,7 @@ function cpSalvar(){
   $("cps").disabled=true;
   capaJpg(f).then(dados=>{
     if(!dados)throw new Error("formato de imagem não suportado (use JPG, PNG ou WEBP)");
-    const suf=(j.categoria||"jogos")!=="jogos"?"-"+j.categoria:"";
+    const suf=catDe(j)?"-"+catDe(j):"";
     const caminho=`capas/${j.console}/${slug(j.titulo)}${suf}.jpg`;
     filaCapas.push({j,caminho,dados,titulo:j.titulo,novo:!j.capa,antes:j.capa});
     j.capa=caminho;
@@ -476,7 +479,7 @@ async function salvarPop(){
 function lista(){
   atualizarStats();
   const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
-  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(j.categoria||"jogos")===fk)&&(!q||norm(j.titulo).includes(q))});
+  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(fk==="__sem"?!catDe(j):catDe(j)===fk))&&(!q||norm(j.titulo).includes(q))});
   idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
   ultimoIdx=idx.map(i=>jogos[i].id);
   $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
@@ -501,7 +504,7 @@ function lista(){
       if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
       const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
-      const m=document.createElement("small");m.textContent=[catNome(j.categoria||"jogos"),j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
+      const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
       const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
@@ -513,7 +516,7 @@ function lista(){
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("categoria").value="jogos";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
+  $("popular").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -536,7 +539,7 @@ async function statusCapa(j,i){
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
-  $("categoria").value=j.categoria||"jogos";$("popular").checked=!!j.popular;$("arq").value="";
+  $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("arq").value="";
   $("voltar").style.display="inline-block";posLista=scrollY;scrollTo(0,0);statusCapa(j,i);
 }
 function voltar(){limpar();scrollTo(0,posLista)}
@@ -709,7 +712,7 @@ async function gerarLote(){
       break;
     }
     grupos[g].forEach((n,k)=>{
-      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c+($("lcat").value!=="jogos"?"-"+$("lcat").value:""));
+      const it=itens[k]||{},t=String(it.titulo||"").trim(),id=slug(t+"-"+c+($("lcat").value?"-"+$("lcat").value:""));
       const dup=!!t&&jogos.some(j=>j.id===id);
       lote.push({entrada:n,titulo:t||n,genero:it.genero||"",ano:String(it.ano||""),descricao:it.descricao||"",popular:!!it.popular,link:"",sel:!!t&&!dup,nota:!t?"A IA não reconheceu este jogo. Confira o nome.":dup?"Este jogo já está na lista.":""});
     });
@@ -738,7 +741,7 @@ function reduzirCapa(f){
 }
 
 async function adicionarLote(pub){
-  const vistos=new Set(),cat=$("lcat").value,suf=cat!=="jogos"?"-"+cat:"";
+  const vistos=new Set(),cat=$("lcat").value,suf=cat?"-"+cat:"";
   const sel=lote.filter(x=>x.sel&&String(x.titulo).trim())
     .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC+suf)}))
     .filter(o=>{if(jogos.some(j=>j.id===o.id)||vistos.has(o.id))return false;vistos.add(o.id);return true});
@@ -754,7 +757,8 @@ async function adicionarLote(pub){
   }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
   sel.forEach(o=>{
     const x=o.x;
-    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular,categoria:cat};
+    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular};
+    if(cat)j.categoria=cat;
     if(o.capa)j.capa=o.capa;
     jogos.push(j);
   });
@@ -766,7 +770,7 @@ try{localStorage.setItem("skipgc","t")}catch(e){}
 let CFG={};
 fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
   CFG=c||{};CONS=consDe(CFG);iniciarConsoles();
-  if(Array.isArray(CFG.categorias)&&CFG.categorias.length){CATS=CFG.categorias;if(!CATS.some(x=>x.id==="jogos"))CATS.unshift({id:"jogos",nome:"Jogos"})}
+  if(Array.isArray(CFG.categorias))CATS=CFG.categorias.filter(x=>x&&x.id&&x.id!=="jogos")
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("gc").value=CFG.gc||"";carregarVisitas();
@@ -820,9 +824,10 @@ async function salvarJogo(){
   const titulo=$("titulo").value.trim();
   if(!titulo)return aviso("Informe o título.");
   const antigo=edit!==null?jogos[edit]:{};
-  const cat=$("categoria").value||"jogos",suf=cat!=="jogos"?"-"+cat:"";
+  const cat=$("categoria").value,suf=cat?"-"+cat:"";
   const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
   if(!j.senha)delete j.senha;
+  if(!j.categoria)delete j.categoria;
   const f=$("arq").files[0];
   let erroCapa="";
   try{
