@@ -8,5 +8,11 @@
     "snes": "A era 16-bits!"
   },
   "hero": "hero.png",
-  "gc": "jogos-on"
+  "gc": "jogos-on",
+  "categorias": [
+    {
+      "id": "jogos",
+      "nome": "Jogos"
+    }
+  ]
 }
