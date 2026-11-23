@@ -137,6 +137,17 @@ gemini-2.5-flash-lite</textarea></label>
   <button class="s" onclick="addCons()">Adicionar</button><button onclick="salvarConsoles()">Salvar e publicar consoles</button>
 </details>
 
+<details id="dn"><summary>💛 Doação ao baixar</summary>
+  <p style="color:var(--mu);margin:6px 0">Mostra um aviso pedindo uns trocados (Pix) quando o visitante toca em Baixar. Ele sempre pode seguir com "Agora não".</p>
+  <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="dn_on" style="width:auto"> Ativar aviso</label>
+  <label>Com que frequência?<select id="dn_f">
+    <option value="1">Em todo download</option><option value="2">A cada 2 downloads</option><option value="3">A cada 3 downloads</option>
+    <option value="5">A cada 5 downloads</option><option value="10">A cada 10 downloads</option><option value="0">Só 1 vez por visita</option></select></label>
+  <label>Título<input id="dn_t" maxlength="80" placeholder="Gostou do site?"></label>
+  <label>Mensagem<textarea id="dn_x" rows="3" maxlength="300" placeholder="Ele é mantido por uma pessoa só. Se puder ajudar com uns trocados, agradeço muito!"></textarea></label>
+  <button onclick="salvarDoacao()">Salvar e publicar</button>
+</details>
+
 <details id="rs"><summary>🌐 Redes sociais</summary>
   <p style="color:var(--mu);margin:6px 0">Aparecem como botões no topo do site. Cole o link completo do seu perfil ou canal.</p>
   <div id="rsl"></div>
@@ -247,6 +258,11 @@ function lerRedes(){
   });
 }
 function addRede(){lerRedes();REDES.push({tipo:"Instagram",ic:"📸",nome:"Instagram",url:""});iniciarRedes()}
+async function salvarDoacao(){
+  const d={on:$("dn_on").checked,freq:+$("dn_f").value,titulo:$("dn_t").value.trim(),texto:$("dn_x").value.trim()};
+  try{aviso("Publicando...");const c={...CFG,doacao:d};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza aviso de doação");CFG=c;aviso("Salvo!")}
+  catch(e){aviso("Erro: "+e.message)}
+}
 async function salvarRedes(){
   lerRedes();
   const ok=[];
@@ -820,6 +836,7 @@ fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("gc").value=CFG.gc||"";carregarVisitas();
+  {const d=CFG.doacao||{};$("dn_on").checked=d.on===true;$("dn_f").value=String(d.freq??3);if(!$("dn_f").value)$("dn_f").value="3";$("dn_t").value=d.titulo||"";$("dn_x").value=d.texto||""}
   REDES=Array.isArray(CFG.redes)?CFG.redes.map(r=>({...r})):[];iniciarRedes();
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
 });
