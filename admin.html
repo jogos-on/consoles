@@ -84,6 +84,11 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 .flt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.flt>*{flex:1 1 140px}
 #capaInfo{display:none;margin-top:10px;font-size:.9rem;color:var(--ok)}
 #capaInfo img{max-width:120px;max-height:120px;border-radius:8px;display:block;margin-bottom:6px}
+#capaWrap{position:relative;display:inline-block;vertical-align:top}
+#capaWrap img{margin-bottom:0}
+#capaPh{display:none;width:120px;aspect-ratio:3/4;place-items:center;text-align:center;border-radius:8px;background:#151b30;border:1px solid #39425e;font:italic 800 1.3rem/1 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;color:#ffd400}
+#capaWrap .br{position:absolute;top:4px;right:5px;z-index:1;width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;pointer-events:none;display:none}
+#capaTxt{margin-top:6px}
 .cph{display:flex;justify-content:space-between;color:var(--mu);font-weight:600}
 #cpt{font:italic 800 1.9rem/1.05 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:12px 0 2px;color:#fff;overflow-wrap:anywhere}
 #cpm{color:var(--gold);font-weight:600}
@@ -185,7 +190,7 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="ptbr" type="checkbox" style="width:auto"> PT-BR (jogo em português do Brasil: mostra uma bandeirinha na capa)</label>
-  <div id="capaInfo"><img id="capaPrev" alt="" style="display:none"><div id="capaTxt"></div></div>
+  <div id="capaInfo"><div id="capaWrap"><img id="capaPrev" alt="" style="display:none"><div id="capaPh"><span>Sem capa</span></div><svg id="capaFlag" class="br" viewBox="0 0 20 14" aria-label="PT-BR"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg></div><div id="capaTxt"></div></div>
   <label>Capa (imagem)<span id="trocar" style="display:none"> — se quiser trocar</span><input id="arq" type="file" accept="image/*"></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
 </div>
@@ -579,7 +584,7 @@ function lista(){
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("ptbr").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
+  $("popular").checked=false;$("ptbr").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -590,15 +595,26 @@ async function acharCapa(j){
 }
 async function statusCapa(j,i){
   const box=$("capaInfo"),im=$("capaPrev"),tx=$("capaTxt");
-  box.style.display="block";im.style.display="none";$("trocar").style.display="none";tx.textContent="Verificando capa...";
+  box.style.display="block";im.style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("trocar").style.display="none";tx.textContent="Verificando capa...";
   const p=await acharCapa(j);
   if(edit!==i)return;
   if(p){
     const nova=j.capa!==p;j.capa=p;im.src=p;im.style.display="block";
     tx.textContent="✔ Capa já cadastrada";$("trocar").style.display="inline";
+    flagPrev();
     if(nova)lista();
-  }else tx.textContent="Sem capa cadastrada.";
+  }else{tx.textContent="Sem capa cadastrada.";$("capaPh").style.display="grid";flagPrev()}
 }
+function flagPrev(){
+  const on=$("ptbr").checked,box=$("capaInfo"),im=$("capaPrev"),ph=$("capaPh"),fl=$("capaFlag");
+  if(edit===null){
+    if(on&&!$("arq").files[0]){box.style.display="block";im.style.display="none";ph.style.display="grid";$("capaTxt").textContent="Prévia: jogo sem capa";fl.style.display="block"}
+    else{box.style.display="none";ph.style.display="none";fl.style.display="none"}
+    return;
+  }
+  fl.style.display=on&&(im.style.display==="block"||ph.style.display==="grid")?"block":"none";
+}
+$("ptbr").addEventListener("change",flagPrev);
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
