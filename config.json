@@ -23,5 +23,28 @@
     "freq": 2,
     "titulo": "Gostou do site?",
     "texto": "Nos ajude a mantê-lo e atualizá-lo constantemente."
-  }
+  },
+  "consoles": [
+    {
+      "id": "ps1",
+      "nome": "PS1",
+      "frase": "Clássicos que marcaram época!",
+      "prop": "1/1",
+      "cor": "#3b82f6"
+    },
+    {
+      "id": "ps2",
+      "nome": "PS2",
+      "frase": "Aventuras inesquecíveis!",
+      "prop": "5/7",
+      "cor": "#0000ff"
+    },
+    {
+      "id": "snes",
+      "nome": "Super Nintendo",
+      "frase": "A era 16-bits!",
+      "prop": "7/5",
+      "cor": "#8b5cf6"
+    }
+  ]
 }
