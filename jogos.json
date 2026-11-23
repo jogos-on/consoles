@@ -723,5 +723,16 @@
     "link": "https://drive.google.com/file/d/1Kdn37wbEPN0JQR4WHUPhExlUqo12Bz0z/view",
     "descricao": "É um jogo de luta 3D que permite aos jogadores reviver as batalhas épicas da série Dragon Ball Z. Apresenta um vasto elenco de personagens e cenários destrutíveis.",
     "capa": "capas/ps2/dragon-ball-z-budokai-tenkaichi-3-sparkino-zero.jpg"
+  },
+  {
+    "id": "dragon-ball-gt-final-bout-dublado-e-traduzido-ps1",
+    "titulo": "Dragon Ball GT - Final Bout (Dublado e Traduzido)",
+    "console": "ps1",
+    "popular": false,
+    "genero": "Luta",
+    "ano": "1997",
+    "link": "https://www.mediafire.com/file/cqmgcejo7bqfz0s/Dragon_Ball_GT_-_+Final_Bout.rar/file",
+    "descricao": "Este é um jogo de luta 3D baseado na popular série de anime Dragon Ball GT. Os jogadores podem escolher entre vários personagens icônicos para batalhas intensas.",
+    "capa": "capas/ps1/dragon-ball-gt-final-bout-dublado-e-traduzido.jpg"
   }
 ]
