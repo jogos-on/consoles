@@ -18,6 +18,9 @@ body{margin:0 auto;background:radial-gradient(900px 420px at 85% -120px,#1a3a8a5
 .top small{color:var(--gold);letter-spacing:.2em;font-weight:600}
 h1{font:italic 800 2.5rem/.95 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:2px 0 0;color:#fff}
 h1 span{display:block;color:var(--gold)}
+.rt{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.vtop{display:flex;gap:14px;font-size:1.15rem}
+.vtop b{font:800 1.3rem/1 "Barlow Condensed",sans-serif;margin-left:2px}
 .stats{display:flex;gap:8px}
 .stats div{background:#ffffff0d;border:1px solid var(--bd);border-radius:12px;padding:6px 12px;text-align:center;min-width:64px}
 .stats b{display:block;font:800 1.5rem/1.1 "Barlow Condensed",sans-serif}
@@ -100,7 +103,7 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 </head>
 <body>
 <header class="top"><div><small>🎮 PAINEL</small><h1>Admin<span>do Catálogo</span></h1></div>
-<div class="stats"><div><b id="sTot">0</b><small>jogos</small></div><div><b id="sSem">0</b><small>sem capa</small></div></div></header>
+<div class="rt"><div class="vtop" style="display:none"><span style="display:none">📈 <b id="tvn">—</b></span><span style="display:none">👍 <b id="tvl">—</b></span></div><div class="stats"><div><b id="sTot">0</b><small>jogos</small></div><div><b id="sSem">0</b><small>sem capa</small></div></div></div></header>
 <button class="cta" id="capasBtn" onclick="abrirCapas()">🖼️ Completar capas</button>
 
 <details id="cfg"><summary>🔌 Conexão com o GitHub</summary>
@@ -898,6 +901,7 @@ function redimensionar(f){
     img.src=u;
   });
 }
+[["vsn","tvn"],["vsl2","tvl"]].forEach(([o,t])=>{const src=$(o),dst=$(t);const sync=()=>{dst.textContent=src.textContent;const ok=/\d/.test(src.textContent);dst.parentElement.style.display=ok?"":"none";const v=dst.closest(".vtop");v.style.display=[...v.children].some(x=>x.style.display!=="none")?"":"none"};sync();new MutationObserver(sync).observe(src,{childList:true,characterData:true,subtree:true})});
 async function carregarVisitas(){
   const g=($("gc").value||"").trim(),n=$("vsn"),m=$("vsm"),l=$("vsl");
   if(!/^[a-z0-9-]+$/i.test(g)){n.textContent="—";$("vsl2").textContent="—";m.textContent="Informe o código do GoatCounter abaixo para começar a contar.";l.style.display="none";return}
