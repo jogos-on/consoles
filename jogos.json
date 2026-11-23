@@ -8,7 +8,8 @@
     "link": "https://www.mediafire.com/file/qqqr46apssxbqj4/[PS1]_Yu-Gi-Oh!+Forbidden+Memories+(PT-BR).rar/file",
     "descricao": "Neste jogo de cartas estratégico, os jogadores viajam para o Antigo Egito para desvendar mistérios e duelar com poderosos oponentes. Colecione cartas e construa o baralho definitivo para se tornar o Mestre dos Duelistas.",
     "capa": "capas/ps1/yu-gi-oh-forbidden-memories.png",
-    "popular": true
+    "popular": true,
+    "ptbr": true
   },
   {
     "id": "resident-evil-2-ps1",
@@ -19,7 +20,8 @@
     "link": "https://www.mediafire.com/file/cvyr0evyeg1h2an/RE2_(PT-BR)[Dublado].rar/file",
     "descricao": "Um clássico do survival horror que mergulha os jogadores em Raccoon City durante um apocalipse zumbi. Explore cenários aterrorizantes e desvende os mistérios por trás do surto viral.",
     "popular": false,
-    "capa": "capas/ps1/resident-evil-2-pt-br-2-discos.webp"
+    "capa": "capas/ps1/resident-evil-2-pt-br-2-discos.webp",
+    "ptbr": true
   },
   {
     "id": "bomberman-fantasy-race-ps1",
@@ -42,7 +44,8 @@
     "link": "https://www.mediafire.com/file/eybrqu2xfxkqmju/MCidSVniSghUBR.rar/file?action=check",
     "descricao": "Esta é uma versão expandida do aclamado jogo de corrida, adicionando novos veículos, músicas e uma cidade extra para explorar. Os jogadores podem continuar a personalizar seus carros e motos em corridas de rua emocionantes.",
     "capa": "capas/ps2/midnight-club-3-dub-edition-remix.jpg",
-    "senha": "dubsgamer.com"
+    "senha": "dubsgamer.com",
+    "ptbr": true
   },
   {
     "id": "tom-and-jerry-in-house-trap-ps1",
@@ -89,7 +92,8 @@
     "link": "https://www.mediafire.com/file/c867d32i2hxinvd/PatchTremedorTerras+27.rar/file?action=check",
     "senha": "dubsgamer.com",
     "descricao": "A última edição da aclamada série de futebol lançada para o PlayStation 2, trazendo os times e jogadores da temporada 2013-2014. Oferece uma experiência de jogo refinada com foco na física da bola e movimentos dos jogadores.",
-    "capa": "capas/ps2/pes-efotball-treme-terra-2027.jpg"
+    "capa": "capas/ps2/pes-efotball-treme-terra-2027.jpg",
+    "ptbr": true
   },
   {
     "id": "crash-team-racing-dublado-legendado-ps1",
@@ -100,7 +104,8 @@
     "ano": "1999",
     "link": "https://archive.org/download/4_20210106/22.zip",
     "descricao": "É um jogo de corrida de kart estrelado pelos personagens da série Crash Bandicoot. Os jogadores competem em diversas pistas e modos de jogo para impedir o vilão Nitrous Oxide.",
-    "capa": "capas/ps1/crash-team-racing-dublado-legendado.jpg"
+    "capa": "capas/ps1/crash-team-racing-dublado-legendado.jpg",
+    "ptbr": true
   },
   {
     "id": "battlefield-2-modern-combat-ps2",
@@ -122,7 +127,8 @@
     "link": "https://www.mediafire.com/file/0mqouvahaad2yot/Downhill_Domination_%2528PT-BR%2529_PS2.7z/file",
     "descricao": "Um jogo de corrida de bicicleta radical que permite aos jogadores realizar manobras insanas e competir em descidas perigosas. Oferece uma experiência de alta velocidade com muita ação e adrenalina.",
     "popular": true,
-    "capa": "capas/ps2/downhill-domination-pt-br.jpg"
+    "capa": "capas/ps2/downhill-domination-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "gta-sa-brasil-v1-2-ps2",
@@ -133,7 +139,8 @@
     "link": "https://www.mediafire.com/file/dv5ciz3a70brz15/GTA+BRASIL+v1.2+PS2.iso/file",
     "descricao": "Um épico jogo de mundo aberto onde o jogador explora o estado fictício de San Andreas, assumindo o papel de Carl 'CJ' Johnson. Combina elementos de tiro, direção e exploração em uma narrativa envolvente.",
     "popular": true,
-    "capa": "capas/ps2/gta-sa-brasil-v1-2.jpg"
+    "capa": "capas/ps2/gta-sa-brasil-v1-2.jpg",
+    "ptbr": true
   },
   {
     "id": "black-dub-ps2",
@@ -144,7 +151,8 @@
     "ano": "2006",
     "link": "https://www.mediafire.com/file/aw9955qed1l7reb/BL4CKDUBV1.rar/file",
     "descricao": "Shooter intenso da Criterion, famoso pelas explosões e pela destruição de cenários. Versão dublada em português.",
-    "capa": "capas/ps2/black-dub.jpg"
+    "capa": "capas/ps2/black-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "bomba-patch-11-2024-ps2",
@@ -155,7 +163,8 @@
     "ano": "2024",
     "link": "https://www.mediafire.com/file/2w9jnmix8ro687t/NOVO+BOMBA+PATCH+2025+NOVEMBRO+PS2+ISO+BR.rar/file",
     "descricao": "Patch brasileiro de futebol com elencos, times e uniformes atualizados (versão 11/2024).",
-    "capa": "capas/ps2/bomba-patch-11-2024.jpg"
+    "capa": "capas/ps2/bomba-patch-11-2024.jpg",
+    "ptbr": true
   },
   {
     "id": "darkwatch-ps2",
@@ -177,7 +186,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/qj7cytqti6m2tkh/D3_%2528PT-BR%2529.7z/file",
     "descricao": "Driv3r: o policial infiltrado Tanner persegue criminosos por Miami, Nice e Istambul, a pé ou ao volante.",
-    "capa": "capas/ps2/driver-3-pt-br.jpg"
+    "capa": "capas/ps2/driver-3-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "formula-one-2006-ps2",
@@ -200,7 +210,8 @@
     "link": "https://www.mediafire.com/file/boz8g7is24ef9qz/God_Hand_Legenda_PT-BR_ISO_PS2.rar/file?dkey=w1rjj3b2daa&r=813",
     "senha": "PS2-Nostalgia",
     "descricao": "Beat 'em up cheio de humor e golpes exagerados, criado por equipe ligada a Resident Evil. Versão legendada em português.",
-    "capa": "capas/ps2/god-hand-pt-br.jpg"
+    "capa": "capas/ps2/god-hand-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "god-of-war-1-dub-ps2",
@@ -211,7 +222,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/81vhjuo2xf76ku1/G00WPTB.rar/file",
     "descricao": "Kratos, um espartano em busca de vingança contra Ares, enfrenta monstros e desafios da mitologia grega.",
-    "capa": "capas/ps2/god-of-war-1-dub.jpg"
+    "capa": "capas/ps2/god-of-war-1-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "god-of-war-2-dub-ps2",
@@ -222,7 +234,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/p1mmgbcg6cul5h9/G0W2DUB.rar/file",
     "descricao": "Kratos volta mais furioso para desafiar os deuses do Olimpo e mudar o próprio destino.",
-    "capa": "capas/ps2/god-of-war-2-dub.jpg"
+    "capa": "capas/ps2/god-of-war-2-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "gta-sa-com-mod-menu-r2-up-ps2",
@@ -234,7 +247,8 @@
     "link": "https://www.mediafire.com/file/toxo19ffatsar2n/Gta_Auto_San_Andreas__%2528v1.03%2529__DVD_ISO_PT-BR_PS2.rar/file",
     "senha": "PS2-Nostalgia",
     "descricao": "GTA San Andreas com menu de mods ativado por R2 + cima, para liberar truques e extras.",
-    "capa": "capas/ps2/gta-sa-com-mod-menu-r2-up.jpg"
+    "capa": "capas/ps2/gta-sa-com-mod-menu-r2-up.jpg",
+    "ptbr": true
   },
   {
     "id": "gta-sa-homem-de-ferro-ps2",
@@ -245,7 +259,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/8mtjbeo8ogh2kr7/GTA_Homem_de_Ferro.rar/file",
     "descricao": "Versão modificada de GTA San Andreas com tema do Homem de Ferro.",
-    "capa": "capas/ps2/gta-sa-homem-de-ferro.jpg"
+    "capa": "capas/ps2/gta-sa-homem-de-ferro.jpg",
+    "ptbr": true
   },
   {
     "id": "guitar-hero3-brazucas-1-ps2",
@@ -256,7 +271,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/qg93qyz2xam2c8c/GH3_Brazucas_1_FIXED.iso/file",
     "descricao": "Guitar Hero III com repertório brasileiro, volume 1.",
-    "capa": "capas/ps2/guitar-hero3-brazucas-1.jpg"
+    "capa": "capas/ps2/guitar-hero3-brazucas-1.jpg",
+    "ptbr": true
   },
   {
     "id": "guitar-hero3-brazucas-2-ps2",
@@ -267,7 +283,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/k1wb08eq77cpte5/Guitar+Hero+3+Brazucas+2.iso/file",
     "descricao": "Guitar Hero III com repertório brasileiro, volume 2.",
-    "capa": "capas/ps2/guitar-hero3-brazucas-2.jpg"
+    "capa": "capas/ps2/guitar-hero3-brazucas-2.jpg",
+    "ptbr": true
   },
   {
     "id": "guitar-hero3-brazucas-3-ps2",
@@ -278,7 +295,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/5cmv9gzd83tot3a/SLUS_216.72.GH+3+BRAZUCAS+3+ps2.iso/file",
     "descricao": "Guitar Hero III com repertório brasileiro, volume 3.",
-    "capa": "capas/ps2/guitar-hero3-brazucas-3.jpg"
+    "capa": "capas/ps2/guitar-hero3-brazucas-3.jpg",
+    "ptbr": true
   },
   {
     "id": "half-life-pt-br-ps2",
@@ -289,7 +307,8 @@
     "ano": "2001",
     "link": "https://www.mediafire.com/file/9mdsgay82craj7x/H4LFL1FDUB.rar/file",
     "descricao": "O cientista Gordon Freeman tenta sobreviver a um desastre em um laboratório e a uma invasão alienígena.",
-    "capa": "capas/ps2/half-life-pt-br.jpg"
+    "capa": "capas/ps2/half-life-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "killzone-pt-br-ps2",
@@ -300,7 +319,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/wt1ocx2w2rd0imx/K1LZ0NPTB.rar/file",
     "descricao": "Guerra futurista entre humanos e a Helghast, com combates táticos e muito clima de guerra.",
-    "capa": "capas/ps2/killzone-pt-br.jpg"
+    "capa": "capas/ps2/killzone-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "naruto-shippudden-u-n-5-dub-ps2",
@@ -311,7 +331,8 @@
     "ano": "2008",
     "link": "https://www.mediafire.com/file/ja4xvlw2v13yfbt/Naruto_Shippuden_5_%2528DUBeLEG%2529.iso/file",
     "descricao": "Lutas de ninjas com os personagens de Naruto Shippuden, com golpes especiais e transformações. Versão dublada.",
-    "capa": "capas/ps2/naruto-shippudden-u-n-5-dub.jpg"
+    "capa": "capas/ps2/naruto-shippudden-u-n-5-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "naruto-shippudden-u-n-5-mod-boruto-2-1-ps2",
@@ -323,7 +344,8 @@
     "link": "https://www.mediafire.com/file/bu6spvk7t2kwbl4/Naruto_5_MOD_Boruto_2.1_ISO_PS2.rar/file",
     "senha": "PS2-Nostalgia",
     "descricao": "Ultimate Ninja 5 modificado com personagens e conteúdo de Boruto (versão 2.1).",
-    "capa": "capas/ps2/naruto-shippudden-u-n-5-mod-boruto-2-1.jpg"
+    "capa": "capas/ps2/naruto-shippudden-u-n-5-mod-boruto-2-1.jpg",
+    "ptbr": true
   },
   {
     "id": "naruto-shippudden-u-n-6-ps2",
@@ -334,7 +356,8 @@
     "ano": "",
     "link": "https://www.mediafire.com/file/zvad0s7xm4lel7j/N4RUT0+ULT1M4T3+N1NJ4+S31S+BR.rar/file",
     "descricao": "Jogo de luta da série Ultimate Ninja com personagens de Naruto, em versão em português.",
-    "capa": "capas/ps2/naruto-shippudden-u-n-6.jpg"
+    "capa": "capas/ps2/naruto-shippudden-u-n-6.jpg",
+    "ptbr": true
   },
   {
     "id": "nfs-carbon-pt-br-ps2",
@@ -345,7 +368,8 @@
     "ano": "2006",
     "link": "https://www.mediafire.com/file/pir3q1j9k6ghhet/SLUS_214.93.NEED+FOR+SPEED+CARBON+PT-BR.iso/file",
     "descricao": "Corridas de rua noturnas e disputas de cânions, com tuning e controle de equipe. Em português.",
-    "capa": "capas/ps2/nfs-carbon-pt-br.jpg"
+    "capa": "capas/ps2/nfs-carbon-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "nfs-most-wantead-pt-br-ps2",
@@ -356,7 +380,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/dmwd08fcaovza7u/NFS_Most_Wantead_PS2_PTBR.rar/file",
     "descricao": "Fuja da polícia e suba na lista dos pilotos mais procurados da cidade. Em português.",
-    "capa": "capas/ps2/nfs-most-wantead-pt-br.jpg"
+    "capa": "capas/ps2/nfs-most-wantead-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "nfs-underground-2-dub-ps2",
@@ -367,7 +392,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/ixuk1fet79ir54f/NFSUND2DUBPTB.rar/file",
     "descricao": "Corridas de rua com carros customizados e mundo aberto. Versão dublada.",
-    "capa": "capas/ps2/nfs-underground-2-dub.jpg"
+    "capa": "capas/ps2/nfs-underground-2-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "os-cavaleiros-dos-zodiaco-a-saga-do-santuario-dub-ps2",
@@ -378,7 +404,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/hbw1znqep9csnm7/SAINT_SEIYA_THE_SANCTUARY_DUB_PTBR.rar/file",
     "descricao": "Os Cavaleiros do Zodíaco no arco do Santuário, com batalhas contra os Cavaleiros de Ouro. Versão dublada.",
-    "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-a-saga-do-santuario-dub.jpg"
+    "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-a-saga-do-santuario-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "os-cavaleiros-dos-zodiaco-hades-dub-ps2",
@@ -389,7 +416,8 @@
     "ano": "2008",
     "link": "https://drive.google.com/file/d/1W6o4KWHXiB4tkFakaf1hhq2vpp8SxU3w/view",
     "descricao": "Os Cavaleiros do Zodíaco no arco de Hades, com os guerreiros de Atena nos últimos combates. Versão dublada.",
-    "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-hades-dub.jpg"
+    "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-hades-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "pes-2025-ps2",
@@ -400,7 +428,8 @@
     "ano": "2025",
     "link": "https://www.mediafire.com/file/c3r2lfph70h8p1q/SLES_556.76.PES_2025_MIX_ITAQUI-RS_4.rar/file",
     "descricao": "Patch de PES com elencos e times atualizados para 2025, versão Itaqui-RS Mix.",
-    "capa": "capas/ps2/pes-2025.jpg"
+    "capa": "capas/ps2/pes-2025.jpg",
+    "ptbr": true
   },
   {
     "id": "resident-evil-4-dub-ps2",
@@ -411,7 +440,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/zcz6se9mx10gapr/R34DUBR1P.rar/file",
     "descricao": "Leon S. Kennedy resgata a filha do presidente em uma vila dominada por criaturas. Versão dublada.",
-    "capa": "capas/ps2/resident-evil-4-dub.jpg"
+    "capa": "capas/ps2/resident-evil-4-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "rumble-racing-ps2",
@@ -433,7 +463,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/64759uqyeuxb4eb/SPIDER_MAN_2_PTBR.rar/file",
     "descricao": "Peter Parker balança pela cidade de Nova York e enfrenta o Doutor Octopus. Em português.",
-    "capa": "capas/ps2/spider-man-2-pt-br.jpg"
+    "capa": "capas/ps2/spider-man-2-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "spider-man-friend-or-foe-pt-br-ps2",
@@ -444,7 +475,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/7fcmcvlh8e14gmb/Spider-Man_-_Friend_or_Foe_%2528PT-BR%2529.iso/file",
     "descricao": "Homem-Aranha junta forças com antigos vilões para deter uma ameaça global. Em português.",
-    "capa": "capas/ps2/spider-man-friend-or-foe-pt-br.jpg"
+    "capa": "capas/ps2/spider-man-friend-or-foe-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "urban-reign-pt-br-ps2",
@@ -455,7 +487,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/ilpf54qh4klcztn/Urban_Reign_%2528Br%2529.zip/file",
     "descricao": "Pancadaria em equipe em arenas fechadas, com combos e golpes em grupo. Em português.",
-    "capa": "capas/ps2/urban-reign-pt-br.jpg"
+    "capa": "capas/ps2/urban-reign-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "mortal-kombat-deception-pt-br-ps2",
@@ -466,7 +499,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/52jvl8i0hlgqu9u/(EUR)+Mortal+Kombat+-+Deception+(PT-BR)+v2.0.iso/file",
     "descricao": "Mortal Kombat com modos extras como Konquest e Chess Kombat. Em português.",
-    "capa": "capas/ps2/mortal-kombat-deception-pt-br.jpg"
+    "capa": "capas/ps2/mortal-kombat-deception-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "super-bomberman-collection-ps2",
@@ -488,7 +522,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/wzohg3o3cv1pkbi/GTA_FREE_FIRE_Mod_%2528Pr%25C3%25A9_Alpha%2529_DVD_ISO_PS2.rar/file?dkey=9skqb9g92ui&r=585",
     "descricao": "Versão modificada de GTA San Andreas com tema Free Fire (pré-alpha).",
-    "capa": "capas/ps2/gta-sa-mod-free-fire.jpg"
+    "capa": "capas/ps2/gta-sa-mod-free-fire.jpg",
+    "ptbr": true
   },
   {
     "id": "hot-wheels-turbo-racing-ps1",
@@ -510,7 +545,8 @@
     "ano": "2002",
     "link": "https://www.mediafire.com/file/xkphpnjcwh620se/GTA_VICE_CITY_PTBR.rar/file",
     "descricao": "Tommy Vercetti constrói seu império do crime na Miami dos anos 80. Em português.",
-    "capa": "capas/ps2/gta-vc-pt-br.jpg"
+    "capa": "capas/ps2/gta-vc-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "cold-fear-ps2",
@@ -532,7 +568,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/8y4jd2r4nsh5vj1/DRAGON_BAL_Z_BT_3_DUB_PTBR.rar/file",
     "descricao": "Dragon Ball Z com mais de 150 personagens e lutas em arenas grandes. Versão dublada.",
-    "capa": "capas/ps2/dragon-ball-b-t-3-dub.jpg"
+    "capa": "capas/ps2/dragon-ball-b-t-3-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "mortal-kombat-armageddon-pt-br-ps2",
@@ -543,7 +580,8 @@
     "ano": "2006",
     "link": "https://www.mediafire.com/file/i886uqdk1au3jh3/Mortal+Kombat+Armageddon+PT-BR.iso/file",
     "descricao": "O capítulo final da fase 3D de Mortal Kombat, com elenco gigante e modo Konquest. Em português.",
-    "capa": "capas/ps2/mortal-kombat-armageddon-pt-br.jpg"
+    "capa": "capas/ps2/mortal-kombat-armageddon-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "pes-2014-ps2",
@@ -554,7 +592,8 @@
     "ano": "2013",
     "link": "https://www.mediafire.com/file/rtk0tkfnzvye4lp/PES_2014.rar/file",
     "descricao": "Pro Evolution Soccer 2014 com partidas e modos clássicos de futebol.",
-    "capa": "capas/ps2/pes-2014.jpg"
+    "capa": "capas/ps2/pes-2014.jpg",
+    "ptbr": true
   },
   {
     "id": "carros-dub-ps2",
@@ -565,7 +604,8 @@
     "ano": "2006",
     "link": "https://www.mediafire.com/file/0vwtlpxv1yabojm/Carros_Dublado_PT-BR_DVD_ISO_PS2.rar/file?dkey=hsmmybsiqhz&r=676",
     "descricao": "Relâmpago McQueen e os amigos de Radiator Springs em corridas e minigames. Versão dublada.",
-    "capa": "capas/ps2/carros-dub.jpg"
+    "capa": "capas/ps2/carros-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "obscure-2-pt-br-ps2",
@@ -577,7 +617,8 @@
     "link": "https://www.mediafire.com/file/g3h8mm658ipmj2x/ObsCure_2_ISO_PT-BR_PS2.rar/file?dkey=7jbxn7hd06l&r=1001",
     "senha": "PS2-Nostalgia",
     "descricao": "Obscure: The Aftermath: estudantes enfrentam criaturas dentro de uma universidade. Em português.",
-    "capa": "capas/ps2/obscure-2-pt-br.jpg"
+    "capa": "capas/ps2/obscure-2-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "x-men-origins-ps2",
@@ -599,7 +640,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/yfwscxdl5je7b3v/Ghost_Rider__Motoqueiro_%2528PTBR%2529.rar/file?dkey=4tpzzcz07jn&r=1112",
     "descricao": "Johnny Blaze vira o Motoqueiro Fantasma e enfrenta demônios em fases de ação. Em português.",
-    "capa": "capas/ps2/ghost-rider-pt-br.jpg"
+    "capa": "capas/ps2/ghost-rider-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "devil-my-cry-3-dub-ps2",
@@ -610,7 +652,8 @@
     "ano": "2005",
     "link": "https://www.mediafire.com/file/o022ss7e8nlr84d/D3VLMCRY3DUBPTB.rar/file?dkey=wd3qzolql5p&r=753",
     "descricao": "Dante em sua história de origem, com combates estilosos contra hordas de demônios. Versão dublada.",
-    "capa": "capas/ps2/devil-my-cry-3-dub.jpg"
+    "capa": "capas/ps2/devil-my-cry-3-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "burnout-dominator-rip-pt-br-ps2",
@@ -621,7 +664,8 @@
     "ano": "2007",
     "link": "https://www.mediafire.com/file/tilgqkdrhy808d5/SLUS_215.96.BURNOUT_DOMINATOR.iso/file",
     "descricao": "Corridas rápidas em que bater nos rivais enche o turbo e dá espetáculo. Em português.",
-    "capa": "capas/ps2/burnout-dominator-rip-pt-br.jpg"
+    "capa": "capas/ps2/burnout-dominator-rip-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "up-altas-aventuras-pt-br-ps2",
@@ -632,7 +676,8 @@
     "ano": "2009",
     "link": "https://www.mediafire.com/file/g3ib0h1pblyckaq/Up_Ps2_Com_Legenda_PT-BR.rar/file?dkey=sl1z41t7cnv&r=415",
     "descricao": "A aventura do velho Carl e do jovem Russell com balões e lugares exóticos. Em português.",
-    "capa": "capas/ps2/up-altas-aventuras-pt-br.jpg"
+    "capa": "capas/ps2/up-altas-aventuras-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "gta-sa-project-kaizo-v2-0-ps2",
@@ -643,7 +688,8 @@
     "ano": "2004",
     "link": "https://www.mediafire.com/file/syc8udjmtz9igkv/GTA_SAN_Project_Kaizo_2.0_%2528Formato_zso%2529_-_Azel_Games.7z/file",
     "descricao": "Versão modificada de GTA San Andreas (Project Kaizo 2.0, formato zso).",
-    "capa": "capas/ps2/gta-sa-project-kaizo-v2-0.jpg"
+    "capa": "capas/ps2/gta-sa-project-kaizo-v2-0.jpg",
+    "ptbr": true
   },
   {
     "id": "super-mario-collection-ps2",
@@ -666,7 +712,8 @@
     "link": "https://www.mediafire.com/file/wkz249fdqztu8dn/00001+-+Agent+Hugo+-+Hula+Holiday+(Europe)+(En,Fr,De,Es,It,Nl,Pt).rar/file",
     "senha": "ch1n.com.br",
     "descricao": "O troll Hugo sai em um passeio de férias havaiano, com fases rápidas e divertidas. Em português.",
-    "capa": "capas/ps2/agent-hugo-hula-holiday-pt-br.jpg"
+    "capa": "capas/ps2/agent-hugo-hula-holiday-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "obscure-1-pt-br-ps2",
@@ -677,7 +724,8 @@
     "ano": "2004",
     "link": "https://drive.google.com/file/d/1iSZeNsFgSR8PX_LRCBytB7_8hcUgtuyh/view?usp=drivesdk",
     "descricao": "Estudantes exploram um colégio tomado por criaturas e ainda precisam sobreviver cooperando. Em português.",
-    "capa": "capas/ps2/obscure-1-pt-br.jpg"
+    "capa": "capas/ps2/obscure-1-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "tekken-5-mod-unlocked-ps2",
@@ -701,7 +749,8 @@
     "link": "https://www.mediafire.com/file/f6eo4kwyza4ouag/SLUS_213.04.Justice_League_Heroes_%2528BR%2529_%2528DUB%2529_%2528T1.0%2529.rar/file",
     "senha": "PS2-Nostalgia",
     "descricao": "Superman, Batman, Mulher-Maravilha e outros heróis da Liga em missões cooperativas. Versão dublada.",
-    "capa": "capas/ps2/justice-league-heroes-dub.jpg"
+    "capa": "capas/ps2/justice-league-heroes-dub.jpg",
+    "ptbr": true
   },
   {
     "id": "ghost-rider-dub-i-a-ps2",
@@ -712,7 +761,8 @@
     "ano": "2007",
     "link": "https://gofile.io/d/fbO5Ix",
     "descricao": "Johnny Blaze vira o Motoqueiro Fantasma e enfrenta demônios em fases de ação. Versão dublada por I.A.",
-    "capa": "capas/ps2/ghost-rider-dub-i-a.jpg"
+    "capa": "capas/ps2/ghost-rider-dub-i-a.jpg",
+    "ptbr": true
   },
   {
     "id": "dragon-ball-z-budokai-tenkaichi-3-sparkino-zero-ps2",
@@ -723,7 +773,8 @@
     "ano": "2026",
     "link": "https://drive.google.com/file/d/1Kdn37wbEPN0JQR4WHUPhExlUqo12Bz0z/view",
     "descricao": "É um jogo de luta 3D que permite aos jogadores reviver as batalhas épicas da série Dragon Ball Z. Apresenta um vasto elenco de personagens e cenários destrutíveis.",
-    "capa": "capas/ps2/dragon-ball-z-budokai-tenkaichi-3-sparkino-zero.jpg"
+    "capa": "capas/ps2/dragon-ball-z-budokai-tenkaichi-3-sparkino-zero.jpg",
+    "ptbr": true
   },
   {
     "id": "dragon-ball-gt-final-bout-dublado-e-traduzido-ps1",
@@ -735,6 +786,7 @@
     "link": "https://www.mediafire.com/file/cqmgcejo7bqfz0s/Dragon_Ball_GT_-_+Final_Bout.rar/file",
     "descricao": "Este é um jogo de luta 3D baseado na popular série de anime Dragon Ball GT. Os jogadores podem escolher entre vários personagens icônicos para batalhas intensas.",
     "capa": "capas/ps1/dragon-ball-gt-final-bout-dublado-e-traduzido.jpg",
-    "senha": "ch1n.com.br"
+    "senha": "ch1n.com.br",
+    "ptbr": true
   }
 ]
