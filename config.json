@@ -9,5 +9,13 @@
   },
   "hero": "hero.png",
   "gc": "jogos-on",
-  "categorias": []
+  "categorias": [],
+  "redes": [
+    {
+      "tipo": "YouTube",
+      "ic": "▶️",
+      "nome": "YouTube",
+      "url": "https://youtube.com/@johntutorsva8053"
+    }
+  ]
 }
