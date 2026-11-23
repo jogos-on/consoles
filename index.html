@@ -102,7 +102,10 @@ dialog::backdrop{background:#000a}
 .btn{display:inline-block;margin:10px 8px 0 0;padding:10px 18px;border:0;border-radius:8px;background:var(--gold);color:#1a1300;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
 .btn.alt{background:transparent;border:1px solid var(--gold);color:var(--gold)}
 .btn:focus-visible{outline:3px solid var(--snes);outline-offset:2px}
-#pix{width:min(380px,94vw);text-align:center}
+#pix,#dlm{width:min(380px,94vw);text-align:center}
+#dlm h3{margin:0 0 8px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+#dlm p{color:var(--mu);margin:0 0 6px}#dlmok{min-height:1.4em;color:var(--gold);font-weight:600;margin-top:6px}
+#dlm .btn{display:block;width:100%;margin:8px 0 0}
 #pix h3{margin:0 0 8px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
 #pixqr{min-height:60px;margin:12px 0;color:var(--mu)}
 #pixqr img{width:220px;height:220px;image-rendering:pixelated;background:#fff;border-radius:8px;padding:6px}
@@ -141,6 +144,14 @@ dialog::backdrop{background:#000a}
   <footer><div class="l cond">Escolha seu clássico<small class="cond">e boa jogatina!</small></div><div class="r cond">Game over?<small class="cond">Jamais.</small></div></footer>
 </div>
 <dialog id="dlg"><div class="in"><button class="x" aria-label="Fechar" onclick="dlg.close()">×</button><div id="det"></div><div id="cm" style="margin-top:16px"></div></div></dialog>
+<dialog id="dlm"><div class="in">
+  <h3 id="dlmt">Gostou do site?</h3>
+  <p id="dlmx"></p>
+  <button class="btn" onclick="copiarPixDl()">Copiar Pix (copia e cola)</button>
+  <button class="btn alt" onclick="abrirPix()">Ver QR Code</button>
+  <div id="dlmok" role="status"></div>
+  <button class="btn alt" id="dlmgo" onclick="continuarDl()">Agora não</button>
+</div></dialog>
 <dialog id="pix"><div class="in"><button class="x" aria-label="Fechar" onclick="document.getElementById('pix').close()">×</button>
   <h3>Doar uns trocados</h3>
   <div>Nome: <b id="pxn"></b><br>Banco: <b id="pxb"></b></div>
@@ -205,6 +216,12 @@ function aplicarRedes(l){
 }
 function aplicarCfg(c){
   c=c||{};aplicarRedes(c.redes);
+  if(c.doacao&&typeof c.doacao==="object"){const d=c.doacao;
+    DOA.on=d.on===true;
+    if([0,1,2,3,5,10].includes(+d.freq))DOA.freq=+d.freq;
+    if(d.titulo)DOA.titulo=String(d.titulo).slice(0,80);
+    if(d.texto)DOA.texto=String(d.texto).slice(0,300);
+  }
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc))iniciarLike(c.gc);
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc)&&!document.getElementById("gcs")){const g=document.createElement("script");g.id="gcs";g.async=true;g.dataset.goatcounter="https://"+c.gc+".goatcounter.com/count";g.src="https://gc.zgo.at/count.js";document.head.appendChild(g)}
   if(Array.isArray(c.categorias))CATS=c.categorias.filter(x=>x&&x.id&&x.id!=="jogos");
@@ -317,6 +334,36 @@ async function abrirPix(){
     const im=$("pixqr").querySelector("img");if(im)im.alt="QR Code Pix";
   }catch(e){$("pixqr").textContent="Não foi possível gerar o QR Code. Use o botão para copiar o código."}
 }
+const DOA={on:false,freq:3,titulo:"Gostou do site?",texto:"Ele é mantido por uma pessoa só. Se puder ajudar com uns trocados, agradeço muito!"};
+let DL_URL="";
+function doacaoDeve(){
+  if(!DOA.on)return false;
+  try{
+    if(DOA.freq===0)return sessionStorage.getItem("dlSessao")!=="1";
+    return (+localStorage.getItem("dlCont")||0)%DOA.freq===0;
+  }catch(e){return false}
+}
+function doacaoContar(){
+  try{if(DOA.freq===0)sessionStorage.setItem("dlSessao","1");else localStorage.setItem("dlCont",String((+localStorage.getItem("dlCont")||0)+1))}catch(e){}
+}
+function baixarClick(e,a){
+  const mostrar=doacaoDeve();doacaoContar();
+  if(!mostrar)return true;
+  e.preventDefault();DL_URL=a.href;
+  $("dlmt").textContent=DOA.titulo;$("dlmx").textContent=DOA.texto;
+  $("dlmok").textContent="";$("dlmgo").textContent="Agora não";
+  $("dlm").showModal();return false;
+}
+function continuarDl(){
+  const u=DL_URL;DL_URL="";$("dlm").close();
+  if(u)window.open(u,"_blank","noopener,noreferrer");
+}
+async function copiarPixDl(){
+  pixCode=pixCode||pixPayload();
+  try{await navigator.clipboard.writeText(pixCode)}
+  catch(e){const t=document.createElement("textarea");t.value=pixCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}
+  $("dlmok").textContent="Pix copiado! Obrigado 💛";$("dlmgo").textContent="Continuar para o download";
+}
 async function copiarPix(){
   try{await navigator.clipboard.writeText(pixCode)}
   catch(e){const t=document.createElement("textarea");t.value=pixCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}
@@ -341,7 +388,7 @@ function abrir(j){
   if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
   const w=({"1/1":150,"5/7":130,"7/5":170})[PROP[j.console]]||130;
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
+  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer" onclick="return baixarClick(event,this)">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
   const im=$("det").querySelector(".top img");
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
   const s=document.createElement("script");
