@@ -17,5 +17,11 @@
       "nome": "YouTube",
       "url": "https://youtube.com/@johntutorsva8053"
     }
-  ]
+  ],
+  "doacao": {
+    "on": false,
+    "freq": 0,
+    "titulo": "Gostou do site?",
+    "texto": "Nos ajude a mantê-lo, e atualizá-lo constantemente."
+  }
 }
