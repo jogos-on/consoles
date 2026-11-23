@@ -76,7 +76,8 @@
     "link": "https://www.mediafire.com/file/4vt5qtimcfax3lu/Crash+3_Dublado+e+Legendado.rar/file",
     "senha": "dubsgamer.com",
     "descricao": "Este aclamado jogo de plataforma 3D continua as aventuras de Crash, que viaja no tempo para impedir os planos malignos de seus inimigos. Ele oferece uma grande variedade de fases e novas habilidades para o protagonista.",
-    "capa": "capas/ps1/crash-bandicoot-3-warped-dublado-e-traduzido-pt-br.jpg"
+    "capa": "capas/ps1/crash-bandicoot-3-warped-dublado-e-traduzido-pt-br.jpg",
+    "ptbr": true
   },
   {
     "id": "pes-efotball-treme-terra-2027-ps2",
