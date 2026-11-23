@@ -19,7 +19,7 @@
     }
   ],
   "doacao": {
-    "on": false,
+    "on": true,
     "freq": 0,
     "titulo": "Gostou do site?",
     "texto": "Nos ajude a mantê-lo, e atualizá-lo constantemente."
