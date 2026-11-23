@@ -30,6 +30,7 @@ details>summary::-webkit-details-marker{display:none}
 details>summary::after{content:"▾";color:var(--gold);transition:transform .15s}
 details:not([open])>summary::after{transform:rotate(-90deg)}
 .bt{cursor:default;color:#fff}
+#ft{scroll-margin-top:14px}
 #ft::before{content:"🎮 "}.lst::before{content:"📚 "}
 label{display:block;margin-top:12px;font-size:.88rem;color:var(--mu)}
 input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:#080d1d;color:var(--fg);font:inherit}
@@ -199,15 +200,18 @@ gemini-2.5-flash-lite</textarea></label>
   <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"></select><select id="fcat" onchange="lista()"></select></div>
   <button class="s" id="selBtn" onclick="modoSel()">☑️ Seleção em massa</button>
   <div id="selBar" hidden>
-    <div id="selN">0 marcado(s) como popular</div>
-    <small style="color:var(--mu)">Os jogos marcados são os populares. Marque ou desmarque e use os botões flutuantes Salvar ou Fechar.</small>
+    <div id="selN">0 jogo(s) selecionado(s)</div>
+    <small style="color:var(--mu)">Marque os jogos na lista e escolha o que alterar. O que ficar em "Não alterar" não muda. Depois toque em Aplicar.</small>
+    <label>Categoria<select id="scat"></select></label>
+    <label>PT-BR<select id="sptbr"><option value="">Não alterar</option><option value="1">Marcar PT-BR</option><option value="0">Desmarcar PT-BR</option></select></label>
+    <label>Popular<select id="spop"><option value="">Não alterar</option><option value="1">Marcar como popular</option><option value="0">Desmarcar popular</option></select></label>
     <button class="s" onclick="selTodos()">Selecionar todos</button><button class="s" onclick="selLimpar()">Limpar</button>
   </div>
   <div id="lista"></div>
   <button onclick="publicar()">Publicar no GitHub</button><button class="s" onclick="baixar()">Baixar jogos.json</button>
 </div>
 <dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
-<div id="selFab" hidden><span id="selFabN">★ 0</span><button onclick="salvarPop()">💾 Salvar</button><button class="s" onclick="fecharSel()">✖ Fechar</button></div>
+<div id="selFab" hidden><span id="selFabN">✔ 0</span><button onclick="aplicarLote()">💾 Aplicar</button><button class="s" onclick="fecharSel()">✖ Fechar</button></div>
 <dialog id="cpd">
   <div class="cph"><b>🖼️ COMPLETAR CAPAS</b><span id="cpn"></span></div>
   <div id="cpt"></div><div id="cpm"></div>
@@ -357,6 +361,7 @@ function iniciarCats(){
     CATS.forEach(c=>e.add(new Option(c.nome,c.id)));
     if([...e.options].some(o=>o.value===v))e.value=v;
   });
+  {const e=$("scat"),v=e.value||"__nao";e.replaceChildren();e.add(new Option("Não alterar","__nao"));e.add(new Option("Sem categoria",""));CATS.forEach(c=>e.add(new Option(c.nome,c.id)));e.value=[...e.options].some(o=>o.value===v)?v:"__nao"}
   const l=$("catl");l.replaceChildren();
   CATS.forEach(c=>{
     const d=document.createElement("div");d.className="crow";
@@ -531,18 +536,27 @@ function atualizarStats(){
   $("capasBtn").textContent=sem?`🖼️ Completar capas (${sem})`:"✅ Todos os jogos têm capa";
 }
 let selMode=false,ultimoIdx=[];const sel=new Set();
-function selInfo(){$("selN").textContent=sel.size+" marcado(s) como popular";$("selFabN").textContent="★ "+sel.size}
-function modoSel(){selMode=!selMode;sel.clear();if(selMode)jogos.forEach(j=>{if(j.popular)sel.add(j.id)});$("selBar").hidden=!selMode;$("selFab").hidden=!selMode;document.body.classList.toggle("sel",selMode);$("selBtn").textContent=selMode?"✖ Sair da seleção":"☑️ Seleção em massa";selInfo();lista()}
-function selTodos(){ultimoIdx.forEach(id=>sel.add(id));lista()}
-function selLimpar(){sel.clear();lista()}
-const difPop=()=>({add:jogos.filter(j=>sel.has(j.id)&&!j.popular).length,rem:jogos.filter(j=>!sel.has(j.id)&&j.popular).length});
-function fecharSel(){const d=difPop();if((d.add||d.rem)&&!confirm("Sair sem salvar as alterações dos populares?"))return;modoSel()}
-async function salvarPop(){
-  const {add,rem}=difPop();
-  if(!add&&!rem)return aviso("Nenhuma alteração nos populares.");
-  if(!confirm(`Salvar populares? ${add} novo(s) e ${rem} removido(s).`))return;
-  jogos.forEach(j=>{j.popular=sel.has(j.id)});
-  if(await publicar()&&selMode)modoSel();
+function selInfo(){$("selN").textContent=sel.size+" jogo(s) selecionado(s)";$("selFabN").textContent="✔ "+sel.size}
+function modoSel(){selMode=!selMode;sel.clear();$("scat").value="__nao";$("sptbr").value="";$("spop").value="";$("selBar").hidden=!selMode;$("selFab").hidden=!selMode;document.body.classList.toggle("sel",selMode);$("selBtn").textContent=selMode?"✖ Sair da seleção":"☑️ Seleção em massa";selInfo();lista()}
+function selTodos(){ultimoIdx.forEach(id=>sel.add(id));selInfo();lista()}
+function selLimpar(){sel.clear();selInfo();lista()}
+function fecharSel(){if(sel.size&&!confirm("Sair sem aplicar as alterações?"))return;modoSel()}
+async function aplicarLote(){
+  const alvo=jogos.filter(j=>sel.has(j.id));
+  if(!alvo.length)return aviso("Selecione pelo menos um jogo.");
+  const cat=$("scat").value,pt=$("sptbr").value,pop=$("spop").value;
+  if(cat==="__nao"&&!pt&&!pop)return aviso("Escolha o que alterar: categoria, PT-BR ou popular.");
+  const partes=[];
+  if(cat!=="__nao")partes.push("• Categoria: "+(cat?catNome(cat):"sem categoria"));
+  if(pt)partes.push("• "+(pt==="1"?"Marcar PT-BR":"Desmarcar PT-BR"));
+  if(pop)partes.push("• "+(pop==="1"?"Marcar como popular":"Desmarcar popular"));
+  if(!confirm(`Aplicar em ${alvo.length} jogo(s)?\n${partes.join("\n")}`))return;
+  alvo.forEach(j=>{
+    if(cat!=="__nao"){if(cat)j.categoria=cat;else delete j.categoria}
+    if(pt==="1")j.ptbr=true;else if(pt==="0")delete j.ptbr;
+    if(pop)j.popular=pop==="1";
+  });
+  if(await publicar()&&selMode)modoSel();else lista();
 }
 function lista(){
   atualizarStats();
@@ -619,7 +633,7 @@ function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
   $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("arq").value="";
-  $("voltar").style.display="inline-block";posLista=scrollY;scrollTo(0,0);statusCapa(j,i);
+  $("voltar").style.display="inline-block";posLista=scrollY;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
 }
 function voltar(){limpar();scrollTo(0,posLista)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
