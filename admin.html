@@ -261,7 +261,7 @@ function lerRedes(){
 function addRede(){lerRedes();REDES.push({tipo:"Instagram",ic:"📸",nome:"Instagram",url:""});iniciarRedes()}
 async function salvarDoacao(){
   const d={on:$("dn_on").checked,freq:+$("dn_f").value,titulo:$("dn_t").value.trim(),texto:$("dn_x").value.trim()};
-  try{aviso("Publicando...");const c={...CFG,doacao:d};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza aviso de doação");CFG=c;aviso("Salvo!")}
+  try{aviso("Publicando...");await salvarCfg({doacao:d},"Atualiza aviso de doação");aviso("Salvo!")}
   catch(e){aviso("Erro: "+e.message)}
 }
 async function salvarRedes(){
@@ -273,7 +273,7 @@ async function salvarRedes(){
     try{new URL(u)}catch(e){return aviso("Link inválido em "+r.nome)}
     ok.push({tipo:r.tipo,ic:r.ic,nome:r.nome,url:u});
   }
-  try{aviso("Publicando...");const c={...CFG,redes:ok};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza redes sociais");CFG=c;REDES=ok;iniciarRedes();aviso("Redes salvas!")}
+  try{aviso("Publicando...");await salvarCfg({redes:ok},"Atualiza redes sociais");REDES=ok;iniciarRedes();aviso("Redes salvas!")}
   catch(e){aviso("Erro: "+e.message)}
 }
 let CATS=[];
@@ -337,8 +337,7 @@ function delCons(id){
 }
 async function salvarConsoles(){
   lerConsoles();
-  try{aviso("Publicando...");const c={...CFG,consoles:CONS.map(({id,nome,frase,prop,cor})=>({id,nome,frase,prop,cor}))};
-    await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza consoles");CFG=c;iniciarConsoles();lista();aviso("Consoles salvos!")}
+  try{aviso("Publicando...");await salvarCfg({consoles:CONS.map(({id,nome,frase,prop,cor})=>({id,nome,frase,prop,cor}))},"Atualiza consoles");iniciarConsoles();lista();aviso("Consoles salvos!")}
   catch(e){aviso("Erro: "+e.message)}
 }
 const catNome=id=>(CATS.find(c=>c.id===id)||{nome:id}).nome;
@@ -381,7 +380,7 @@ function delCat(id){
 async function salvarCats(){
   lerCats();
   jogos.forEach(j=>{if(j.categoria==="jogos"){delete j.categoria;jogosMudou=true}});
-  try{aviso("Publicando...");const c={...CFG,categorias:CATS};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza categorias");CFG=c;if(jogosMudou){await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");jogosMudou=false}iniciarCats();lista();aviso("Categorias publicadas.")}
+  try{aviso("Publicando...");await salvarCfg({categorias:CATS},"Atualiza categorias");if(jogosMudou){await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");jogosMudou=false}iniciarCats();lista();aviso("Categorias publicadas.")}
   catch(e){aviso(e.message)}
 }
 
@@ -633,6 +632,18 @@ async function api(p,o={}){
   return r.json();
 }
 const SHAS={};
+async function cfgRepo(){
+  const r=await api("config.json?ref="+C.branch);
+  if(!r||!r.content)return null;
+  SHAS["config.json"]=r.sha;
+  try{const bin=atob(r.content.replace(/\n/g,""));return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,ch=>ch.charCodeAt(0))))}catch(e){return null}
+}
+async function salvarCfg(mudanca,msg){
+  const atual=await cfgRepo()||CFG||{};
+  const c={...atual,...mudanca};
+  await enviar("config.json",enc(JSON.stringify(c,null,2)),msg);
+  CFG=c;return c;
+}
 async function enviar(p,conteudo,msg,semGet){
   for(let t=0;t<3;t++){
     let sha;
@@ -831,7 +842,7 @@ async function adicionarLote(pub){
 
 try{localStorage.setItem("skipgc","t")}catch(e){}
 let CFG={};
-fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(c=>{
+(C.token&&C.user&&C.repo?cfgRepo().catch(()=>null):Promise.resolve(null)).then(x=>x||fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))).then(c=>{
   CFG=c||{};CONS=consDe(CFG);iniciarConsoles();
   if(Array.isArray(CFG.categorias))CATS=CFG.categorias.filter(x=>x&&x.id&&x.id!=="jogos")
   iniciarCats();lista();
@@ -869,18 +880,18 @@ async function carregarVisitas(){
 async function salvarGc(){
   const g=$("gc").value.trim();
   if(g&&!/^[a-z0-9-]+$/i.test(g)){aviso("Código inválido");return}
-  try{aviso("Publicando...");const c={...CFG,gc:g};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza contador de visitas");CFG=c;aviso("Salvo!");carregarVisitas()}
+  try{aviso("Publicando...");await salvarCfg({gc:g},"Atualiza contador de visitas");aviso("Salvo!");carregarVisitas()}
   catch(e){aviso("Erro: "+e.message)}
 }
 async function salvarPagina(){
   try{
     aviso("Publicando...");
-    const c={...CFG,titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim()};
+    const c={titulo1:$("t1").value.trim(),titulo2:$("t2").value.trim(),subtitulo:$("st").value.trim()};
     const f=$("hf").files[0];
     if($("hrm").checked)c.hero="";
     else if(f){await enviar("hero.png",await b64(await redimensionar(f)),"Imagem do topo");c.hero="hero.png";c.heroV=Date.now()}
-    await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza configurações da página");
-    CFG=c;$("hf").value="";$("hrm").checked=false;
+    await salvarCfg(c,"Atualiza configurações da página");
+    $("hf").value="";$("hrm").checked=false;
     aviso("Publicado. O site atualiza em cerca de 1 minuto.");
   }catch(e){aviso(e.message)}
 }
