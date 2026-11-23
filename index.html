@@ -73,6 +73,7 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .g{all:unset;cursor:pointer;display:block;text-align:center}
 .cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
 .star{position:absolute;top:3px;left:5px;z-index:1;font:normal 700 17px/1 Barlow,sans-serif;background:linear-gradient(180deg,#fff3b0 0%,#f0c230 50%,#b9830a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 1.5px #000d);pointer-events:none}
+.br{position:absolute;top:4px;right:5px;z-index:1;width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;pointer-events:none}
 .cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:fill!important;display:block}
 .ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
 .ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
@@ -240,7 +241,7 @@ function aplicarCfg(c){
 }
 function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
-function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
+function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${j.ptbr?'<svg class="br" viewBox="0 0 20 14" title="PT-BR" aria-label="Em português do Brasil"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
 function renderCats(){
   const e=$("cats");e.hidden=CATS.length<1;
