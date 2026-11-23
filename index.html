@@ -34,8 +34,12 @@ h1 span{display:block}
 h1 .a{background:linear-gradient(#fff,#aeb6c8);-webkit-background-clip:text;background-clip:text;color:transparent}
 h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:1.15rem}
+[hidden]{display:none!important}
 .like{margin-top:14px;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--gold);background:transparent;color:var(--gold);font:700 1rem Barlow,system-ui,sans-serif;cursor:pointer}
 .like b{color:var(--fg);font-weight:700}.like[aria-pressed=true]{background:var(--gold);color:#1a1300}.like[aria-pressed=true] b{color:#1a1300}
+.redes{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.rede{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--bd,#2a3358);background:#ffffff0d;color:var(--fg);text-decoration:none;font:600 .95rem Barlow,system-ui,sans-serif}
+.rede:hover,.rede:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
 .like:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .sub i{width:28px;height:5px;border-radius:3px;background:var(--ps1)}
 .hero img{flex:0 1 46%;width:46%;aspect-ratio:1000/540;max-height:300px;object-fit:contain}
@@ -123,6 +127,7 @@ dialog::backdrop{background:#000a}
       <h1><span class="a" id="t1">Catálogo</span><span class="b" id="t2">de jogos</span></h1>
       <div class="sub"><i></i><span id="st">Reviva grandes clássicos!</span><i></i></div>
       <button type="button" id="lk" class="like" hidden aria-pressed="false"><span class="ic">👍</span> <span id="lkt">Curtir o site</span> <b id="lkn"></b></button>
+      <div id="redes" class="redes" hidden></div>
     </div>
     <img id="hero" alt="" hidden onerror="this.remove()">
   </div>
@@ -193,8 +198,13 @@ function iniciarLike(gc){
     pinta();
   };
 }
+function aplicarRedes(l){
+  const e=$("redes");if(!e)return;
+  const h=(Array.isArray(l)?l:[]).map(r=>{const u=seguro(String(r&&r.url||"").trim());return u&&r.nome?`<a class="rede" href="${esc(u)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">${esc(String(r.ic||"🔗").slice(0,4))}</span> ${esc(r.nome)}</a>`:""}).join("");
+  e.innerHTML=h;e.hidden=!h;
+}
 function aplicarCfg(c){
-  c=c||{};
+  c=c||{};aplicarRedes(c.redes);
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc))iniciarLike(c.gc);
   if(c.gc&&/^[a-z0-9-]+$/i.test(c.gc)&&!document.getElementById("gcs")){const g=document.createElement("script");g.id="gcs";g.async=true;g.dataset.goatcounter="https://"+c.gc+".goatcounter.com/count";g.src="https://gc.zgo.at/count.js";document.head.appendChild(g)}
   if(Array.isArray(c.categorias))CATS=c.categorias.filter(x=>x&&x.id&&x.id!=="jogos");
