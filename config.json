@@ -20,7 +20,7 @@
   ],
   "doacao": {
     "on": true,
-    "freq": 5,
+    "freq": 2,
     "titulo": "Gostou do site?",
     "texto": "Nos ajude a mantê-lo e atualizá-lo constantemente."
   }
