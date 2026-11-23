@@ -184,6 +184,7 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Senha para descompactar (opcional, ex.: dubsgamer.com)<input id="senha" autocomplete="off"></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
+  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="ptbr" type="checkbox" style="width:auto"> PT-BR (jogo em português do Brasil: mostra uma bandeirinha na capa)</label>
   <div id="capaInfo"><img id="capaPrev" alt="" style="display:none"><div id="capaTxt"></div></div>
   <label>Capa (imagem)<span id="trocar" style="display:none"> — se quiser trocar</span><input id="arq" type="file" accept="image/*"></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
@@ -565,7 +566,7 @@ function lista(){
       const im=document.createElement("img");im.alt="";im.loading="lazy";
       if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
-      const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+j.titulo;
+      const b=document.createElement("b");b.textContent=(j.popular?"★ ":"")+(j.ptbr?"[PT-BR] ":"")+j.titulo;
       const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":""].filter(Boolean).join(" · ");
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
@@ -578,7 +579,7 @@ function lista(){
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
+  $("popular").checked=false;$("ptbr").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -601,7 +602,7 @@ async function statusCapa(j,i){
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
-  $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("arq").value="";
+  $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("arq").value="";
   $("voltar").style.display="inline-block";posLista=scrollY;scrollTo(0,0);statusCapa(j,i);
 }
 function voltar(){limpar();scrollTo(0,posLista)}
@@ -741,7 +742,8 @@ function renderLote(){
 <input data-i="${i}" data-k="ano" placeholder="Ano" inputmode="numeric">
 <input data-i="${i}" data-k="link" type="url" placeholder="Link (opcional)">
 <label style="display:block;color:var(--mu);font-size:.9rem;margin-top:6px">Capa (imagem)<input type="file" accept="image/*" data-i="${i}" data-k="arq"></label><img class="lp" alt="" style="display:none;max-width:90px;max-height:90px;margin-top:6px;border-radius:6px">
-<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="popular"> Popular</label>`;
+<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="popular"> Popular</label>
+<label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" style="width:auto" data-i="${i}" data-k="ptbr"> PT-BR</label>`;
     d.querySelectorAll("[data-k]").forEach(el=>{if(el.type==="file")return;const v=x[el.dataset.k];if(el.type==="checkbox")el.checked=!!v;else el.value=v||""});
     if(x.nota){const n=document.createElement("div");n.className="nt";n.textContent=x.nota;d.appendChild(n)}
     r.appendChild(d);
@@ -832,6 +834,7 @@ async function adicionarLote(pub){
   sel.forEach(o=>{
     const x=o.x;
     const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular};
+    if(x.ptbr)j.ptbr=true;
     if(cat)j.categoria=cat;
     if(o.capa)j.capa=o.capa;
     jogos.push(j);
@@ -901,8 +904,9 @@ async function salvarJogo(){
   if(!titulo)return aviso("Informe o título.");
   const antigo=edit!==null?jogos[edit]:{};
   const cat=$("categoria").value,suf=cat?"-"+cat:"";
-  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
+  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,ptbr:$("ptbr").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
   if(!j.senha)delete j.senha;
+  if(!j.ptbr)delete j.ptbr;
   if(!j.categoria)delete j.categoria;
   const f=$("arq").files[0];
   let erroCapa="";
