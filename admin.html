@@ -137,6 +137,12 @@ gemini-2.5-flash-lite</textarea></label>
   <button class="s" onclick="addCons()">Adicionar</button><button onclick="salvarConsoles()">Salvar e publicar consoles</button>
 </details>
 
+<details id="rs"><summary>🌐 Redes sociais</summary>
+  <p style="color:var(--mu);margin:6px 0">Aparecem como botões no topo do site. Cole o link completo do seu perfil ou canal.</p>
+  <div id="rsl"></div>
+  <button class="s" onclick="addRede()">+ Adicionar rede</button><button onclick="salvarRedes()">Salvar e publicar redes</button>
+</details>
+
 <details id="ct"><summary>🏷️ Categorias</summary>
   <div id="catl"></div>
   <label>Nova categoria (ex.: OPL, Temas)<input id="catnovo"></label>
@@ -213,6 +219,46 @@ function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista()}).catch(()=>lista());
 
+const REDES_TIPOS=[["📸","Instagram"],["🎵","TikTok"],["▶️","YouTube"],["💬","Discord"],["✈️","Telegram"],["🟢","WhatsApp"],["📘","Facebook"],["✖️","X"],["🟣","Twitch"],["🐙","GitHub"],["🌐","Site"],["🔗","Outro"]];
+let REDES=[];
+function iniciarRedes(){
+  const l=$("rsl");l.replaceChildren();
+  REDES.forEach((r,i)=>{
+    const bx=document.createElement("div");bx.className="rbx";bx.dataset.i=i;bx.style.cssText="border:1px solid var(--bd);border-radius:10px;padding:8px;margin-top:8px";
+    const r1=document.createElement("div");r1.className="crow";r1.style.marginTop="0";
+    const sel=document.createElement("select");sel.dataset.k="tipo";REDES_TIPOS.forEach(([ic,n])=>sel.add(new Option(ic+" "+n,n)));
+    sel.value=REDES_TIPOS.some(t=>t[1]===r.tipo)?r.tipo:"Outro";
+    sel.onchange=()=>{const t=REDES_TIPOS.find(x=>x[1]===sel.value),nm=bx.querySelector('[data-k="nome"]');if(sel.value!=="Outro")nm.value=t[1]};
+    const del=document.createElement("button");del.className="d";del.textContent="🗑️";del.title="Excluir";del.setAttribute("aria-label","Excluir rede");del.onclick=()=>{lerRedes();REDES.splice(i,1);iniciarRedes()};
+    r1.append(sel,del);
+    const r2=document.createElement("div");r2.className="crow";
+    const nm=document.createElement("input");nm.value=r.nome||"";nm.dataset.k="nome";nm.placeholder="Nome exibido";nm.setAttribute("aria-label","Nome exibido");
+    r2.append(nm);
+    const r3=document.createElement("div");r3.className="crow";
+    const u=document.createElement("input");u.type="url";u.value=r.url||"";u.dataset.k="url";u.placeholder="https://...";u.setAttribute("aria-label","Link");u.autocapitalize="none";
+    r3.append(u);
+    bx.append(r1,r2,r3);l.appendChild(bx);
+  });
+}
+function lerRedes(){
+  REDES=[...document.querySelectorAll("#rsl .rbx")].map(bx=>{
+    const g=k=>bx.querySelector('[data-k="'+k+'"]').value.trim(),tipo=g("tipo"),t=REDES_TIPOS.find(x=>x[1]===tipo)||REDES_TIPOS[11];
+    return{tipo,ic:t[0],nome:g("nome")||tipo,url:g("url")};
+  });
+}
+function addRede(){lerRedes();REDES.push({tipo:"Instagram",ic:"📸",nome:"Instagram",url:""});iniciarRedes()}
+async function salvarRedes(){
+  lerRedes();
+  const ok=[];
+  for(const r of REDES){
+    if(!r.url)continue;
+    let u=r.url;if(!/^https?:\/\//i.test(u))u="https://"+u;
+    try{new URL(u)}catch(e){return aviso("Link inválido em "+r.nome)}
+    ok.push({tipo:r.tipo,ic:r.ic,nome:r.nome,url:u});
+  }
+  try{aviso("Publicando...");const c={...CFG,redes:ok};await enviar("config.json",enc(JSON.stringify(c,null,2)),"Atualiza redes sociais");CFG=c;REDES=ok;iniciarRedes();aviso("Redes salvas!")}
+  catch(e){aviso("Erro: "+e.message)}
+}
 let CATS=[];
 const catDe=j=>(j&&j.categoria&&j.categoria!=="jogos")?j.categoria:"";
 const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",prop:"1/1",cor:"#3b82f6"},{id:"ps2",nome:"PS2",frase:"Aventuras inesquecíveis!",prop:"5/7",cor:"#4f7cff"},{id:"snes",nome:"Super Nintendo",frase:"A era 16-bits!",prop:"7/5",cor:"#8b5cf6"}];
@@ -774,6 +820,7 @@ fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("gc").value=CFG.gc||"";carregarVisitas();
+  REDES=Array.isArray(CFG.redes)?CFG.redes.map(r=>({...r})):[];iniciarRedes();
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
 });
 $("hf").onchange=()=>{const f=$("hf").files[0];if(f){const h=$("hp");h.src=URL.createObjectURL(f);h.style.display="block"}};
