@@ -181,8 +181,7 @@ gemini-2.5-flash-lite</textarea></label>
 
 
 
-<div class="box">
-  <b id="ft" class="bt">Novo jogo</b>
+<details id="nj"><summary><span id="ft">Novo jogo</span></summary>
   <label>Título<input id="titulo"></label>
   <label>Console<select id="console"></select></label>
   <label>Categoria<select id="categoria"></select></label>
@@ -198,7 +197,7 @@ gemini-2.5-flash-lite</textarea></label>
   <div id="capaInfo"><div id="capaWrap"><img id="capaPrev" alt="" style="display:none"><div id="capaPh"><span>Sem capa</span></div><svg id="capaFlag" class="br" viewBox="0 0 20 14" aria-label="PT-BR"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg></div><div id="capaTxt"></div></div>
   <label>Capa (imagem)<span id="trocar" style="display:none"> — se quiser trocar</span><input id="arq" type="file" accept="image/*"></label>
   <button onclick="salvarJogo()">Salvar jogo</button><button class="s" id="voltar" style="display:none" onclick="voltar()">← Voltar</button><button class="s" onclick="limpar()">Limpar</button>
-</div>
+</details>
 
 <div class="box"><b class="bt lst">Jogos (<span id="n">0</span>)</b>
   <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"></select><select id="fcat" onchange="lista()"></select></div>
@@ -640,9 +639,9 @@ function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
   $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("oculto").checked=!!j.oculto;$("arq").value="";
-  $("voltar").style.display="inline-block";posLista=scrollY;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
+  $("voltar").style.display="inline-block";posLista=scrollY;$("nj").open=true;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
 }
-function voltar(){limpar();scrollTo(0,posLista)}
+function voltar(){limpar();$("nj").open=false;scrollTo(0,posLista)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
 const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const b64=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});
