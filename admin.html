@@ -35,6 +35,14 @@ details:not([open])>summary::after{transform:rotate(-90deg)}
 .bt{cursor:default;color:#fff}
 #ft{scroll-margin-top:14px}
 #ft::before{content:"🎮 "}.lst::before{content:"📚 "}
+select[hidden]{display:none}
+.lbl{margin-top:12px;font-size:.88rem;color:var(--mu)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chips label{display:block;margin:0;position:relative}
+.chips input{position:absolute;opacity:0;width:0;height:0;padding:0;border:0}
+.chips span{display:block;padding:8px 14px;border:1px solid var(--bd);border-radius:999px;background:#080d1d;color:var(--fg);font-size:.95rem;cursor:pointer;user-select:none}
+.chips input:checked+span{background:var(--gold);border-color:var(--gold);color:#111;font-weight:700}
+.chips input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
 label{display:block;margin-top:12px;font-size:.88rem;color:var(--mu)}
 input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:#080d1d;color:var(--fg);font:inherit}
 input:focus,select:focus,textarea:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px #e8b92333}
@@ -183,8 +191,8 @@ gemini-2.5-flash-lite</textarea></label>
 
 <details id="nj"><summary><span id="ft">Novo jogo</span></summary>
   <label>Título<input id="titulo"></label>
-  <label>Console<select id="console"></select></label>
-  <label>Categoria<select id="categoria"></select></label>
+  <div class="lbl">Console</div><select id="console" hidden></select><div class="chips" id="ch-console"></div>
+  <div class="lbl">Categoria</div><select id="categoria" hidden></select><div class="chips" id="ch-categoria"></div>
   <button class="s" onclick="preencherIA()">Preencher com IA</button>
   <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
   <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
@@ -301,6 +309,7 @@ function consDe(c){
 }
 const conNome=id=>(CONS.find(c=>c.id===id)||{nome:String(id).toUpperCase()}).nome;
 const conCor=id=>(CONS.find(c=>c.id===id)||{cor:"#3b82f6"}).cor;
+function chipsSync(id){const sel=$(id),box=$("ch-"+id);box.replaceChildren();[...sel.options].forEach(o=>{const l=document.createElement("label"),i=document.createElement("input"),t=document.createElement("span");i.type="radio";i.name="r-"+id;i.checked=o.value===sel.value;i.onchange=()=>{sel.value=o.value;sel.dispatchEvent(new Event("change"))};t.textContent=o.text;l.append(i,t);box.append(l)})}
 function iniciarConsoles(){
   jogos.forEach(j=>{if(j.console&&!CONS.some(c=>c.id===j.console))CONS.push({id:j.console,nome:String(j.console).toUpperCase(),frase:"",prop:"1/1",cor:CORES_NOVAS[CONS.length%CORES_NOVAS.length]})});
   [["lc",0],["console",0],["fc",1]].forEach(([id,todos])=>{
@@ -309,6 +318,7 @@ function iniciarConsoles(){
     CONS.forEach(c=>e.add(new Option(c.nome,c.id)));
     if([...e.options].some(o=>o.value===v))e.value=v;
   });
+  chipsSync("console");
   const l=$("csl");l.replaceChildren();
   CONS.forEach(c=>{
     const bx=document.createElement("div");bx.className="cbx";bx.dataset.id=c.id;bx.style.cssText="border:1px solid var(--bd);border-radius:10px;padding:8px;margin-top:8px";
@@ -365,6 +375,7 @@ function iniciarCats(){
     CATS.forEach(c=>e.add(new Option(c.nome,c.id)));
     if([...e.options].some(o=>o.value===v))e.value=v;
   });
+  chipsSync("categoria");
   {const e=$("scat"),v=e.value||"__nao";e.replaceChildren();e.add(new Option("Não alterar","__nao"));e.add(new Option("Sem categoria",""));CATS.forEach(c=>e.add(new Option(c.nome,c.id)));e.value=[...e.options].some(o=>o.value===v)?v:"__nao"}
   const l=$("catl");l.replaceChildren();
   CATS.forEach(c=>{
@@ -604,7 +615,7 @@ function lista(){
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("ptbr").checked=false;$("oculto").checked=false;$("categoria").value="";$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
+  $("popular").checked=false;$("ptbr").checked=false;$("oculto").checked=false;$("categoria").value="";chipsSync("categoria");$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -638,7 +649,7 @@ $("ptbr").addEventListener("change",flagPrev);
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
-  $("categoria").value=catDe(j);$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("oculto").checked=!!j.oculto;$("arq").value="";
+  $("categoria").value=catDe(j);chipsSync("console");chipsSync("categoria");$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("oculto").checked=!!j.oculto;$("arq").value="";
   $("voltar").style.display="inline-block";posLista=scrollY;$("nj").open=true;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
 }
 function voltar(){limpar();$("nj").open=false;scrollTo(0,posLista)}
