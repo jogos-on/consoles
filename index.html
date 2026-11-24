@@ -194,7 +194,7 @@ function aplicarCons(lista){
 aplicarCons(CONS_PADRAO);
 const cfgP=fetch("config.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})).then(aplicarCfg);
 function abrirLink(){const id=new URLSearchParams(location.search).get("jogo");if(id){const j=jogos.find(x=>x.id===id);if(j)abrir(j)}}
-fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d;render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
+fetch("jogos.json?"+Date.now()).then(r=>r.json()).then(d=>{jogos=d.filter(j=>!j.oculto);render();return cfgP}).then(abrirLink).catch(()=>{$("grid").innerHTML='<p class="vazio">Não foi possível carregar jogos.json.</p>'});
 
 function iniciarLike(gc){
   const b=$("lk");if(!b||b.dataset.on)return;b.dataset.on="1";
