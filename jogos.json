@@ -128,8 +128,7 @@
     "descricao": "Um jogo de corrida de bicicleta radical que permite aos jogadores realizar manobras insanas e competir em descidas perigosas. Oferece uma experiência de alta velocidade com muita ação e adrenalina.",
     "popular": true,
     "capa": "capas/ps2/downhill-domination-pt-br.jpg",
-    "ptbr": true,
-    "oculto": true
+    "ptbr": true
   },
   {
     "id": "gta-sa-brasil-v1-2-ps2",
