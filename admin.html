@@ -164,6 +164,12 @@ gemini-2.5-flash-lite</textarea></label>
   <button class="s" onclick="addCons()">Adicionar</button><button onclick="salvarConsoles()">Salvar e publicar consoles</button>
 </details>
 
+<details id="es"><summary>🙋 Meu espaço do visitante</summary>
+  <p style="color:var(--mu);margin:6px 0">Painel lateral no site com nome, foto e marcações (Quero jogar, Jogando, Zerei, Baixados). Tudo fica salvo só no navegador de cada visitante.</p>
+  <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="es_on" style="width:auto"> Ativar Meu espaço no site</label>
+  <button onclick="salvarEspaco()">Salvar e publicar</button>
+</details>
+
 <details id="dn"><summary>💛 Doação ao baixar</summary>
   <p style="color:var(--mu);margin:6px 0">Mostra um aviso pedindo uns trocados (Pix) quando o visitante toca em Baixar. Ele sempre pode seguir com "Agora não".</p>
   <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="dn_on" style="width:auto"> Ativar aviso</label>
@@ -268,7 +274,7 @@ if(!C.token)$("cfg").open=true;
 function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não/i.test(t)?20000:5000)}
 function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
-fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista()}).catch(()=>lista());
+fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista();thAquecer()}).catch(()=>lista());
 
 const REDES_TIPOS=[["📸","Instagram"],["🎵","TikTok"],["▶️","YouTube"],["💬","Discord"],["✈️","Telegram"],["🟢","WhatsApp"],["📘","Facebook"],["✖️","X"],["🟣","Twitch"],["🐙","GitHub"],["🌐","Site"],["🔗","Outro"]];
 let REDES=[];
@@ -298,6 +304,10 @@ function lerRedes(){
   });
 }
 function addRede(){lerRedes();REDES.push({tipo:"Instagram",ic:"📸",nome:"Instagram",url:""});iniciarRedes()}
+async function salvarEspaco(){
+  try{aviso("Publicando...");await salvarCfg({espaco:{on:$("es_on").checked}},"Atualiza Meu espaço");aviso("Salvo!")}
+  catch(e){aviso("Erro: "+e.message)}
+}
 async function salvarDoacao(){
   const d={on:$("dn_on").checked,freq:+$("dn_f").value,titulo:$("dn_t").value.trim(),texto:$("dn_x").value.trim()};
   try{aviso("Publicando...");await salvarCfg({doacao:d},"Atualiza aviso de doação");aviso("Salvo!")}
@@ -694,7 +704,7 @@ function lista(){
         d.appendChild(cb);
       }
       const im=document.createElement("img");im.alt="";im.loading="lazy";
-      if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
+      if(j.capa){im.onerror=()=>im.style.visibility="hidden";const c=thGet(j.capa);if(c)im.src=c;else{im.onload=()=>thSalva(j.capa,im);im.src=j.capa}}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
       const b=document.createElement("b");b.textContent=(j.oculto?"🙈 ":"")+(j.popular?"★ ":"")+(j.ptbr?"[PT-BR] ":"")+(j.video?"▶️ ":"")+j.titulo;
       const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":"",j.oculto?"oculto no site":""].filter(Boolean).join(" · ");
@@ -774,6 +784,26 @@ async function api(p,o={}){
   }
   return r.json();
 }
+const TH_K="th1:";
+function thGet(p){try{const v=JSON.parse(localStorage.getItem(TH_K+p)||"null");if(v&&Date.now()-v.t<6048e5)return v.d}catch(e){}return ""}
+function thSalva(p,im){try{
+  const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h)return;
+  const k=Math.min(1,96/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+  localStorage.setItem(TH_K+p,JSON.stringify({t:Date.now(),d:c.toDataURL("image/jpeg",.7)}));
+}catch(e){}}
+function thLimpa(p){try{localStorage.removeItem(TH_K+p)}catch(e){}}
+function thAquecer(){
+  const fila=jogos.filter(j=>j.capa&&!thGet(j.capa)).map(j=>j.capa);let ativos=0;
+  const prox=()=>{
+    while(ativos<3&&fila.length){
+      const p=fila.shift(),im=new Image();ativos++;
+      const fim=()=>{ativos--;prox()};
+      im.onload=()=>{thSalva(p,im);fim()};im.onerror=fim;im.src=p;
+    }
+  };
+  setTimeout(prox,1500);
+}
 const SHAS={};
 async function cfgRepo(){
   const r=await api("config.json?ref="+C.branch);
@@ -795,6 +825,7 @@ async function enviar(p,conteudo,msg,semGet){
     try{
       const r=await api(p,{method:"PUT",body:JSON.stringify({message:msg,content:conteudo,branch:C.branch,sha})});
       if(r&&r.content)SHAS[p]=r.content.sha;
+      if(p.startsWith("capas/"))thLimpa(p);
       return;
     }catch(e){
       delete SHAS[p];
@@ -993,6 +1024,7 @@ let CFG={};
   iniciarCats();lista();
   $("t1").value=CFG.titulo1||"Catálogo";$("t2").value=CFG.titulo2||"de jogos";$("st").value=CFG.subtitulo||"Reviva grandes clássicos!";
   $("gc").value=CFG.gc||"";carregarVisitas();
+  $("es_on").checked=(CFG.espaco||{}).on!==false;
   {const d=CFG.doacao||{};$("dn_on").checked=d.on===true;$("dn_f").value=String(d.freq??3);if(!$("dn_f").value)$("dn_f").value="3";$("dn_t").value=d.titulo||"";$("dn_x").value=d.texto||""}
   REDES=Array.isArray(CFG.redes)?CFG.redes.map(r=>({...r})):[];iniciarRedes();
   if(CFG.hero!==""){const h=$("hp");h.onload=()=>h.style.display="block";h.src=(CFG.hero||"hero.png")+(CFG.heroV?"?v="+CFG.heroV:"")}
