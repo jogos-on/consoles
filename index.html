@@ -41,6 +41,28 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .redes{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .rede{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--bd,#2a3358);background:#ffffff0d;color:var(--fg);text-decoration:none;font:600 .95rem Barlow,system-ui,sans-serif}
 .rede:hover,.rede:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
+.meb{position:fixed;top:12px;right:12px;z-index:20;width:46px;height:46px;border-radius:50%;border:2px solid var(--gold);background:#0d1224ee;color:var(--fg);padding:0;cursor:pointer;display:grid;place-items:center;overflow:hidden;font-size:1.4rem;box-shadow:0 2px 10px #000a}
+.meb img{width:100%;height:100%;object-fit:cover;display:block}.meb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.mk{position:absolute;left:4px;bottom:4px;z-index:1;padding:1px 4px;border-radius:5px;background:#000c;font:normal 12px/16px sans-serif;pointer-events:none;left:2cqw;bottom:2cqw;padding:.8cqw 1.6cqw;border-radius:2cqw;font-size:max(8px,9cqw);line-height:1.15}
+#meu{margin:0 0 0 auto;width:min(390px,94vw);height:100dvh;max-height:100dvh;border-radius:14px 0 0 14px;border-right:0}
+#meu[open]{animation:meIn .22s ease-out}@keyframes meIn{from{transform:translateX(100%)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){#meu[open]{animation:none}}
+.mehd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.mehd b{font-size:1.6rem}
+.mepf{display:flex;gap:12px;align-items:center}
+.meav{flex:none;width:68px;height:68px;border-radius:50%;border:2px solid var(--gold);background:#151b30;display:grid;place-items:center;overflow:hidden;cursor:pointer;font-size:1.8rem;position:relative}
+.meav img{width:100%;height:100%;object-fit:cover}.meav:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+#meno{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #2a3350;background:#070a14;color:var(--fg);font:inherit}
+.menota{margin:12px 0;padding:10px 12px;border-radius:10px;background:#e8b9231a;border:1px solid #e8b92355;font-size:.9rem;color:#f3e3a6}
+#mesum{font-weight:600;margin:6px 0}
+#mech{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.mei{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #1f2742}
+.mei button.ab{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.mei img,.mei .ph0{width:38px;height:38px;border-radius:6px;object-fit:cover;background:#151b30;flex:none}
+.mei b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mei small{color:var(--mu)}
+.mei .rm{border:1px solid #2a3350;background:#151b30;color:var(--fg);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;flex:none}
+.meft{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+#meok{min-height:1.3em;margin-top:8px;color:var(--gold);font-weight:600}
+.meus{margin:12px 0}.meus small{display:block;color:var(--mu);margin-bottom:6px}.meus .chips{display:flex;flex-wrap:wrap;gap:6px}
 .like:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .sub i{width:28px;height:5px;border-radius:3px;background:var(--ps1)}
 .hero img{flex:0 1 46%;width:46%;aspect-ratio:1000/540;max-height:300px;object-fit:contain}
@@ -69,9 +91,9 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .cb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media(max-width:560px){.sh p{order:3;flex-basis:100%;margin:0 0 10px;padding-left:20px}.cc{order:2;margin-left:auto}}
 .g{all:unset;cursor:pointer;display:block;text-align:center}
-.cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30}
-.star{position:absolute;top:3px;left:5px;z-index:1;font:normal 700 17px/1 Barlow,sans-serif;background:linear-gradient(180deg,#fff3b0 0%,#f0c230 50%,#b9830a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 1.5px #000d);pointer-events:none}
-.br{position:absolute;top:4px;right:5px;z-index:1;width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;pointer-events:none}
+.cv{position:relative;display:block;border:1px solid #39425e;border-radius:6px;overflow:hidden;background:#151b30;container-type:inline-size}
+.star{position:absolute;top:3px;left:5px;z-index:1;font:normal 700 17px/1 Barlow,sans-serif;background:linear-gradient(180deg,#fff3b0 0%,#f0c230 50%,#b9830a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 1.5px #000d);pointer-events:none;font-size:max(8px,10cqw);top:1.5cqw;left:2.5cqw}
+.br{position:absolute;top:4px;right:5px;z-index:1;width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;pointer-events:none;width:max(11px,15cqw);height:max(8px,10.5cqw);top:2.5cqw;right:3cqw;border-radius:max(1px,.8cqw)}
 .cv img,.ph{width:100%;aspect-ratio:var(--ar,3/4);object-fit:fill!important;display:block}
 .ph{display:grid;place-items:center;padding:6px;text-align:center;background:#151b30 var(--hero) center/contain no-repeat}
 .ph span{font:italic 800 1.55rem/1 "Barlow Condensed","Arial Narrow",Impact,sans-serif;text-transform:uppercase;color:#ffd400;text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,2px 2px #fff,-2px -2px #fff,2px -2px #fff,-2px 2px #fff,0 5px 6px #0009}
@@ -84,8 +106,6 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .rrow{display:flex;gap:10px;padding:10px 12px 12px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch;align-items:flex-start}
 .rec .g{flex:0 0 84px;scroll-snap-align:start}
 .rec .g b{margin-top:5px;font-size:.78rem;line-height:1.1}
-.rec .star{font-size:12px;top:2px;left:3px}
-.rec .br{width:14px;height:10px;top:3px;right:3px}
 @media(min-width:900px){.rec .g{flex-basis:104px}}
 .pw{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--gold);border-radius:8px;color:var(--fg)}
 .pw b{color:var(--gold);user-select:all;overflow-wrap:anywhere}
@@ -104,7 +124,7 @@ footer small{display:block;color:var(--fg);font-size:1.1rem}
 dialog{width:min(640px,94vw);max-height:92vh;border:1px solid #2a3350;border-radius:14px;padding:0;background:#0d1224;color:var(--fg)}
 dialog::backdrop{background:#000a}
 .in{padding:18px}
-.vd{position:absolute;top:4px;right:29px;z-index:1;height:14px;padding:0 3px;border-radius:3px;background:#000a;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;font:normal 10px/14px sans-serif;pointer-events:none}
+.vd{position:absolute;top:4px;right:29px;z-index:1;height:14px;padding:0 3px;border-radius:3px;background:#000a;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;font:normal 10px/14px sans-serif;pointer-events:none;right:max(14px,20cqw);top:2.5cqw;height:max(8px,10.5cqw);padding:0 1cqw;font-size:max(6px,7cqw);line-height:max(8px,10.5cqw);border-radius:1cqw}
 .vbox{position:relative;float:left;margin:0 14px 8px 0;border-radius:6px;overflow:hidden;background:#151b30}
 .top .vbox img,.top .vbox .ph{float:none!important;margin:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-radius:0;display:block}
 .vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;opacity:0;transition:opacity .3s}
@@ -141,6 +161,7 @@ dialog::backdrop{background:#000a}
 </style>
 </head>
 <body>
+<button id="meb" class="meb" type="button" aria-label="Meu espaço" title="Meu espaço" hidden onclick="meAbrir()"><img id="meba" alt="" hidden><span id="mebi">👤</span></button>
 <div class="wrap">
   <div class="hero">
     <div>
@@ -161,6 +182,19 @@ dialog::backdrop{background:#000a}
   <footer><div class="l cond">Escolha seu clássico<small class="cond">e boa jogatina!</small></div><div class="r cond">Game over?<small class="cond">Jamais.</small></div></footer>
 </div>
 <dialog id="dlg"><div class="in"><button class="x" aria-label="Fechar" onclick="dlg.close()">×</button><div id="det"></div><div id="cm" style="margin-top:16px"></div></div></dialog>
+<dialog id="meu" aria-label="Meu espaço"><div class="in">
+  <div class="mehd"><b class="cond">Meu espaço</b><button class="x" aria-label="Fechar" onclick="$('meu').close()">×</button></div>
+  <div class="mepf">
+    <label class="meav" title="Trocar foto"><img id="mefo" alt="" hidden><span id="mefi">👤</span><input type="file" accept="image/*" id="mefin" hidden></label>
+    <input id="meno" maxlength="24" placeholder="Seu nome ou apelido" aria-label="Seu nome ou apelido">
+  </div>
+  <p class="menota">🔒 Seu nome, sua foto e suas marcações ficam salvos <b>somente neste navegador, neste aparelho</b>. Nada é enviado para nenhum servidor. Se você limpar os dados do navegador ou trocar de aparelho, tudo é perdido. Use <b>Exportar</b> para guardar uma cópia.</p>
+  <div id="mesum"></div>
+  <div id="mech"></div>
+  <div id="mel"></div>
+  <div class="meft"><button class="btn alt sm" onclick="meExportar()">Exportar</button><button class="btn alt sm" onclick="$('meimp').click()">Importar</button><button class="btn alt sm" onclick="meApagar()">Apagar tudo</button><input type="file" id="meimp" accept="application/json,.json" hidden></div>
+  <div id="meok" role="status"></div>
+</div></dialog>
 <dialog id="dlm"><div class="in">
   <h3 id="dlmt">Gostou do site?</h3>
   <p id="dlmx"></p>
@@ -233,6 +267,7 @@ function aplicarRedes(l){
 }
 function aplicarCfg(c){
   c=c||{};aplicarRedes(c.redes);
+  if(c.espaco&&typeof c.espaco==="object"){ESPACO.on=c.espaco.on!==false;if(typeof meAplicar==="function")meAplicar()}
   if(c.doacao&&typeof c.doacao==="object"){const d=c.doacao;
     DOA.on=d.on===true;
     if([0,1,2,3,5,10].includes(+d.freq))DOA.freq=+d.freq;
@@ -256,7 +291,7 @@ function aplicarCfg(c){
 }
 function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
-function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${j.video?'<i class="vd" title="Vídeo demo" aria-label="Vídeo demo">▶️</i>':""}${j.ptbr?'<svg class="br" viewBox="0 0 20 14" title="PT-BR" aria-label="Em português do Brasil"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
+function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${j.video?'<i class="vd" title="Vídeo demo" aria-label="Vídeo demo">▶️</i>':""}${j.ptbr?'<svg class="br" viewBox="0 0 20 14" title="PT-BR" aria-label="Em português do Brasil"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg>':""}${mk(j)}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
 function renderCats(){
   const e=$("cats");e.hidden=CATS.length<1;
@@ -358,7 +393,7 @@ async function abrirPix(){
   }catch(e){$("pixqr").textContent="Não foi possível gerar o QR Code. Use o botão para copiar o código."}
 }
 const DOA={on:false,freq:3,titulo:"Gostou do site?",texto:"Ele é mantido por uma pessoa só. Se puder ajudar com uns trocados, agradeço muito!"};
-let DL_URL="";
+let DL_URL="",DL_ID="";
 function doacaoDeve(){
   if(!DOA.on)return false;
   try{
@@ -371,14 +406,14 @@ function doacaoContar(){
 }
 function baixarClick(e,a){
   const mostrar=doacaoDeve();doacaoContar();
-  if(!mostrar)return true;
-  e.preventDefault();DL_URL=a.href;
+  if(!mostrar){meMarcaBaixado(atual&&atual.id);return true}
+  e.preventDefault();DL_URL=a.href;DL_ID=atual&&atual.id;
   $("dlmt").textContent=DOA.titulo;$("dlmx").textContent=DOA.texto;
   $("dlmok").textContent="";$("dlmgo").textContent="Agora não";
   $("dlm").showModal();return false;
 }
 function continuarDl(){
-  const u=DL_URL;DL_URL="";$("dlm").close();
+  const u=DL_URL;DL_URL="";$("dlm").close();meMarcaBaixado(DL_ID);
   if(u)window.open(u,"_blank","noopener,noreferrer");
 }
 async function copiarPixDl(){
@@ -422,11 +457,98 @@ function alternarVideo(btn,ligar){
     btn.textContent="▶️ Vídeo demo";
   }
 }
+const ESPACO={on:true};
+const ME_ST=[["quero","🎯","Quero jogar"],["jogando","🎮","Jogando"],["zerei","🏆","Zerei"]];
+let ME={nome:"",foto:"",j:{}},meAba="zerei";
+function meLer(){try{const v=JSON.parse(localStorage.getItem("meuEspaco")||"null");if(v&&typeof v==="object")ME=meLimpo(v)}catch(e){}}
+function meLimpo(v){
+  const j={};
+  if(v.j&&typeof v.j==="object")Object.entries(v.j).forEach(([id,o])=>{
+    if(!o||typeof o!=="object")return;const n={};
+    if(ME_ST.some(x=>x[0]===o.s))n.s=o.s;if(o.b)n.b=1;n.t=+o.t||0;
+    if(n.s||n.b)j[String(id).slice(0,120)]=n;
+  });
+  return{nome:String(v.nome||"").slice(0,24),foto:(typeof v.foto==="string"&&/^data:image\/(jpeg|png|webp);base64,/.test(v.foto)&&v.foto.length<200000)?v.foto:"",j};
+}
+function meSalvar(){try{localStorage.setItem("meuEspaco",JSON.stringify(ME));return true}catch(e){meMsg("Não consegui salvar neste navegador.");return false}}
+function meMsg(t){const e=$("meok");e.textContent=t;clearTimeout(meMsg.t);meMsg.t=setTimeout(()=>e.textContent="",4000)}
+function meGrava(id,o){if(!o.s&&!o.b)delete ME.j[id];else ME.j[id]=o;meSalvar()}
+function meSetStatus(id,s){const o={...(ME.j[id]||{})};if(o.s===s)delete o.s;else o.s=s;o.t=Date.now();meGrava(id,o)}
+function meToggleBaixado(id){const o={...(ME.j[id]||{})};if(o.b)delete o.b;else o.b=1;o.t=Date.now();meGrava(id,o)}
+function meMarcaBaixado(id){if(!ESPACO.on||!id)return;const o={...(ME.j[id]||{})};if(o.b)return;o.b=1;o.t=Date.now();meGrava(id,o);render();if(atual&&atual.id===id)meDetalhe(atual)}
+function mk(j){
+  if(!ESPACO.on)return"";const o=ME.j[j.id];if(!o)return"";
+  const ic=(o.s?ME_ST.find(x=>x[0]===o.s)[1]:"")+(o.b?"⬇️":"");
+  return ic?`<i class="mk" aria-hidden="true">${ic}</i>`:"";
+}
+function meDetalhe(j){
+  const velho=$("det").querySelector(".meus");if(velho)velho.remove();
+  if(!ESPACO.on)return;
+  const acts=$("det").querySelector(".acts");if(!acts)return;
+  const o=ME.j[j.id]||{},d=document.createElement("div");d.className="meus";
+  d.innerHTML='<small>Meu progresso (salvo só neste navegador)</small><div class="chips"></div>';
+  const c=d.querySelector(".chips");
+  ME_ST.forEach(([k,ic,t])=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=ic+" "+t;b.setAttribute("aria-pressed",o.s===k);b.onclick=()=>{meSetStatus(j.id,k);meDetalhe(j);render()};c.appendChild(b)});
+  const b=document.createElement("button");b.className="chip";b.type="button";b.textContent="⬇️ Baixado";b.setAttribute("aria-pressed",!!o.b);b.onclick=()=>{meToggleBaixado(j.id);meDetalhe(j);render()};c.appendChild(b);
+  acts.before(d);
+}
+function meAplicar(){
+  $("meb").hidden=!ESPACO.on;
+  const f=$("meba"),i=$("mebi");
+  if(ME.foto){f.src=ME.foto;f.hidden=false;i.hidden=true}else{f.hidden=true;i.hidden=false;i.textContent=ME.nome?ME.nome.trim().charAt(0).toUpperCase():"👤"}
+}
+function meAbrir(){meRender();$("meu").showModal()}
+function meRender(){
+  const fo=$("mefo"),fi=$("mefi");
+  if(ME.foto){fo.src=ME.foto;fo.hidden=false;fi.hidden=true}else{fo.hidden=true;fi.hidden=false}
+  if($("meno")!==document.activeElement)$("meno").value=ME.nome;
+  const ids=new Set(jogos.map(g=>g.id)),c={quero:0,jogando:0,zerei:0,baixados:0};
+  Object.entries(ME.j).forEach(([id,o])=>{if(!ids.has(id))return;if(o.s)c[o.s]++;if(o.b)c.baixados++});
+  $("mesum").textContent=c.zerei?`Você zerou ${c.zerei} jogo${c.zerei>1?"s":""} 🏆`:"Marque seus jogos para acompanhar seu progresso.";
+  const abas=[...ME_ST.map(([k,ic,t])=>[k,ic+" "+t,c[k]]),["baixados","⬇️ Baixados",c.baixados]];
+  $("mech").innerHTML=abas.map(([k,t,n])=>`<button class="chip" data-aba="${k}" aria-pressed="${k===meAba}">${t} (${n})</button>`).join("");
+  const l=Object.entries(ME.j).filter(([id,o])=>ids.has(id)&&(meAba==="baixados"?o.b:o.s===meAba)).sort((a,b)=>b[1].t-a[1].t);
+  $("mel").innerHTML=l.length?l.map(([id])=>{const g=jogos.find(x=>x.id===id);
+    return `<div class="mei"><button class="ab" data-abrir="${esc(id)}">${g.capa?`<img src="${esc(g.capa)}" alt="" loading="lazy">`:'<span class="ph0"></span>'}<span style="min-width:0"><b>${esc(g.titulo)}</b><small>${esc((SEC[g.console]||[""])[0])}</small></span></button><button class="rm" data-rm="${esc(id)}" aria-label="Remover ${esc(g.titulo)} desta lista">Remover</button></div>`}).join(""):'<p style="color:var(--mu)">Nenhum jogo nesta lista ainda.</p>';
+}
+function meExportar(){
+  const b=new Blob([JSON.stringify({v:1,...ME})],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="meu-espaco.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);meMsg("Arquivo exportado.");
+}
+function meApagar(){if(!confirm("Apagar nome, foto e todas as marcações deste navegador? Isso não pode ser desfeito."))return;ME={nome:"",foto:"",j:{}};meSalvar();meRender();meAplicar();render();meMsg("Dados apagados.")}
+function meFoto(f){
+  if(!f)return;const u=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{
+    const s=Math.min(im.naturalWidth,im.naturalHeight),c=document.createElement("canvas");c.width=c.height=128;
+    c.getContext("2d").drawImage(im,(im.naturalWidth-s)/2,(im.naturalHeight-s)/2,s,s,0,0,128,128);
+    URL.revokeObjectURL(u);ME.foto=c.toDataURL("image/jpeg",.85);meSalvar();meRender();meAplicar();
+  };
+  im.onerror=()=>{URL.revokeObjectURL(u);meMsg("Imagem inválida.")};im.src=u;
+}
+meLer();
+$("mefin").onchange=e=>{meFoto(e.target.files[0]);e.target.value=""};
+$("meno").oninput=e=>{ME.nome=e.target.value.slice(0,24);meSalvar();meAplicar()};
+$("meimp").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{const v=JSON.parse(await f.text());if(!v||typeof v!=="object")throw 0;
+    if(!confirm("Substituir seus dados atuais pelos do arquivo?"))return;
+    ME=meLimpo(v);meSalvar();meRender();meAplicar();render();meMsg("Dados importados.")}
+  catch(err){meMsg("Arquivo inválido.")}
+};
+$("mech").onclick=e=>{const b=e.target.closest("[data-aba]");if(!b)return;meAba=b.dataset.aba;meRender()};
+$("mel").onclick=e=>{
+  const r=e.target.closest("[data-rm]"),a=e.target.closest("[data-abrir]");
+  if(r){const id=r.dataset.rm,o={...(ME.j[id]||{})};if(meAba==="baixados")delete o.b;else delete o.s;meGrava(id,o);meRender();render()}
+  else if(a){const g=jogos.find(x=>x.id===a.dataset.abrir);if(g){$("meu").close();abrir(g)}}
+};
+$("meu").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
+meAplicar();
 function abrir(j){
   if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
   const w=({"1/1":150,"5/7":130,"7/5":170})[PROP[j.console]]||130;
   $("det").innerHTML=`<div class="top">${j.video?`<div class="vbox" style="width:${w}px;aspect-ratio:${PROP[j.console]||"3/4"}">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}">`:`<div class="ph"><span>SEM CAPA</span></div>`}<iframe title="Vídeo demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><button class="vt" type="button" onclick="alternarVideo(this)"></button></div>`:`${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer" onclick="return baixarClick(event,this)">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
+  meDetalhe(j);
   const im=$("det").querySelector(".top img");
   const vb=$("det").querySelector(".vbox");if(vb)alternarVideo(vb.querySelector(".vt"),true);
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
