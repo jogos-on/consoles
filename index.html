@@ -42,6 +42,9 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .rede{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--bd,#2a3358);background:#ffffff0d;color:var(--fg);text-decoration:none;font:600 .95rem Barlow,system-ui,sans-serif}
 .rede:hover,.rede:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
 .meb{position:fixed;top:12px;right:12px;z-index:20;width:46px;height:46px;border-radius:50%;border:2px solid var(--gold);background:#0d1224ee;color:var(--fg);padding:0;cursor:pointer;display:grid;place-items:center;overflow:hidden;font-size:1.4rem;box-shadow:0 2px 10px #000a}
+.meb,.meav{-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.meb{transition:transform .12s,border-color .12s}.meb:active{transform:scale(.92);border-color:#fff}
+.meav:active{opacity:.8}
 .meb img{width:100%;height:100%;object-fit:cover;display:block}.meb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .mk{position:absolute;left:4px;bottom:4px;z-index:1;padding:1px 4px;border-radius:5px;background:#000c;font:normal 12px/16px sans-serif;pointer-events:none;left:2cqw;bottom:2cqw;padding:.8cqw 1.6cqw;border-radius:2cqw;font-size:max(8px,9cqw);line-height:1.15}
 #meu{margin:0 0 0 auto;width:min(390px,94vw);height:100dvh;max-height:100dvh;border-radius:14px 0 0 14px;border-right:0}
@@ -445,15 +448,16 @@ dlg.addEventListener("close",()=>{document.querySelectorAll("#det iframe").forEa
 // vídeo demo: toca mudo e em loop no lugar da capa; botão alterna entre vídeo e capa
 function alternarVideo(btn,ligar){
   const box=btn.closest(".vbox"),f=box.querySelector("iframe");
-  const ligado=ligar!==undefined?ligar:!f.classList.contains("on")&&!f.dataset.carregando;
+  const ligado=ligar!==undefined?ligar:box.dataset.v!=="1";
   if(ligado){
     const id=atual&&atual.video;if(!id)return;
-    f.dataset.carregando="1";
-    f.onload=()=>{f.classList.add("on");delete f.dataset.carregando};
+    box.dataset.v="1";
+    f.onload=()=>{if(box.dataset.v==="1")f.classList.add("on")};
     f.src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=1&loop=1&playlist="+encodeURIComponent(id)+"&playsinline=1&rel=0&modestbranding=1";
     btn.textContent="🖼️ Ver capa";
   }else{
-    f.classList.remove("on");delete f.dataset.carregando;f.removeAttribute("src");
+    box.dataset.v="0";
+    f.onload=null;f.classList.remove("on");f.src="about:blank";
     btn.textContent="▶️ Vídeo demo";
   }
 }
