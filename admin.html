@@ -209,7 +209,7 @@ gemini-2.5-flash-lite</textarea></label>
 </details>
 
 <div class="box"><b class="bt lst">Jogos (<span id="n">0</span>)</b>
-  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"></select><select id="fcat" onchange="lista()"></select></div>
+  <div class="flt"><input id="busca" type="search" placeholder="Buscar jogo" oninput="lista()"><select id="fc" onchange="lista()"></select><select id="fcat" onchange="lista()"></select><select id="fcp" onchange="lista()"><option value="">Capa: todos</option><option value="sem">🖼️ Sem capa</option><option value="com">Com capa</option></select><select id="fvd" onchange="lista()"><option value="">Vídeo: todos</option><option value="sem">Sem vídeo</option><option value="com">▶️ Com vídeo</option></select></div>
   <button class="s" id="selBtn" onclick="modoSel()">☑️ Seleção em massa</button>
   <div id="selBar" hidden>
     <div id="selN">0 jogo(s) selecionado(s)</div>
@@ -578,8 +578,8 @@ async function aplicarLote(){
 }
 function lista(){
   atualizarStats();
-  const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value;
-  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fk||(fk==="__sem"?!catDe(j):catDe(j)===fk))&&(!q||norm(j.titulo).includes(q))});
+  const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value,fcp=$("fcp").value,fvd=$("fvd").value;
+  const idx=jogos.map((j,i)=>i).filter(i=>{const j=jogos[i];return(!fc||j.console===fc)&&(!fcp||(fcp==="sem"?!j.capa:!!j.capa))&&(!fvd||(fvd==="sem"?!j.video:!!j.video))&&(!fk||(fk==="__sem"?!catDe(j):catDe(j)===fk))&&(!q||norm(j.titulo).includes(q))});
   idx.sort((a,b)=>jogos[a].console.localeCompare(jogos[b].console)||jogos[a].titulo.localeCompare(jogos[b].titulo,"pt"));
   ultimoIdx=idx.map(i=>jogos[i].id);
   $("n").textContent=idx.length+(idx.length!==jogos.length?" de "+jogos.length:"");
@@ -989,9 +989,15 @@ async function salvarJogo(){
         j.capa=caminho;
       }catch(e){erroCapa=e.message}
     }
-    edit!==null?jogos[edit]=j:jogos.push(j);
-    $("busca").value="";$("fc").value="";$("fcat").value="";abertos.add(j.console);
-    limpar();lista();
+    const eraEdicao=edit!==null;
+    eraEdicao?jogos[edit]=j:jogos.push(j);
+    // jogo novo: zera os filtros para ele aparecer; edição: mantém busca/filtros para voltar ao mesmo ponto da lista
+    if(!eraEdicao){$("busca").value="";$("fc").value="";$("fcat").value="";$("fcp").value="";$("fvd").value=""}
+    abertos.add(j.console);
+    limpar();
+    if(eraEdicao)$("nj").open=false;
+    lista();
+    if(eraEdicao){const y=posLista;scrollTo(0,y);requestAnimationFrame(()=>scrollTo(0,y))}
     const ok=await publicar();
     if(ok&&erroCapa)aviso("Jogo publicado, mas a capa falhou: "+erroCapa+". Edite o jogo e tente enviar a capa de novo.");
   }catch(e){aviso("Falha ao salvar: "+e.message)}
