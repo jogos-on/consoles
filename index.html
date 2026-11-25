@@ -104,6 +104,14 @@ footer small{display:block;color:var(--fg);font-size:1.1rem}
 dialog{width:min(640px,94vw);max-height:92vh;border:1px solid #2a3350;border-radius:14px;padding:0;background:#0d1224;color:var(--fg)}
 dialog::backdrop{background:#000a}
 .in{padding:18px}
+.vd{position:absolute;top:4px;right:29px;z-index:1;height:14px;padding:0 3px;border-radius:3px;background:#000a;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;font:normal 10px/14px sans-serif;pointer-events:none}
+.vbox{position:relative;float:left;margin:0 14px 8px 0;border-radius:6px;overflow:hidden;background:#151b30}
+.top .vbox img,.top .vbox .ph{float:none!important;margin:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-radius:0;display:block}
+.vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;opacity:0;transition:opacity .3s}
+.vbox iframe.on{opacity:1}
+.vt{position:absolute;left:6px;bottom:6px;z-index:2;font:700 .8rem/1 Barlow,sans-serif;padding:6px 9px;border-radius:999px;border:1px solid #fff5;background:#000b;color:#fff;cursor:pointer}
+.vt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:400px){.vbox{width:46%!important}}
 .top{display:flow-root}
 .top img{float:left;width:130px;height:auto;margin:0 14px 8px 0;object-fit:fill!important;border-radius:6px}
 .top h3{margin:0 0 4px;font:700 1.6rem/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase}
@@ -248,7 +256,7 @@ function aplicarCfg(c){
 }
 function capa(j){return j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" loading="lazy" onerror="this.outerHTML='<div class=ph><span>SEM CAPA</span></div>'">`:`<div class="ph"><span>SEM CAPA</span></div>`}
 
-function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${j.ptbr?'<svg class="br" viewBox="0 0 20 14" title="PT-BR" aria-label="Em português do Brasil"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
+function card(j,c){return `<button class="g" style="--c:var(--${c})" data-id="${esc(j.id)}"><span class="cv">${j.popular?'<i class="star" title="Popular" aria-hidden="true">★</i>':""}${j.video?'<i class="vd" title="Vídeo demo" aria-label="Vídeo demo">▶️</i>':""}${j.ptbr?'<svg class="br" viewBox="0 0 20 14" title="PT-BR" aria-label="Em português do Brasil"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.2 7 10 12.4 1.8 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .9" stroke="#fff" stroke-width=".55" fill="none"/></svg>':""}${capa(j)}</span><b>${esc(j.titulo)}</b>${j.genero?`<em>${esc(j.genero)}</em>`:""}</button>`}
 
 function renderCats(){
   const e=$("cats");e.hidden=CATS.length<1;
@@ -398,13 +406,29 @@ async function compartilhar(){
   if(navigator.share){try{await navigator.share({title:atual.titulo,text:atual.titulo,url:u});return}catch(e){if(e.name==="AbortError")return}}
   copiarTxt(u,"Link copiado!");
 }
-dlg.addEventListener("close",()=>{atual=null;history.replaceState(null,"",location.pathname)});
+dlg.addEventListener("close",()=>{document.querySelectorAll("#det iframe").forEach(f=>f.removeAttribute("src"));atual=null;history.replaceState(null,"",location.pathname)});
+// vídeo demo: toca mudo e em loop no lugar da capa; botão alterna entre vídeo e capa
+function alternarVideo(btn,ligar){
+  const box=btn.closest(".vbox"),f=box.querySelector("iframe");
+  const ligado=ligar!==undefined?ligar:!f.classList.contains("on")&&!f.dataset.carregando;
+  if(ligado){
+    const id=atual&&atual.video;if(!id)return;
+    f.dataset.carregando="1";
+    f.onload=()=>{f.classList.add("on");delete f.dataset.carregando};
+    f.src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=1&loop=1&playlist="+encodeURIComponent(id)+"&playsinline=1&rel=0&modestbranding=1";
+    btn.textContent="🖼️ Ver capa";
+  }else{
+    f.classList.remove("on");delete f.dataset.carregando;f.removeAttribute("src");
+    btn.textContent="▶️ Vídeo demo";
+  }
+}
 function abrir(j){
   if(!j)return;atual=j;history.replaceState(null,"",urlJogo(j));
   const link=seguro(j.link);
   const w=({"1/1":150,"5/7":130,"7/5":170})[PROP[j.console]]||130;
-  $("det").innerHTML=`<div class="top">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer" onclick="return baixarClick(event,this)">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
+  $("det").innerHTML=`<div class="top">${j.video?`<div class="vbox" style="width:${w}px;aspect-ratio:${PROP[j.console]||"3/4"}">${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}">`:`<div class="ph"><span>SEM CAPA</span></div>`}<iframe title="Vídeo demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><button class="vt" type="button" onclick="alternarVideo(this)"></button></div>`:`${j.capa?`<img src="${esc(j.capa)}" alt="Capa de ${esc(j.titulo)}" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px">`:`<div class="ph" style="aspect-ratio:${PROP[j.console]||"3/4"};width:${w}px"><span>SEM CAPA</span></div>`}`}<h3>${esc(j.titulo)}</h3><div style="color:var(--mu)">${(SEC[j.console]||[""])[0]}${catDe(j)?" - "+esc(catNome(catDe(j))):""}${j.genero?" - "+esc(j.genero):""}${j.ano?" - "+esc(j.ano):""}</div>${j.descricao?`<p>${esc(j.descricao)}</p>`:""}${j.senha?`<p class="pw">Senha: <b>${esc(j.senha)}</b><button class="btn alt sm" onclick="copiarSenha()">Copiar</button></p>`:""}<div class="acts">${link?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer" onclick="return baixarClick(event,this)">Baixar</a>`:""}<button class="btn alt" onclick="compartilhar()">Compartilhar</button><button class="btn alt" onclick="abrirPix()">Doar uns trocados</button><span id="cpok" role="status"></span></div></div>`;
   const im=$("det").querySelector(".top img");
+  const vb=$("det").querySelector(".vbox");if(vb)alternarVideo(vb.querySelector(".vt"),true);
   if(im)im.onerror=()=>{const d=document.createElement("div");d.className="ph";d.style.cssText=im.style.cssText;d.innerHTML="<span>SEM CAPA</span>";im.replaceWith(d)};
   const s=document.createElement("script");
   s.src="https://giscus.app/client.js";s.async=true;s.crossOrigin="anonymous";
