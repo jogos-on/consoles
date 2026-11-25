@@ -199,6 +199,7 @@ gemini-2.5-flash-lite</textarea></label>
   <label>Link<input id="link" type="url" placeholder="https://"></label>
   <label>Senha para descompactar (opcional, ex.: dubsgamer.com)<input id="senha" autocomplete="off"></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
+  <label>Vídeo demo (opcional — link do YouTube)<input id="video" type="url" placeholder="https://youtu.be/..." autocomplete="off"></label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="popular" type="checkbox" style="width:auto"> Popular (aparece em destaque na página)</label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="ptbr" type="checkbox" style="width:auto"> PT-BR (jogo em português do Brasil: mostra uma bandeirinha na capa)</label>
   <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input id="oculto" type="checkbox" style="width:auto"> Ocultar no site (não aparece no catálogo)</label>
@@ -602,7 +603,7 @@ function lista(){
       const im=document.createElement("img");im.alt="";im.loading="lazy";
       if(j.capa){im.src=j.capa;im.onerror=()=>im.style.visibility="hidden"}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
-      const b=document.createElement("b");b.textContent=(j.oculto?"🙈 ":"")+(j.popular?"★ ":"")+(j.ptbr?"[PT-BR] ":"")+j.titulo;
+      const b=document.createElement("b");b.textContent=(j.oculto?"🙈 ":"")+(j.popular?"★ ":"")+(j.ptbr?"[PT-BR] ":"")+(j.video?"▶️ ":"")+j.titulo;
       const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":"",j.oculto?"oculto no site":""].filter(Boolean).join(" · ");
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
@@ -614,7 +615,7 @@ function lista(){
 }
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
-  ["titulo","genero","ano","link","descricao","senha","arq"].forEach(k=>$(k).value="");
+  ["titulo","genero","ano","link","descricao","senha","video","arq"].forEach(k=>$(k).value="");
   $("popular").checked=false;$("ptbr").checked=false;$("oculto").checked=false;$("categoria").value="";chipsSync("categoria");$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
@@ -648,7 +649,7 @@ function flagPrev(){
 $("ptbr").addEventListener("change",flagPrev);
 function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
-  ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");
+  ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");$("video").value=j.video?"https://youtu.be/"+j.video:"";
   $("categoria").value=catDe(j);chipsSync("console");chipsSync("categoria");$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("oculto").checked=!!j.oculto;$("arq").value="";
   $("voltar").style.display="inline-block";posLista=scrollY;$("nj").open=true;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
 }
@@ -947,14 +948,31 @@ async function salvarPagina(){
   }catch(e){aviso(e.message)}
 }
 
+// aceita youtube.com/watch?v=, youtu.be/, /shorts/, /embed/, /live/ ou o próprio ID de 11 caracteres
+function ytId(u){
+  u=String(u||"").trim();if(!u)return"";
+  if(/^[\w-]{11}$/.test(u))return u;
+  try{
+    const x=new URL(u),h=x.hostname.replace(/^(www|m|music)\./,"");
+    let id="";
+    if(h==="youtu.be")id=x.pathname.split("/")[1]||"";
+    else if(h==="youtube.com"||h==="youtube-nocookie.com"){
+      id=x.searchParams.get("v")||((x.pathname.match(/^\/(?:shorts|embed|live|v)\/([\w-]+)/)||[])[1])||"";
+    }
+    return /^[\w-]{11}$/.test(id)?id:"";
+  }catch(e){return""}
+}
 async function salvarJogo(){
   const titulo=$("titulo").value.trim();
   if(!titulo)return aviso("Informe o título.");
+  const vid=ytId($("video").value);
+  if($("video").value.trim()&&!vid)return aviso("Link do vídeo inválido. Use um link do YouTube (youtube.com, youtu.be ou Shorts).");
   const antigo=edit!==null?jogos[edit]:{};
   const cat=$("categoria").value,suf=cat?"-"+cat:"";
   const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,ptbr:$("ptbr").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
   if(!j.senha)delete j.senha;
   if(!j.ptbr)delete j.ptbr;
+  if(vid)j.video=vid;else delete j.video;
   if($("oculto").checked)j.oculto=true;else delete j.oculto;
   if(!j.categoria)delete j.categoria;
   const f=$("arq").files[0];
