@@ -55,9 +55,7 @@ h1 .b{background:linear-gradient(#ffd75a,#c98f0a);-webkit-background-clip:text;b
 .sh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 16px 0 0;border-bottom:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
 .sh h2{margin:0;padding:12px 44px 12px 20px;font-style:italic;font-size:1.9rem;line-height:1;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,#000),color-mix(in srgb,var(--c) 25%,#000));clip-path:polygon(0 0,calc(100% - 26px) 0,100% 100%,0 100%)}
 .sh p{margin:0;color:var(--c);font-weight:700;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-size:1.1rem;filter:brightness(1.4)}
-.sec{--n:2}
-@media(min-width:560px){.sec{--n:3}}
-@media(min-width:900px){.sec{--n:5}}
+.sec{--n:3}
 .row{gap:14px;padding:16px;align-items:flex-start}
 .row.grade{align-items:start}
 .row.grade{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
@@ -178,7 +176,7 @@ dialog::backdrop{background:#000a}
 const GISCUS={repo:"jogos-on/consoles",repoId:"R_kgDOV2o_fA",category:"Announcements",categoryId:"DIC_kwDOV2o_fM4DLp4_"};
 const CONS_PADRAO=[{id:"ps1",nome:"PS1",frase:"Clássicos que marcaram época!",prop:"1/1",cor:"#3b82f6"},{id:"ps2",nome:"PS2",frase:"Aventuras inesquecíveis!",prop:"5/7",cor:"#4f7cff"},{id:"snes",nome:"Super Nintendo",frase:"A era 16-bits!",prop:"7/5",cor:"#8b5cf6"}];
 const SEC={},PROP={};
-const ROLO=5,PAG=10,MAXC=6; // 5 no rolo lateral; 10 por página na grade; máx. de colunas
+const ROLO=5,MAXC=6,COLS0=3,LINHAS={1:6,2:5,3:3,4:3,5:3,6:3},pagDe=n=>n*LINHAS[n]; // grade = colunas x linhas (6x3,5x3,4x3,3x3,2x5,1x6); começa em 3x3
 const st={};
 let jogos=[],filtro="todos",catF="todas",atual=null,CATS=[];
 const catDe=j=>(j&&j.categoria&&j.categoria!=="jogos")?j.categoria:"";
@@ -194,7 +192,7 @@ function aplicarCons(lista){
     SEC[x.id]=[String(x.nome),String(x.frase||"")];
     PROP[x.id]=["1/1","5/7","7/5"].includes(x.prop)?x.prop:"1/1";
     if(/^#[0-9a-f]{6}$/i.test(x.cor||""))document.documentElement.style.setProperty("--"+x.id,x.cor);
-    if(!st[x.id]){st[x.id]={ex:false,p:0};try{const v=+localStorage.getItem("cols:"+x.id);if(v>=1&&v<=MAXC)st[x.id].cols=v}catch(e){}}
+    if(!st[x.id]){st[x.id]={ex:false,p:0,cols:COLS0};try{const v=+localStorage.getItem("cols:"+x.id);if(v>=1&&v<=MAXC)st[x.id].cols=v}catch(e){}}
   });
   if(filtro!=="todos"&&!SEC[filtro])filtro="todos";
   $("cchips").innerHTML=Object.keys(SEC).map(c=>`<button class="chip" data-f="${esc(c)}" aria-pressed="${filtro===c}">${esc(SEC[c][0])}</button>`).join("");
@@ -270,7 +268,7 @@ function render(){
       if(l.length>ROLO)nav=`<button data-a="mais" data-c="${c}">Mostrar mais (${l.length} jogos)</button>`;
     }else{
       modo="grade";
-      const pgs=Math.ceil(l.length/PAG);st[c].p=Math.min(Math.max(st[c].p,0),pgs-1);
+      const PAG=pagDe(st[c].cols||COLS0);const pgs=Math.ceil(l.length/PAG);st[c].p=Math.min(Math.max(st[c].p,0),pgs-1);
       itens=l.slice(st[c].p*PAG,st[c].p*PAG+PAG);
       if(pgs>1)nav=`<button data-a="prev" data-c="${c}"${st[c].p===0?" disabled":""}>‹ Voltar</button><span>${st[c].p+1} / ${pgs}</span><button data-a="next" data-c="${c}"${st[c].p>=pgs-1?" disabled":""}>Avançar ›</button>`;
       if(!forc)nav+=`<button data-a="menos" data-c="${c}">Mostrar menos</button>`;
@@ -292,8 +290,13 @@ function ajustarCols(sec){
 function mudarCols(c,d){
   const sec=document.getElementById("s-"+c);if(!sec)return;
   const n=Math.min(MAXC,Math.max(1,nCols(sec)+d));
-  st[c].cols=n;sec.style.setProperty("--n",n);
+  const velho=st[c].cols||COLS0;
+  const grade=sec.querySelector(".row").classList.contains("grade");
+  const primeiro=st[c].p*pagDe(velho);
+  st[c].cols=n;
   try{localStorage.setItem("cols:"+c,n)}catch(e){}
+  if(grade){st[c].p=Math.floor(primeiro/pagDe(n));render();return}
+  sec.style.setProperty("--n",n);
   ajustarCols(sec);
 }
 
