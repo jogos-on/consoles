@@ -107,6 +107,8 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 #ytd .yh button,#ytd .crow button{margin:0;padding:6px 12px}
 #ytd textarea{width:100%;box-sizing:border-box}
 #ytd .crow button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+#ytd .ychips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}#ytd .ychips button{margin:0;padding:5px 10px;font-size:.85rem;text-align:left}
+#ytd .ychips button.ok{border-color:var(--gold);color:var(--gold);opacity:.7}
 #ytd .ya{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}#ytd .ya button{margin:0}
 .cph{display:flex;justify-content:space-between;color:var(--mu);font-weight:600}
 #cpt{font:italic 800 1.9rem/1.05 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:12px 0 2px;color:#fff;overflow-wrap:anywhere}
@@ -624,10 +626,34 @@ function ytTipo(tp){
     const h=document.createElement("div");h.className="yh";
     const sp=document.createElement("span");sp.textContent=rot;
     const b=document.createElement("button");b.className="s";b.type="button";b.textContent="📋 Copiar";
-    const ta=document.createElement("textarea");ta.value=txt;ta.rows=rot==="Comentário fixado"?4:(rot==="Título"?2:3);ta.dataset.rot=rot;
+    const ta=document.createElement("textarea");ta.value=txt;ta.rows=rot==="Comentário fixado"?4:(rot==="Título"?2:(rot==="Tags"?6:3));ta.dataset.rot=rot;
     b.onclick=()=>ytCopiar(ta.value,b,"📋 Copiar");
-    if(rot==="Tags"){const cn=document.createElement("small");cn.style.cssText="color:var(--mu);font-weight:400";const at=()=>{cn.textContent=ta.value.length+"/500";cn.style.color=ta.value.length>500?"#ff6b6b":"var(--mu)"};ta.oninput=at;at();sp.append(" ",cn)}
-    h.append(sp,b);w.append(h,ta);box.appendChild(w);
+    let chips=null,nb=null;
+    if(rot==="Tags"){
+      const cn=document.createElement("small");cn.style.cssText="color:var(--mu);font-weight:400";
+      chips=document.createElement("div");chips.className="ychips";
+      const lerTags=()=>ta.value.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean);
+      let prox=0;
+      nb=document.createElement("button");nb.type="button";nb.style.cssText="width:100%;margin:8px 0 0";
+      const rot=()=>{const l=lerTags();nb.textContent=prox>=l.length?"✅ Todas copiadas — recomeçar":"📋 Copiar tag "+(prox+1)+" de "+l.length+": "+l[prox]};
+      nb.onclick=async()=>{
+        const l=lerTags();if(!l.length)return;
+        if(prox>=l.length){prox=0;chips.querySelectorAll("button").forEach(c=>c.classList.remove("ok"));rot();return}
+        const t=l[prox];await ytCopiar(t,{set textContent(v){}},"");
+        const c=chips.children[prox];if(c)c.classList.add("ok");
+        prox++;rot();
+      };
+      const at=()=>{
+        prox=0;const l=lerTags();
+        const n=l.join(", ").length;cn.textContent=n+"/500";cn.style.color=n>500?"#ff6b6b":"var(--mu)";
+        chips.textContent="";
+        l.forEach((t,k)=>{const c=document.createElement("button");c.type="button";c.className="s";c.textContent=t;c.title="Copiar só esta tag";c.onclick=()=>{ytCopiar(t,{set textContent(v){}},"");c.classList.add("ok");prox=k+1;rot()};chips.appendChild(c)});rot();
+      };
+      ta.oninput=at;at();sp.append(" ",cn);
+    }
+    h.append(sp,b);w.append(h,ta);
+    if(chips){const d=document.createElement("div");d.style.cssText="color:var(--mu);font-size:.8rem;margin-top:6px";d.textContent="Se o app do YouTube juntar tudo numa tag só, copie uma por vez: cole, confirme a tag e toque de novo.";w.append(d,nb,chips)}
+    box.appendChild(w);
   });
 }
 async function ytCopiar(txt,btn,orig){
