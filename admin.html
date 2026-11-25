@@ -101,6 +101,13 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 #capaPh{display:none;width:120px;aspect-ratio:3/4;place-items:center;text-align:center;border-radius:8px;background:#151b30;border:1px solid #39425e;font:italic 800 1.3rem/1 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;color:#ffd400}
 #capaWrap .br{position:absolute;top:4px;right:5px;z-index:1;width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px #0008,0 1px 3px #000c;pointer-events:none;display:none}
 #capaTxt{margin-top:6px}
+#ytd{width:min(560px,94vw);max-height:92vh;overflow:auto}
+#ytd .yb{margin-top:12px}
+#ytd .yh{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--mu);font-weight:600;margin-bottom:4px}
+#ytd .yh button,#ytd .crow button{margin:0;padding:6px 12px}
+#ytd textarea{width:100%;box-sizing:border-box}
+#ytd .crow button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+#ytd .ya{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}#ytd .ya button{margin:0}
 .cph{display:flex;justify-content:space-between;color:var(--mu);font-weight:600}
 #cpt{font:italic 800 1.9rem/1.05 "Barlow Condensed",Barlow,sans-serif;text-transform:uppercase;margin:12px 0 2px;color:#fff;overflow-wrap:anywhere}
 #cpm{color:var(--gold);font-weight:600}
@@ -225,6 +232,13 @@ gemini-2.5-flash-lite</textarea></label>
 </div>
 <dialog id="iad"><b id="iat">Consultando a IA...</b><ul id="ial"></ul><div id="iao"></div><button class="s" onclick="iad.close()">Fechar</button></dialog>
 <div id="selFab" hidden><span id="selFabN">✔ 0</span><button onclick="aplicarLote()">💾 Aplicar</button><button class="s" onclick="fecharSel()">✖ Fechar</button></div>
+<dialog id="ytd">
+  <div class="cph"><b>📋 TEXTOS PARA O YOUTUBE</b></div>
+  <div id="ytn" style="color:var(--mu);margin:4px 0 8px"></div>
+  <div class="crow"><span style="color:var(--mu)">Tipo:</span><button class="s" id="yiso" type="button" aria-pressed="true" onclick="ytTipo('ISO')">ISO</button><button class="s" id="yrom" type="button" aria-pressed="false" onclick="ytTipo('ROM')">ROM</button></div>
+  <div id="ytb"></div>
+  <div class="ya"><button onclick="ytCopiarTudo(this)">📋 Copiar tudo</button><button class="s" onclick="$('ytd').close()">Fechar</button></div>
+</dialog>
 <dialog id="cpd">
   <div class="cph"><b>🖼️ COMPLETAR CAPAS</b><span id="cpn"></span></div>
   <div id="cpt"></div><div id="cpm"></div>
@@ -576,6 +590,59 @@ async function aplicarLote(){
   });
   if(await publicar()&&selMode)modoSel();else lista();
 }
+// ===== Textos prontos para postar no YouTube =====
+const SITE_BASE="https://jogos-on.github.io/consoles";
+const ehDisco=c=>/ps1|ps2|ps3|psx|playstation|psp|dreamcast|gamecube|wii|saturn|sega ?cd|3do|xbox/.test(norm((c.id||"")+" "+(c.nome||"")));
+let ytJogo=null,ytTp="ISO";
+function ytTextos(j,tipo){
+  const c=CONS.find(x=>x.id===j.console)||{id:j.console,nome:j.console};
+  const nome=j.titulo+(j.ptbr&&!/pt[\s-]?br/i.test(j.titulo)?" (PT BR)":"");
+  const link=SITE_BASE+"/?jogo="+encodeURIComponent(j.id);
+  const partes=j.titulo.split(/\s*[:–—]\s*|\s+-\s+/);
+  const palavras=j.titulo.split(/\s+/);
+  const serie=partes.length>1?partes[0]:(palavras.length>1?palavras[0]:"");
+  const tp=tipo[0]+tipo.slice(1).toLowerCase();
+  const vistos=new Set(),tags=[serie,nome,j.ptbr?"Pt br":"",tp,c.nome].filter(t=>{const k=norm(t||"");if(!k||vistos.has(k))return false;vistos.add(k);return true});
+  return[
+    ["Título",`${nome} ${tipo} ${c.nome}`],
+    ["Descrição",`${nome} ${link}`],
+    ["Comentário fixado",`${nome} ${link}\n\nPara baixar este e outros jogos, acesse:\n${SITE_BASE}`],
+    ["Tags",tags.join(", ")]
+  ];
+}
+function ytAbrir(j){
+  ytJogo=j;const c=CONS.find(x=>x.id===j.console)||{};
+  $("ytn").textContent=j.titulo;
+  ytTipo(ehDisco(c)?"ISO":"ROM");
+  $("ytd").showModal();
+}
+function ytTipo(tp){
+  ytTp=tp;$("yiso").setAttribute("aria-pressed",tp==="ISO");$("yrom").setAttribute("aria-pressed",tp==="ROM");
+  const box=$("ytb");box.textContent="";
+  ytTextos(ytJogo,tp).forEach(([rot,txt],n)=>{
+    const w=document.createElement("div");w.className="yb";
+    const h=document.createElement("div");h.className="yh";
+    const sp=document.createElement("span");sp.textContent=rot;
+    const b=document.createElement("button");b.className="s";b.type="button";b.textContent="📋 Copiar";
+    const ta=document.createElement("textarea");ta.value=txt;ta.rows=rot==="Comentário fixado"?4:(rot==="Título"?2:3);ta.dataset.rot=rot;
+    b.onclick=()=>ytCopiar(ta.value,b,"📋 Copiar");
+    if(rot==="Tags"){const cn=document.createElement("small");cn.style.cssText="color:var(--mu);font-weight:400";const at=()=>{cn.textContent=ta.value.length+"/500";cn.style.color=ta.value.length>500?"#ff6b6b":"var(--mu)"};ta.oninput=at;at();sp.append(" ",cn)}
+    h.append(sp,b);w.append(h,ta);box.appendChild(w);
+  });
+}
+async function ytCopiar(txt,btn,orig){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){
+    const t=document.createElement("textarea");t.value=txt;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();
+    try{ok=document.execCommand("copy")}catch(_){}t.remove();
+  }
+  btn.textContent=ok?"✅ Copiado":"❌ Não copiou";
+  setTimeout(()=>btn.textContent=orig,1500);
+}
+function ytCopiarTudo(btn){
+  const txt=[...$("ytb").querySelectorAll("textarea")].map(t=>t.dataset.rot.toUpperCase()+"\n"+t.value).join("\n\n");
+  ytCopiar(txt,btn,"📋 Copiar tudo");
+}
 function lista(){
   atualizarStats();
   const q=norm($("busca").value),fc=$("fc").value,fk=$("fcat").value,fcp=$("fcp").value,fvd=$("fvd").value;
@@ -608,7 +675,8 @@ function lista(){
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
       const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
-      selMode?d.append(im,t):d.append(im,t,e,r);g.appendChild(d);
+      const y=document.createElement("button");y.className="s";y.textContent="📋";y.title="Textos para o YouTube";y.setAttribute("aria-label","Textos para o YouTube: "+j.titulo);y.onclick=()=>ytAbrir(j);
+      selMode?d.append(im,t):d.append(im,t,y,e,r);g.appendChild(d);
     });
     box.appendChild(g);
   });
