@@ -95,7 +95,8 @@
     "senha": "dubsgamer.com",
     "descricao": "A última edição da aclamada série de futebol lançada para o PlayStation 2, trazendo os times e jogadores da temporada 2013-2014. Oferece uma experiência de jogo refinada com foco na física da bola e movimentos dos jogadores.",
     "capa": "capas/ps2/pes-efotball-treme-terra-2027.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "crash-team-racing-dublado-legendado-ps1",
@@ -312,7 +313,8 @@
     "link": "https://www.mediafire.com/file/9mdsgay82craj7x/H4LFL1FDUB.rar/file",
     "descricao": "O cientista Gordon Freeman tenta sobreviver a um desastre em um laboratório e a uma invasão alienígena.",
     "capa": "capas/ps2/half-life-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "killzone-pt-br-ps2",
@@ -336,7 +338,8 @@
     "link": "https://www.mediafire.com/file/ja4xvlw2v13yfbt/Naruto_Shippuden_5_%2528DUBeLEG%2529.iso/file",
     "descricao": "Lutas de ninjas com os personagens de Naruto Shippuden, com golpes especiais e transformações. Versão dublada.",
     "capa": "capas/ps2/naruto-shippudden-u-n-5-dub.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "naruto-shippudden-u-n-5-mod-boruto-2-1-ps2",
@@ -349,7 +352,8 @@
     "senha": "PS2-Nostalgia",
     "descricao": "Ultimate Ninja 5 modificado com personagens e conteúdo de Boruto (versão 2.1).",
     "capa": "capas/ps2/naruto-shippudden-u-n-5-mod-boruto-2-1.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "naruto-shippudden-u-n-6-ps2",
@@ -361,7 +365,8 @@
     "link": "https://www.mediafire.com/file/zvad0s7xm4lel7j/N4RUT0+ULT1M4T3+N1NJ4+S31S+BR.rar/file",
     "descricao": "Jogo de luta da série Ultimate Ninja com personagens de Naruto, em versão em português.",
     "capa": "capas/ps2/naruto-shippudden-u-n-6.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "nfs-carbon-pt-br-ps2",
@@ -373,7 +378,8 @@
     "link": "https://www.mediafire.com/file/pir3q1j9k6ghhet/SLUS_214.93.NEED+FOR+SPEED+CARBON+PT-BR.iso/file",
     "descricao": "Corridas de rua noturnas e disputas de cânions, com tuning e controle de equipe. Em português.",
     "capa": "capas/ps2/nfs-carbon-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "nfs-most-wantead-pt-br-ps2",
@@ -409,7 +415,8 @@
     "link": "https://www.mediafire.com/file/hbw1znqep9csnm7/SAINT_SEIYA_THE_SANCTUARY_DUB_PTBR.rar/file",
     "descricao": "Os Cavaleiros do Zodíaco no arco do Santuário, com batalhas contra os Cavaleiros de Ouro. Versão dublada.",
     "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-a-saga-do-santuario-dub.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "os-cavaleiros-dos-zodiaco-hades-dub-ps2",
@@ -421,7 +428,8 @@
     "link": "https://drive.google.com/file/d/1W6o4KWHXiB4tkFakaf1hhq2vpp8SxU3w/view",
     "descricao": "Os Cavaleiros do Zodíaco no arco de Hades, com os guerreiros de Atena nos últimos combates. Versão dublada.",
     "capa": "capas/ps2/os-cavaleiros-dos-zodiaco-hades-dub.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "pes-2025-ps2",
@@ -433,7 +441,8 @@
     "link": "https://www.mediafire.com/file/c3r2lfph70h8p1q/SLES_556.76.PES_2025_MIX_ITAQUI-RS_4.rar/file",
     "descricao": "Patch de PES com elencos e times atualizados para 2025, versão Itaqui-RS Mix.",
     "capa": "capas/ps2/pes-2025.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "resident-evil-4-dub-ps2",
@@ -445,7 +454,8 @@
     "link": "https://www.mediafire.com/file/zcz6se9mx10gapr/R34DUBR1P.rar/file",
     "descricao": "Leon S. Kennedy resgata a filha do presidente em uma vila dominada por criaturas. Versão dublada.",
     "capa": "capas/ps2/resident-evil-4-dub.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "rumble-racing-ps2",
@@ -456,7 +466,8 @@
     "ano": "2001",
     "link": "https://www.mediafire.com/file/5f6x6syuckbu85w/Rumble_Racing_DVD_ISO_Via_Opl_PS2.rar/file",
     "descricao": "Corridas arcade cheias de saltos e atalhos, com manobras no ar para ganhar turbo.",
-    "capa": "capas/ps2/rumble-racing.jpg"
+    "capa": "capas/ps2/rumble-racing.jpg",
+    "oculto": true
   },
   {
     "id": "spider-man-2-pt-br-ps2",
@@ -468,7 +479,8 @@
     "link": "https://www.mediafire.com/file/64759uqyeuxb4eb/SPIDER_MAN_2_PTBR.rar/file",
     "descricao": "Peter Parker balança pela cidade de Nova York e enfrenta o Doutor Octopus. Em português.",
     "capa": "capas/ps2/spider-man-2-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "spider-man-friend-or-foe-pt-br-ps2",
@@ -480,7 +492,8 @@
     "link": "https://www.mediafire.com/file/7fcmcvlh8e14gmb/Spider-Man_-_Friend_or_Foe_%2528PT-BR%2529.iso/file",
     "descricao": "Homem-Aranha junta forças com antigos vilões para deter uma ameaça global. Em português.",
     "capa": "capas/ps2/spider-man-friend-or-foe-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "urban-reign-pt-br-ps2",
@@ -492,7 +505,8 @@
     "link": "https://www.mediafire.com/file/ilpf54qh4klcztn/Urban_Reign_%2528Br%2529.zip/file",
     "descricao": "Pancadaria em equipe em arenas fechadas, com combos e golpes em grupo. Em português.",
     "capa": "capas/ps2/urban-reign-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "mortal-kombat-deception-pt-br-ps2",
@@ -504,7 +518,8 @@
     "link": "https://www.mediafire.com/file/52jvl8i0hlgqu9u/(EUR)+Mortal+Kombat+-+Deception+(PT-BR)+v2.0.iso/file",
     "descricao": "Mortal Kombat com modos extras como Konquest e Chess Kombat. Em português.",
     "capa": "capas/ps2/mortal-kombat-deception-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "super-bomberman-collection-ps2",
@@ -515,7 +530,8 @@
     "ano": "",
     "link": "https://www.mediafire.com/file/2w4wouvke2f9rmv/Super+Bomberman+Collection.zip/file",
     "descricao": "Coletânea com jogos da série Bomberman para jogar sozinho ou com amigos.",
-    "capa": "capas/ps2/super-bomberman-collection.jpg"
+    "capa": "capas/ps2/super-bomberman-collection.jpg",
+    "oculto": true
   },
   {
     "id": "gta-sa-mod-free-fire-ps2",
@@ -527,7 +543,8 @@
     "link": "https://www.mediafire.com/file/wzohg3o3cv1pkbi/GTA_FREE_FIRE_Mod_%2528Pr%25C3%25A9_Alpha%2529_DVD_ISO_PS2.rar/file?dkey=9skqb9g92ui&r=585",
     "descricao": "Versão modificada de GTA San Andreas com tema Free Fire (pré-alpha).",
     "capa": "capas/ps2/gta-sa-mod-free-fire.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "hot-wheels-turbo-racing-ps1",
@@ -586,7 +603,8 @@
     "link": "https://www.mediafire.com/file/i886uqdk1au3jh3/Mortal+Kombat+Armageddon+PT-BR.iso/file",
     "descricao": "O capítulo final da fase 3D de Mortal Kombat, com elenco gigante e modo Konquest. Em português.",
     "capa": "capas/ps2/mortal-kombat-armageddon-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "pes-2014-ps2",
@@ -598,7 +616,8 @@
     "link": "https://www.mediafire.com/file/rtk0tkfnzvye4lp/PES_2014.rar/file",
     "descricao": "Pro Evolution Soccer 2014 com partidas e modos clássicos de futebol.",
     "capa": "capas/ps2/pes-2014.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "carros-dub-ps2",
@@ -623,7 +642,8 @@
     "senha": "PS2-Nostalgia",
     "descricao": "Obscure: The Aftermath: estudantes enfrentam criaturas dentro de uma universidade. Em português.",
     "capa": "capas/ps2/obscure-2-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "x-men-origins-ps2",
@@ -634,7 +654,8 @@
     "ano": "2009",
     "link": "https://www.mediafire.com/file/wy620xgz2ei4jhh/X_Men_Origins_DVD_ISO_PS2.iso/file?dkey=rvnxre1vpzk&r=29",
     "descricao": "Wolverine revela sua origem e enfrenta inimigos com garras e fúria.",
-    "capa": "capas/ps2/x-men-origins.jpg"
+    "capa": "capas/ps2/x-men-origins.jpg",
+    "oculto": true
   },
   {
     "id": "ghost-rider-pt-br-ps2",
@@ -682,7 +703,8 @@
     "link": "https://www.mediafire.com/file/g3ib0h1pblyckaq/Up_Ps2_Com_Legenda_PT-BR.rar/file?dkey=sl1z41t7cnv&r=415",
     "descricao": "A aventura do velho Carl e do jovem Russell com balões e lugares exóticos. Em português.",
     "capa": "capas/ps2/up-altas-aventuras-pt-br.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "gta-sa-project-kaizo-v2-0-ps2",
@@ -694,7 +716,8 @@
     "link": "https://www.mediafire.com/file/syc8udjmtz9igkv/GTA_SAN_Project_Kaizo_2.0_%2528Formato_zso%2529_-_Azel_Games.7z/file",
     "descricao": "Versão modificada de GTA San Andreas (Project Kaizo 2.0, formato zso).",
     "capa": "capas/ps2/gta-sa-project-kaizo-v2-0.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "super-mario-collection-ps2",
@@ -705,7 +728,8 @@
     "ano": "",
     "link": "https://www.mediafire.com/file/du46rqtdx12w0k6/Super_Mario_Collection_DVD_ISO_Via_Opl_Ps2.rar/file?dkey=2gm2t2nzvji&r=1883",
     "descricao": "Coletânea de jogos clássicos do Mario, preparada para rodar via OPL.",
-    "capa": "capas/ps2/super-mario-collection.jpg"
+    "capa": "capas/ps2/super-mario-collection.jpg",
+    "oculto": true
   },
   {
     "id": "agent-hugo-hula-holiday-pt-br-ps2",
@@ -742,7 +766,8 @@
     "link": "https://www.mediafire.com/file/ba0qfsjhttg76s2/SLUS_210.59.Tekken_5_Unlock.rar/file",
     "senha": "PS2-Nostalgia",
     "descricao": "Tekken 5 modificado com personagens e itens desbloqueados desde o início.",
-    "capa": "capas/ps2/tekken-5-mod-unlocked.jpg"
+    "capa": "capas/ps2/tekken-5-mod-unlocked.jpg",
+    "oculto": true
   },
   {
     "id": "justice-league-heroes-dub-ps2",
@@ -755,7 +780,8 @@
     "senha": "PS2-Nostalgia",
     "descricao": "Superman, Batman, Mulher-Maravilha e outros heróis da Liga em missões cooperativas. Versão dublada.",
     "capa": "capas/ps2/justice-league-heroes-dub.jpg",
-    "ptbr": true
+    "ptbr": true,
+    "oculto": true
   },
   {
     "id": "ghost-rider-dub-i-a-ps2",
