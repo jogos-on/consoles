@@ -12,6 +12,12 @@
   "categorias": [],
   "redes": [
     {
+      "tipo": "YouTube",
+      "ic": "▶️",
+      "nome": "YouTube",
+      "url": "https://youtube.com/@johntutorsva8053"
+    },
+    {
       "tipo": "Telegram",
       "ic": "✈️",
       "nome": "Telegram",
