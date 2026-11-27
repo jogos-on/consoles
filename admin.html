@@ -266,6 +266,8 @@ gemini-2.5-flash-lite</textarea></label>
   <div class="cph"><b>📋 TEXTOS PARA O YOUTUBE</b></div>
   <div id="ytn" style="color:var(--mu);margin:4px 0 8px"></div>
   <div class="crow"><span style="color:var(--mu)">Tipo:</span><button class="s" id="yiso" type="button" aria-pressed="true" onclick="ytTipo('ISO')">ISO</button><button class="s" id="yrom" type="button" aria-pressed="false" onclick="ytTipo('ROM')">ROM</button></div>
+  <button type="button" id="ytt" style="width:100%;margin:12px 0 0" onclick="ytTelegram(this)">✈️ Copiar para o Telegram</button>
+  <div style="color:var(--mu);font-size:.8rem;margin-top:4px">Copia o post pronto: título em negrito e sublinhado, descrição e link do jogo no catálogo.</div>
   <div id="ytb"></div>
   <div class="ya"><button onclick="ytCopiarTudo(this)">📋 Copiar tudo</button><button class="s" onclick="$('ytd').close()">Fechar</button></div>
 </dialog>
@@ -857,6 +859,30 @@ async function ytCopiar(txt,btn,orig){
   }
   btn.textContent=ok?"✅ Copiado":"❌ Não copiou";
   setTimeout(()=>btn.textContent=orig,1500);
+}
+function tgPost(j){
+  const nome=j.titulo+(j.ptbr&&!/pt[\s-]?br/i.test(j.titulo)?" (PT BR)":"");
+  const link=SITE_BASE+"/?jogo="+encodeURIComponent(j.id);
+  const desc=String(j.descricao||"").trim();
+  const e=x=>x.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const txt=[nome,desc,link].filter(Boolean).join("\n\n");
+  const html="<b><u>"+e(nome)+"</u></b>"+(desc?"<br><br>"+e(desc).replace(/\n/g,"<br>"):"")+"<br><br>"+e(link);
+  return{txt,html};
+}
+async function ytTelegram(btn){
+  if(!ytJogo)return;
+  const {txt,html}=tgPost(ytJogo);let ok=false;
+  try{
+    await navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([txt],{type:"text/plain"})})]);ok=true;
+  }catch(err){
+    const d=document.createElement("div");d.contentEditable="true";d.innerHTML=html;d.style.cssText="position:fixed;left:-9999px;top:0";
+    $("ytd").appendChild(d);const r=document.createRange();r.selectNodeContents(d);const g=getSelection();g.removeAllRanges();g.addRange(r);
+    try{ok=document.execCommand("copy")}catch(_){}
+    g.removeAllRanges();d.remove();
+    if(!ok)ok=await navigator.clipboard.writeText(txt).then(()=>true,()=>false);
+  }
+  btn.textContent=ok?"✅ Copiado":"❌ Não copiou";
+  setTimeout(()=>btn.textContent="✈️ Copiar para o Telegram",1500);
 }
 function ytCopiarTudo(btn){
   const txt=[...$("ytb").querySelectorAll("textarea")].map(t=>t.dataset.rot.toUpperCase()+"\n"+t.value).join("\n\n");
