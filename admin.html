@@ -116,6 +116,11 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 #cpi{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:12px auto 0}
 #cpi[hidden]{display:none}
 #msg{position:sticky;bottom:8px;padding:10px 14px;border-radius:12px;background:#1a2342;border:1px solid var(--gold);color:var(--fg);display:none;box-shadow:0 8px 24px #000a;z-index:5}
+#encP{width:100%;height:14px;margin-top:12px;accent-color:var(--gold)}
+#encT{color:var(--mu);font-size:.9rem;margin-top:6px;overflow-wrap:anywhere}
+#encF{font-size:.85rem;color:var(--er);padding-left:18px;margin:6px 0 0}
+#enc_st{color:var(--mu);font-size:.88rem;margin-top:10px}
+#en hr{border:0;border-top:1px solid var(--bd);margin:14px 0 2px}
 </style>
 </head>
 <body>
@@ -133,7 +138,24 @@ body.sel{padding-bottom:96px}body.sel #msg{bottom:80px}
 gemini-flash-lite-latest
 gemini-2.5-flash
 gemini-2.5-flash-lite</textarea></label>
-  <button onclick="salvarCfg()">Salvar neste navegador</button>
+  <button onclick="salvarConexao()">Salvar neste navegador</button>
+</details>
+
+<details id="en"><summary>🔗 Encurtador de links (EncurtaNet)</summary>
+  <p style="color:var(--mu);margin:6px 0">Ao salvar um jogo, o link é encurtado e só o link curto vai para o jogos.json. O token e os links originais ficam <b>somente neste navegador</b> (nunca vão para o repositório).</p>
+  <label>Token da API do EncurtaNet<input id="enc_tk" type="password" autocomplete="off" placeholder="Cole o token aqui"></label>
+  <label>URL do Worker da Cloudflare (opcional: só se o navegador bloquear a API por CORS; o token passa a ficar no Worker)<input id="enc_wk" type="url" autocapitalize="none" autocomplete="off" placeholder="https://encurta.seuusuario.workers.dev"></label>
+  <label>Chave do Worker (opcional, se você definiu ADMIN_KEY no Worker)<input id="enc_wkey" type="password" autocomplete="off"></label>
+  <button onclick="salvarEnc()">Salvar neste navegador</button><button class="s" onclick="testarEnc()">Testar conexão</button>
+  <div id="enc_st"></div>
+  <hr>
+  <button id="enc_go" onclick="encurtarTodos()">🔗 Encurtar todos os jogos</button><button class="s" id="enc_cancel" hidden onclick="encCancel=true;this.textContent='Cancelando...'">Cancelar</button>
+  <progress id="encP" max="1" value="0" hidden></progress>
+  <div id="encT"></div><ul id="encF"></ul>
+  <hr>
+  <p style="color:var(--mu);margin:10px 0 0;font-size:.9rem">Backup dos links originais (o arquivo contém os links diretos: guarde em local privado e <b>não</b> envie ao repositório).</p>
+  <button class="s" onclick="baixarBackup()">⬇️ Baixar backup dos originais</button><button class="s" onclick="$('enc_rf').click()">⬆️ Restaurar backup</button>
+  <input id="enc_rf" type="file" accept="application/json,.json" hidden>
 </details>
 
 <details id="pg"><summary>⚙️ Configurações da página</summary>
@@ -211,7 +233,7 @@ gemini-2.5-flash-lite</textarea></label>
   <button class="s" onclick="preencherIA()">Preencher com IA</button>
   <label>Gênero (ex.: Ação / Plataforma)<input id="genero"></label>
   <label>Ano (opcional)<input id="ano" inputmode="numeric"></label>
-  <label>Link<input id="link" type="url" placeholder="https://"></label>
+  <label>Link<input id="link" type="url" placeholder="https://"></label><div id="lkInfo" style="font-size:.85rem;margin-top:4px;color:var(--mu);overflow-wrap:anywhere"></div>
   <label>Senha para descompactar (opcional, ex.: dubsgamer.com)<input id="senha" autocomplete="off"></label>
   <label>Descrição (opcional)<textarea id="descricao" rows="2"></textarea></label>
   <label>Vídeo demo (opcional — link do YouTube)<input id="video" type="url" placeholder="https://youtu.be/..." autocomplete="off"></label>
@@ -268,11 +290,171 @@ gemini-2.5-flash-lite</textarea></label>
 <script>
 const $=id=>document.getElementById(id);
 let jogos=[],edit=null,C=JSON.parse(localStorage.getItem("cfg")||"{}");
+// ===== Encurtador (EncurtaNet): token e links originais ficam só no localStorage deste navegador =====
+let ENC={},LK={};
+try{ENC=JSON.parse(localStorage.getItem("enc1")||"{}")||{}}catch(e){ENC={}}
+try{LK=JSON.parse(localStorage.getItem("links1")||"{}")||{}}catch(e){
+  try{localStorage.setItem("links1_corrompido",localStorage.getItem("links1")||"")}catch(_){}
+  LK={};
+}
+$("enc_tk").value=ENC.token||"";$("enc_wk").value=ENC.worker||"";$("enc_wkey").value=ENC.wkey||"";
+class EncErro extends Error{constructor(m,fatal){super(m);this.fatal=!!fatal}}
+const encPronto=()=>!!(ENC.worker||ENC.token);
+const ehCurtoUrl=u=>/^https?:\/\/(?:[a-z0-9-]+\.)*encurta\.net(?:[\/?#]|$)/i.test(String(u||"").trim());
+const ehCurto=j=>{const m=LK[j.id];return !!((m&&m.c&&m.c===j.link)||ehCurtoUrl(j.link))};
+const linkOriginal=j=>{const m=LK[j.id];return m&&m.c&&m.c===j.link?m.o:(j.link||"")};
+function lkSalvar(){localStorage.setItem("links1",JSON.stringify(LK))}
+function lkInfoMostrar(j){
+  const e=$("lkInfo");if(!e)return;
+  const m=LK[j.id];
+  if(m&&m.c&&m.c===j.link){e.textContent="🔗 Mostrando o link original (guardado só neste navegador). No site vai o curto: "+m.c;e.style.color="var(--ok)"}
+  else if(j.link&&ehCurtoUrl(j.link)){e.textContent="⚠️ Este é um link curto e o original não está guardado neste navegador. Se tiver o backup, restaure-o em Encurtador de links.";e.style.color="var(--gold)"}
+  else if(j.link&&encPronto()){e.textContent="Link direto: será encurtado ao salvar.";e.style.color="var(--mu)"}
+  else{e.textContent="";e.style.color="var(--mu)"}
+}
+function encStats(){
+  const e=$("enc_st");if(!e)return;
+  const com=jogos.filter(j=>j.link),cu=com.filter(ehCurto).length;
+  e.textContent=jogos.length?`Links encurtados: ${cu} de ${com.length} · diretos: ${com.length-cu} · originais guardados neste navegador: ${Object.keys(LK).length}`:"";
+}
+function salvarEnc(){
+  const tk=$("enc_tk").value.trim(),wk=$("enc_wk").value.trim(),key=$("enc_wkey").value.trim();
+  if(wk){try{const u=new URL(wk);if(u.protocol!=="https:")throw 0}catch(e){aviso("A URL do Worker é inválida. Use o endereço completo, começando com https://");return false}}
+  ENC={token:tk,worker:wk,wkey:key};
+  try{localStorage.setItem("enc1",JSON.stringify(ENC))}catch(e){aviso("Falha ao salvar neste navegador: "+e.message);return false}
+  encStats();lista();
+  aviso("Salvo só neste navegador."+(wk?" Com o Worker, o token fica guardado nele.":""));
+  return true;
+}
+// Formato (API do EncurtaNet): GET https://encurta.net/api?api=TOKEN&url=LINK
+// Resposta JSON: {"status":"success","shortenedUrl":"https://encurta.net/xxxx"} ou {"status":"error","message":"..."}
+async function encurtar(url){
+  let u;const h={};
+  if(ENC.worker){u=new URL(ENC.worker);u.searchParams.set("url",url);if(ENC.wkey)h["x-admin-key"]=ENC.wkey}
+  else{
+    if(!ENC.token)throw new EncErro("Informe o token do EncurtaNet em Encurtador de links.",true);
+    u=new URL("https://encurta.net/api");u.searchParams.set("api",ENC.token);u.searchParams.set("url",url);
+  }
+  let r,t;
+  try{r=await fetch(u,{headers:h,cache:"no-store"});t=await r.text()}
+  catch(e){throw new EncErro("O navegador não conseguiu falar com a API (provável bloqueio de CORS, ou sem internet). Se a internet está ok, use o Worker da Cloudflare e coloque a URL dele em Encurtador de links.",true)}
+  let d=null;try{d=JSON.parse(t)}catch(e){}
+  let s=d&&(d.shortenedUrl||d.shortened_url||d.shorturl||d.short_url||"");
+  if(!s&&/^https?:\/\/\S+$/.test(t.trim()))s=t.trim();
+  if(d&&String(d.status||"").toLowerCase()==="error")s="";
+  s=String(s||"").trim();
+  if(!/^https?:\/\//i.test(s)){
+    let msg=(d&&d.message)||"";
+    if(!msg)msg=/^\s*</.test(t)?"resposta inesperada (HTTP "+r.status+")":t.slice(0,120);
+    throw new EncErro("EncurtaNet: "+(msg||"HTTP "+r.status),r.status===401||r.status===403||/token|api key|invalid api|unauthor/i.test(msg));
+  }
+  return s;
+}
+async function testarEnc(){
+  if(!salvarEnc())return;
+  if(!encPronto())return aviso("Informe o token do EncurtaNet ou a URL do Worker.");
+  aviso("Testando...");
+  try{const c=await encurtar("https://example.com/?teste="+Date.now());aviso("✔ Funcionou! Link de teste: "+c)}
+  catch(e){aviso("Falha no teste: "+e.message)}
+}
+// Decide o link que vai para o jogos.json. Nunca encurta duas vezes o mesmo original do mesmo jogo.
+async function linkParaSalvar(id,L,atual,titulo,cons,cru){
+  L=String(L||"").trim();
+  if(!L)return "";
+  if(!/^https?:\/\//i.test(L))return L;
+  const m=LK[id];
+  if(m&&m.c&&m.c===L)return L;
+  if(ehCurtoUrl(L))return L;
+  if(m&&m.c&&m.o===L)return m.c;
+  if(!encPronto()){
+    if(cru||confirm("O encurtador ainda não está configurado. Se salvar agora, o link direto ficará visível no repositório público. Salvar mesmo assim?"))return L;
+    throw new Error("Cancelado. Configure o token em Encurtador de links.");
+  }
+  const c=await encurtar(L);
+  LK[id]={o:L,c,t:titulo||"",k:cons||"",d:Date.now()};
+  try{lkSalvar()}catch(e){delete LK[id];throw new EncErro("Não consegui guardar o link original neste navegador (armazenamento cheio ou bloqueado).",true)}
+  return c;
+}
+let encRodando=false,encCancel=false;
+async function encurtarTodos(){
+  if(encRodando)return;
+  if(!encPronto())return aviso("Informe o token do EncurtaNet (ou a URL do Worker) e toque em Salvar antes.");
+  if(!C.token||!C.user||!C.repo)return aviso("Preencha a conexão com o GitHub: o catálogo é publicado no fim.");
+  const alvo=[],reus=[];let ja=0,semOrig=0,semLink=0;
+  jogos.forEach(j=>{
+    const L=String(j.link||"").trim(),m=LK[j.id];
+    if(!L||!/^https?:\/\//i.test(L)){semLink++;return}
+    if(m&&m.c&&m.c===L){ja++;return}
+    if(m&&m.c&&m.o===L){reus.push(j);return}
+    if(ehCurtoUrl(L)){semOrig++;return}
+    alvo.push(j);
+  });
+  if(!alvo.length&&!reus.length)return aviso("Nada a fazer: "+ja+" já encurtado(s)"+(semOrig?", "+semOrig+" já curto(s) sem original guardado":"")+(semLink?", "+semLink+" sem link":"")+".");
+  const tot=alvo.length;
+  if(!confirm(`Encurtar ${tot} link(s) agora?`+(reus.length?`\n${reus.length} já têm curto guardado e serão só reaproveitados.`:"")+(ja?`\n${ja} já estão encurtados (pulados).`:"")+(semOrig?`\n${semOrig} já são links curtos sem original guardado (pulados).`:"")+`\n\nNo fim o catálogo é publicado no GitHub.`))return;
+  encRodando=true;encCancel=false;
+  const P=$("encP"),T=$("encT"),F=$("encF");
+  $("enc_go").disabled=true;const cb=$("enc_cancel");cb.hidden=false;cb.textContent="Cancelar";
+  P.hidden=false;P.max=Math.max(tot,1);P.value=0;F.replaceChildren();
+  reus.forEach(j=>{j.link=LK[j.id].c});
+  let ok=0,fatal="";const falhas=[];
+  for(let i=0;i<tot;i++){
+    if(encCancel)break;
+    const j=alvo[i],L=String(j.link).trim();
+    T.textContent=`Encurtando ${i+1} de ${tot}: ${j.titulo} · ✔ ${ok} · ✘ ${falhas.length}`;
+    let c="",err=null;
+    for(let t=0;t<3&&!c;t++){
+      try{c=await encurtar(L)}
+      catch(e){err=e;if(e.fatal)break;await espera(1500*(t+1))}
+    }
+    if(c){
+      LK[j.id]={o:L,c,t:j.titulo,k:j.console,d:Date.now()};
+      try{lkSalvar()}catch(e){fatal="Não consegui guardar os originais neste navegador (armazenamento cheio ou bloqueado).";break}
+      j.link=c;ok++;
+    }else if(err&&err.fatal){fatal=err.message;break}
+    else{
+      falhas.push(j);const li=document.createElement("li");li.textContent=j.titulo+": "+(err?err.message:"erro desconhecido");F.appendChild(li);
+    }
+    P.value=i+1;
+    await espera(350);
+  }
+  encRodando=false;$("enc_go").disabled=false;cb.hidden=true;
+  const mudou=ok+reus.length;
+  lista();
+  let pub=true;
+  if(mudou)pub=await publicar();
+  T.textContent=`✔ ${ok} encurtado(s)`+(reus.length?`, ${reus.length} reaproveitado(s)`:"")+(falhas.length?`, ✘ ${falhas.length} falharam (toque em Encurtar todos para tentar só esses)`:"")+(encCancel?". Cancelado.":"")+(fatal?". Parou: "+fatal:"")+(mudou?(pub?" Catálogo publicado.":" NÃO consegui publicar: toque em Publicar no GitHub."):"");
+  if(fatal)aviso("Atenção: "+fatal);
+  if(ok&&confirm("Baixar agora o backup dos links originais? Recomendado: eles ficam só neste navegador."))baixarBackup();
+}
+function baixarBackup(){
+  if(!Object.keys(LK).length)return aviso("Ainda não há links originais guardados neste navegador.");
+  const o={tipo:"links-originais",versao:1,data:new Date().toISOString(),links:LK};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:"application/json"}));
+  a.download="links-originais-"+new Date().toISOString().slice(0,10)+".json";a.click();
+}
+$("enc_rf").onchange=async()=>{
+  const f=$("enc_rf").files[0];$("enc_rf").value="";if(!f)return;
+  try{
+    const d=JSON.parse(await f.text()),src=d&&d.links;
+    if(!src||typeof src!=="object")throw new Error("arquivo não parece um backup de links");
+    let novos=0,iguais=0,difer=0;
+    for(const id of Object.keys(src)){
+      const x=src[id];if(!x||typeof x.o!=="string"||typeof x.c!=="string")continue;
+      const a=LK[id];
+      if(!a){LK[id]={o:x.o,c:x.c,t:x.t||"",k:x.k||"",d:x.d||Date.now()};novos++}
+      else if(a.o===x.o&&a.c===x.c)iguais++;else difer++;
+    }
+    lkSalvar();encStats();lista();
+    aviso(`Backup restaurado: ${novos} novo(s), ${iguais} já existia(m)`+(difer?`, ${difer} diferente(s) mantido(s) como estão neste navegador`:"")+".");
+  }catch(e){aviso("Falha ao restaurar o backup: "+e.message)}
+};
+
 ["user","repo","branch","token","akey","gmodel"].forEach(k=>{if(C[k])$(k).value=C[k]});
 if(!C.token)$("cfg").open=true;
 
-function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não/i.test(t)?20000:5000)}
-function salvarCfg(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
+function aviso(t){const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.style.display="none",/GitHub|Falha|Erro|Preencha|Informe|não|Atenção|CORS|teste/i.test(t)?20000:5000)}
+function salvarConexao(){C={user:$("user").value.trim(),repo:$("repo").value.trim(),branch:$("branch").value.trim()||"main",token:$("token").value.trim(),akey:$("akey").value.trim(),gmodel:$("gmodel").value.trim()};localStorage.setItem("cfg",JSON.stringify(C));aviso("Conexão salva neste navegador.")}
 
 fetch("jogos.json?"+Date.now()).then(r=>r.ok?r.json():[]).then(d=>{jogos=d;iniciarConsoles();iniciarCats();lista();thAquecer()}).catch(()=>lista());
 
@@ -556,7 +738,7 @@ async function rodarFila(){
     }
   }finally{filaOn=false;cpStatus()}
 }
-window.addEventListener("beforeunload",e=>{if(filaOn||filaCapas.length){e.preventDefault();e.returnValue=""}});
+window.addEventListener("beforeunload",e=>{if(filaOn||filaCapas.length||encRodando){e.preventDefault();e.returnValue=""}});
 function cpSalvar(){
   const j=cpAtual(),f=$("cpf").files[0];
   if(!j)return;
@@ -573,6 +755,7 @@ function cpSalvar(){
 }
 const abertos=new Set();let posLista=0;
 function atualizarStats(){
+  encStats();
   const sem=jogos.filter(j=>!j.capa).length;
   $("sTot").textContent=jogos.length;$("sSem").textContent=sem;
   $("capasBtn").textContent=sem?`🖼️ Completar capas (${sem})`:"✅ Todos os jogos têm capa";
@@ -707,7 +890,7 @@ function lista(){
       if(j.capa){im.onerror=()=>im.style.visibility="hidden";const c=thGet(j.capa);if(c)im.src=c;else{im.onload=()=>thSalva(j.capa,im);im.src=j.capa}}else im.style.visibility="hidden";
       const t=document.createElement("div");t.className="tt";
       const b=document.createElement("b");b.textContent=(j.oculto?"🙈 ":"")+(j.popular?"★ ":"")+(j.ptbr?"[PT-BR] ":"")+(j.video?"▶️ ":"")+j.titulo;
-      const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":"",j.oculto?"oculto no site":""].filter(Boolean).join(" · ");
+      const m=document.createElement("small");m.textContent=[catDe(j)?catNome(catDe(j)):"",j.genero,j.capa?"":"sem capa",j.senha?"com senha":"",encPronto()&&j.link&&!ehCurto(j)?"link direto":"",j.oculto?"oculto no site":""].filter(Boolean).join(" · ");
       t.append(b,m);
       const e=document.createElement("button");e.className="s";e.textContent="✏️";e.title="Editar";e.setAttribute("aria-label","Editar "+j.titulo);e.onclick=()=>editar(i);
       const r=document.createElement("button");r.className="d";r.textContent="🗑️";r.title="Remover";r.setAttribute("aria-label","Remover "+j.titulo);r.onclick=()=>remover(i);
@@ -720,7 +903,7 @@ function lista(){
 function limpar(){
   edit=null;$("ft").textContent="Novo jogo";
   ["titulo","genero","ano","link","descricao","senha","video","arq"].forEach(k=>$(k).value="");
-  $("popular").checked=false;$("ptbr").checked=false;$("oculto").checked=false;$("categoria").value="";chipsSync("categoria");$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";
+  $("popular").checked=false;$("ptbr").checked=false;$("oculto").checked=false;$("categoria").value="";chipsSync("categoria");$("capaInfo").style.display="none";$("capaPh").style.display="none";$("capaFlag").style.display="none";$("capaPrev").style.display="none";$("trocar").style.display="none";$("voltar").style.display="none";$("lkInfo").textContent="";
 }
 async function existe(p){try{const r=await fetch(p+"?"+Date.now(),{method:"HEAD"});return r.ok}catch(e){return false}}
 async function acharCapa(j){
@@ -755,7 +938,7 @@ function editar(i){
   const j=jogos[i];edit=i;$("ft").textContent="Editando: "+j.titulo;
   ["titulo","console","genero","ano","link","descricao","senha"].forEach(k=>$(k).value=j[k]||"");$("video").value=j.video?"https://youtu.be/"+j.video:"";
   $("categoria").value=catDe(j);chipsSync("console");chipsSync("categoria");$("popular").checked=!!j.popular;$("ptbr").checked=!!j.ptbr;$("oculto").checked=!!j.oculto;$("arq").value="";
-  $("voltar").style.display="inline-block";posLista=scrollY;$("nj").open=true;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
+  $("link").value=linkOriginal(j);lkInfoMostrar(j);$("voltar").style.display="inline-block";posLista=scrollY;$("nj").open=true;$("ft").scrollIntoView({block:"start"});statusCapa(j,i);
 }
 function voltar(){limpar();$("nj").open=false;scrollTo(0,posLista)}
 function remover(i){if(confirm("Remover "+jogos[i].titulo+"?")){jogos.splice(i,1);limpar();lista()}}
@@ -995,6 +1178,19 @@ async function adicionarLote(pub){
     .map(x=>({x,id:slug(String(x.titulo).trim()+"-"+loteC+suf)}))
     .filter(o=>{if(jogos.some(j=>j.id===o.id)||vistos.has(o.id))return false;vistos.add(o.id);return true});
   if(!sel.length)return aviso("Nenhum jogo novo para adicionar.");
+  {
+    const cru=!encPronto()&&sel.some(o=>{const l=String(o.x.link||"").trim();return l&&/^https?:\/\//i.test(l)&&!ehCurtoUrl(l)});
+    if(cru&&!confirm("O encurtador não está configurado. Os links diretos ficarão visíveis no repositório público. Adicionar mesmo assim?"))return;
+    try{
+      let k=0;
+      for(const o of sel){
+        const l=String(o.x.link||"").trim();o.link=l;if(!l)continue;
+        k++;aviso(`Encurtando link ${k}...`);
+        o.link=await linkParaSalvar(o.id,l,"",String(o.x.titulo).trim(),loteC,true);
+        if(encPronto())await espera(300);
+      }
+    }catch(e){return aviso("Não adicionei os jogos: "+e.message+" A lista foi mantida.")}
+  }
   try{
     let k=0;
     for(const o of sel){
@@ -1006,7 +1202,7 @@ async function adicionarLote(pub){
   }catch(e){return aviso(e.message+" A lista foi mantida: tente de novo.")}
   sel.forEach(o=>{
     const x=o.x;
-    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:String(x.link||"").trim(),descricao:String(x.descricao||"").trim(),popular:!!x.popular};
+    const j={id:o.id,titulo:String(x.titulo).trim(),console:loteC,genero:String(x.genero||"").trim(),ano:String(x.ano||"").trim(),link:o.link||"",descricao:String(x.descricao||"").trim(),popular:!!x.popular};
     if(x.ptbr)j.ptbr=true;
     if(cat)j.categoria=cat;
     if(o.capa)j.capa=o.capa;
@@ -1095,12 +1291,14 @@ async function salvarJogo(){
   if($("video").value.trim()&&!vid)return aviso("Link do vídeo inválido. Use um link do YouTube (youtube.com, youtu.be ou Shorts).");
   const antigo=edit!==null?jogos[edit]:{};
   const cat=$("categoria").value,suf=cat?"-"+cat:"";
-  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,ptbr:$("ptbr").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:$("link").value.trim(),senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
+  const j={...antigo,id:antigo.id||slug(titulo+"-"+$("console").value+suf),titulo,console:$("console").value,categoria:cat,popular:$("popular").checked,ptbr:$("ptbr").checked,genero:$("genero").value.trim(),ano:$("ano").value.trim(),link:antigo.link||"",senha:$("senha").value.trim(),descricao:$("descricao").value.trim()};
   if(!j.senha)delete j.senha;
   if(!j.ptbr)delete j.ptbr;
   if(vid)j.video=vid;else delete j.video;
   if($("oculto").checked)j.oculto=true;else delete j.oculto;
   if(!j.categoria)delete j.categoria;
+  try{aviso("Verificando o link...");j.link=await linkParaSalvar(j.id,$("link").value,antigo.link||"",titulo,j.console)}
+  catch(e){return aviso("Não salvei o jogo: "+e.message)}
   const f=$("arq").files[0];
   let erroCapa="";
   try{
@@ -1129,7 +1327,7 @@ async function salvarJogo(){
   }catch(e){aviso("Falha ao salvar: "+e.message)}
 }
 async function publicar(){
-  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");aviso("Publicado. O site atualiza em cerca de 1 minuto.");return true}catch(e){aviso("Falha ao publicar: "+e.message);return false}
+  try{aviso("Publicando...");await enviar("jogos.json",enc(JSON.stringify(jogos,null,2)),"Atualiza catálogo");const d=encPronto()?jogos.filter(j=>j.link&&!ehCurto(j)).length:0;aviso("Publicado. O site atualiza em cerca de 1 minuto."+(d?" Atenção: "+d+" jogo(s) ainda com link direto (use Encurtar todos).":""));return true}catch(e){aviso("Falha ao publicar: "+e.message);return false}
 }
 function baixar(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(jogos,null,2)],{type:"application/json"}));a.download="jogos.json";a.click()}
 iniciarConsoles();iniciarCats();
