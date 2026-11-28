@@ -22,6 +22,12 @@
       "ic": "✈️",
       "nome": "Telegram",
       "url": "https://t.me/jogosconsoles"
+    },
+    {
+      "tipo": "Outro",
+      "ic": "🔗",
+      "nome": "Pedidos",
+      "url": "https://t.me/jogosconsoles/4"
     }
   ],
   "doacao": {
